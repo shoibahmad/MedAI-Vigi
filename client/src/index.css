@@ -1,0 +1,207 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * PhenoRx design system — LIGHT ONLY.
+ * There is deliberately no .dark block and no prefers-color-scheme block:
+ * reports and PDFs must render light, and dense lab tables read better on white.
+ * `color-scheme: light` stops the OS dark setting from washing out form controls.
+ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Brand */
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-soft: var(--brand-soft);
+  --color-teal: var(--teal);
+  --color-indigo: var(--indigo);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+
+  /* Risk tiers — mirror services/ml_service.py: Critical >=75, High >=50, Moderate >=25, Low */
+  --color-risk-low: var(--risk-low);
+  --color-risk-low-bg: var(--risk-low-bg);
+  --color-risk-low-border: var(--risk-low-border);
+  --color-risk-moderate: var(--risk-moderate);
+  --color-risk-moderate-bg: var(--risk-moderate-bg);
+  --color-risk-moderate-border: var(--risk-moderate-border);
+  --color-risk-high: var(--risk-high);
+  --color-risk-high-bg: var(--risk-high-bg);
+  --color-risk-high-border: var(--risk-high-border);
+  --color-risk-critical: var(--risk-critical);
+  --color-risk-critical-bg: var(--risk-critical-bg);
+  --color-risk-critical-border: var(--risk-critical-border);
+
+  /* Lab value states */
+  --color-lab-normal: var(--lab-normal);
+  --color-lab-normal-bg: var(--lab-normal-bg);
+  --color-lab-borderline: var(--lab-borderline);
+  --color-lab-borderline-bg: var(--lab-borderline-bg);
+  --color-lab-abnormal: var(--lab-abnormal);
+  --color-lab-abnormal-bg: var(--lab-abnormal-bg);
+  --color-lab-critical: var(--lab-critical);
+  --color-lab-critical-bg: var(--lab-critical-bg);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  color-scheme: light;
+  --radius: 0.625rem;
+
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #0ea5e9;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #e0f2fe;
+  --accent-foreground: #0c4a6e;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0ea5e9;
+
+  --chart-1: #0ea5e9;
+  --chart-2: #14b8a6;
+  --chart-3: #6366f1;
+  --chart-4: #f59e0b;
+  --chart-5: #ec4899;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #0ea5e9;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #0ea5e9;
+
+  --brand: #0ea5e9;
+  --brand-dark: #0284c7;
+  --brand-soft: #e0f2fe;
+  --teal: #14b8a6;
+  --indigo: #6366f1;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+
+  /*
+   * Risk tiers are a reserved STATUS palette (good/warning/serious/critical), not a
+   * categorical series and not a single-hue ramp. All four clear WCAG 4.5:1 as text
+   * on their own tint and on white. The moderate/high pair sits below the categorical
+   * CVD floor -- unavoidable for yellow-vs-orange -- so every risk display MUST carry
+   * an icon and the tier word, and the band legend must carry numeric ranges. Never
+   * communicate a tier by color alone.
+   */
+  --risk-low: #047857;
+  --risk-low-bg: #ecfdf5;
+  --risk-low-border: #a7f3d0;
+  --risk-moderate: #a16207;
+  --risk-moderate-bg: #fefce8;
+  --risk-moderate-border: #fde68a;
+  --risk-high: #c2410c;
+  --risk-high-bg: #fff7ed;
+  --risk-high-border: #fed7aa;
+  --risk-critical: #9f1239;
+  --risk-critical-bg: #fff1f2;
+  --risk-critical-border: #fecdd3;
+
+  --lab-normal: #047857;
+  --lab-normal-bg: #ecfdf5;
+  --lab-borderline: #b45309;
+  --lab-borderline-bg: #fffbeb;
+  --lab-abnormal: #c2410c;
+  --lab-abnormal-bg: #fff7ed;
+  --lab-critical: #b91c1c;
+  --lab-critical-bg: #fef2f2;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-balance;
+  }
+
+  /* Strip the spinner from clinical number inputs — accidental scroll-wheel
+     increments on a lab value are a real safety problem. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Print: the medical report must come out clean. */
+@media print {
+  .no-print { display: none !important; }
+  body { background: #ffffff; }
+  @page { margin: 14mm; }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "PhenoRx Dev Container",
+  "dockerFile": "../Dockerfile",
+  "forwardPorts": [5000],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.ruffEnabled": true,
+        "python.formatting.provider": "black"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-python.black-formatter"
+      ]
+    }
+  },
+  "postCreateCommand": "pip install -r requirements-dev.txt && npm ci",
+  "remoteUser": "root"
+}

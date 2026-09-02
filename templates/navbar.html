@@ -1,0 +1,343 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════════════════
+     🎨 PROFESSIONAL RESPONSIVE NAVBAR COMPONENT
+     ═══════════════════════════════════════════════════════════════════════════════════════ -->
+
+<nav class="professional-navbar">
+    <div class="navbar-container">
+        <!-- Logo Section -->
+        <a href="/" class="navbar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="brand-text">
+                <span class="brand-name">PhenoRx</span>
+                <span class="brand-tagline">ADR Intelligence</span>
+            </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <div class="navbar-menu" id="navbarMenu">
+            <a href="/" class="nav-item" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/drug-interactions" class="nav-item" data-page="drug-interactions">
+                <i class="fas fa-pills"></i>
+                <span>Drug Interactions</span>
+            </a>
+            <a href="/clinical-decision-support" class="nav-item" data-page="clinical-support">
+                <i class="fas fa-stethoscope"></i>
+                <span>Clinical Support</span>
+            </a>
+            <a href="/patient-counselling" class="nav-item" data-page="patient-counselling">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Counselling</span>
+            </a>
+            <a href="/chatbot" class="nav-item" data-page="chatbot">
+                <i class="fas fa-robot"></i>
+                <span>AI Chatbot</span>
+            </a>
+            <a href="/about" class="nav-item" data-page="about">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
+            </a>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation">
+            <span class="toggle-bar"></span>
+            <span class="toggle-bar"></span>
+            <span class="toggle-bar"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Navbar Styles -->
+<style>
+    .professional-navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(37, 99, 235, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 70px;
+    }
+
+    /* Brand/Logo */
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        transition: transform 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+        transform: translateY(-2px);
+    }
+
+    .brand-icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .brand-icon i {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .brand-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .brand-name {
+        font-size: 1.3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.5px;
+    }
+
+    .brand-tagline {
+        font-size: 0.7rem;
+        color: #a0aec0;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Desktop Navigation Menu */
+    .navbar-menu {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        color: #cbd5e0;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .nav-item i {
+        font-size: 1.1rem;
+        color: #3b82f6;
+    }
+
+    .nav-item:hover {
+        background: rgba(37, 99, 235, 0.1);
+        color: #3b82f6;
+        transform: translateY(-2px);
+    }
+
+    .nav-item.active {
+        background: rgba(37, 99, 235, 0.15);
+        color: #3b82f6;
+        box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
+    }
+
+    .nav-item.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+        border-radius: 2px;
+    }
+
+    /* Mobile Toggle Button */
+    .navbar-toggle {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        z-index: 1001;
+    }
+
+    .toggle-bar {
+        width: 28px;
+        height: 3px;
+        background: #3b82f6;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-toggle.active .toggle-bar:nth-child(1) {
+        transform: rotate(45deg) translate(8px, 8px);
+    }
+
+    .navbar-toggle.active .toggle-bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .navbar-toggle.active .toggle-bar:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        .navbar-toggle {
+            display: flex;
+        }
+
+        .navbar-menu {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(10px);
+            flex-direction: column;
+            gap: 0;
+            padding: 20px;
+            border-top: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-menu.active {
+            max-height: 400px;
+            opacity: 1;
+        }
+
+        .nav-item {
+            width: 100%;
+            padding: 15px 20px;
+            justify-content: flex-start;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item:hover {
+            transform: translateX(5px);
+        }
+
+        .brand-text {
+            display: none;
+        }
+
+        .navbar-container {
+            padding: 0 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .navbar-container {
+            height: 60px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .brand-icon i {
+            font-size: 1.3rem;
+        }
+
+        .nav-item {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<!-- Navbar JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const navbarToggle = document.getElementById('navbarToggle');
+        const navbarMenu = document.getElementById('navbarMenu');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // Toggle mobile menu
+        navbarToggle.addEventListener('click', function () {
+            navbarToggle.classList.toggle('active');
+            navbarMenu.classList.toggle('active');
+            document.body.style.overflow = navbarMenu.classList.contains('active') ? 'hidden' : '';
+        });
+
+        // Close menu when clicking nav item
+        navItems.forEach(item => {
+            item.addEventListener('click', function () {
+                navbarToggle.classList.remove('active');
+                navbarMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Set active nav item based on current page
+        const currentPath = window.location.pathname;
+        navItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (href === currentPath ||
+                (currentPath === '/' && href === '/') ||
+                (currentPath.includes(href) && href !== '/')) {
+                item.classList.add('active');
+            }
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (event) {
+            if (!navbarToggle.contains(event.target) && !navbarMenu.contains(event.target)) {
+                navbarToggle.classList.remove('active');
+                navbarMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Handle scroll effect
+        let lastScroll = 0;
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.professional-navbar');
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                navbar.style.transform = 'translateY(-100%)';
+            } else {
+                navbar.style.transform = 'translateY(0)';
+            }
+
+            lastScroll = currentScroll;
+        });
+    });
+</script>

@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Decision Support - MedAI-VIGI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/toast.css') }}" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1771389944029472"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+    {% include 'shared_header.html' %}
+</body>
+</html>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+        min-height: 100vh;
+        color: #e2e8f0;
+        line-height: 1.6;
+        position: relative;
+        padding: 20px;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+            linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: gridMove 20s linear infinite;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    @keyframes gridMove {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+    }
+
+    /* Navigation Menu */
+    .nav-menu {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .nav-toggle {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .nav-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+    }
+
+    .nav-items {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid rgba(37, 99, 235, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        min-width: 250px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .nav-items.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 20px;
+        color: #e2e8f0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(79, 209, 197, 0.1);
+    }
+
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+
+    .nav-item:hover {
+        background: rgba(37, 99, 235, 0.1);
+        color: #3b82f6;
+        padding-left: 25px;
+    }
+
+    .nav-item.active {
+        background: rgba(37, 99, 235, 0.15);
+        color: #3b82f6;
+        border-left: 3px solid #3b82f6;
+    }
+
+    .nav-item i {
+        font-size: 1.2rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .header {
+        background: rgba(10, 10, 10, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px 30px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(37, 99, 235, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .header h1 {
+        font-size: 2rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        padding: 12px 24px;
+        background: rgba(10, 10, 10, 0.6);
+        border: 2px solid rgba(37, 99, 235, 0.3);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .tab.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    .tab:hover:not(.active) {
+        background: rgba(37, 99, 235, 0.1);
+        border-color: #3b82f6;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .card {
+        background: rgba(10, 10, 10, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(37, 99, 235, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+        font-size: 1.3rem;
+        color: #3b82f6;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        color: #cbd5e0;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .form-group input, .form-group select {
+        padding: 12px 16px;
+        background: rgba(10, 10, 10, 0.6);
+        border: 2px solid rgba(37, 99, 235, 0.3);
+        border-radius: 12px;
+        color: #e2e8f0;
+        font-size: 1rem;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-calculate {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-calculate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(37, 99, 235, 0.6);
+    }
+
+    .result-card {
+        background: rgba(37, 99, 235, 0.1);
+        border: 2px solid rgba(37, 99, 235, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .result-title {
+        font-size: 1.2rem;
+        color: #3b82f6;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .result-item:last-child {
+        border-bottom: none;
+    }
+
+    .result-label {
+        color: #cbd5e0;
+    }
+
+    .result-value {
+        color: #3b82f6;
+        font-weight: 600;
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 12px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .alert-warning {
+        background: rgba(234, 179, 8, 0.1);
+        border: 1px solid rgba(234, 179, 8, 0.3);
+        color: #eab308;
+    }
+
+    .alert-danger {
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        color: #dc2626;
+    }
+
+    .alert-success {
+        background: rgba(72, 187, 120, 0.1);
+        border: 1px solid rgba(72, 187, 120, 0.3);
+        color: #48bb78;
+    }
+
+    .monitoring-schedule {
+        margin-top: 20px;
+    }
+
+    .schedule-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 4px solid #3b82f6;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+
+    .schedule-time {
+        color: #3b82f6;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .schedule-test {
+        color: #e2e8f0;
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 10px;
+        }
+
+        .header {
+            padding: 15px 20px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+        }
+
+        .tabs {
+            gap: 5px;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card {
+            padding: 20px;
+        }
+    }
+</style>
+
+
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-stethoscope"></i> Clinical Decision Support</h1>
+        <p>Automated dosing, monitoring protocols, and clinical pathways</p>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('dosing')">
+            <i class="fas fa-calculator"></i> Dosing Calculator
+        </div>
+        <div class="tab" onclick="switchTab('renal')">
+            <i class="fas fa-kidneys"></i> Renal Adjustment
+        </div>
+        <div class="tab" onclick="switchTab('hepatic')">
+            <i class="fas fa-liver"></i> Hepatic Adjustment
+        </div>
+        <div class="tab" onclick="switchTab('monitoring')">
+            <i class="fas fa-heartbeat"></i> TDM Schedule
+        </div>
+        <div class="tab" onclick="switchTab('pathway')">
+            <i class="fas fa-route"></i> Clinical Pathway
+        </div>
+    </div>
+
+    <!-- Dosing Calculator Tab -->
+    <div id="dosing-tab" class="tab-content active">
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-calculator"></i>
+                Automated Dosing Calculator
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Medication</label>
+                    <select id="dose-medication">
+                        <option value="">Select medication...</option>
+                        <option value="vancomycin">Vancomycin</option>
+                        <option value="gentamicin">Gentamicin</option>
+                        <option value="warfarin">Warfarin</option>
+                        <option value="digoxin">Digoxin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="dose-weight" placeholder="70">
+                </div>
+                <div class="form-group">
+                    <label>Age (years)</label>
+                    <input type="number" id="dose-age" placeholder="50">
+                </div>
+                <div class="form-group">
+                    <label>Creatinine (mg/dL)</label>
+                    <input type="number" step="0.1" id="dose-creatinine" placeholder="1.0">
+                </div>
+            </div>
+            <button class="btn-calculate" onclick="calculateDose()">
+                <i class="fas fa-calculator"></i> Calculate Dose
+            </button>
+            <div id="dose-result"></div>
+        </div>
+    </div>
+
+    <!-- Renal Adjustment Tab -->
+    <div id="renal-tab" class="tab-content">
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-kidneys"></i>
+                Renal Dose Adjustment
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Creatinine (mg/dL)</label>
+                    <input type="number" step="0.1" id="renal-creatinine" placeholder="1.0">
+                </div>
+                <div class="form-group">
+                    <label>Age (years)</label>
+                    <input type="number" id="renal-age" placeholder="50">
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="renal-weight" placeholder="70">
+                </div>
+                <div class="form-group">
+                    <label>Sex</label>
+                    <select id="renal-sex">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-calculate" onclick="calculateRenalAdjustment()">
+                <i class="fas fa-calculator"></i> Calculate eGFR & Recommendations
+            </button>
+            <div id="renal-result"></div>
+        </div>
+    </div>
+
+    <!-- Hepatic Adjustment Tab -->
+    <div id="hepatic-tab" class="tab-content">
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-liver"></i>
+                Hepatic Dose Adjustment
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Bilirubin (mg/dL)</label>
+                    <input type="number" step="0.1" id="hepatic-bilirubin" placeholder="1.0">
+                </div>
+                <div class="form-group">
+                    <label>Albumin (g/dL)</label>
+                    <input type="number" step="0.1" id="hepatic-albumin" placeholder="4.0">
+                </div>
+                <div class="form-group">
+                    <label>INR</label>
+                    <input type="number" step="0.1" id="hepatic-inr" placeholder="1.0">
+                </div>
+                <div class="form-group">
+                    <label>Ascites</label>
+                    <select id="hepatic-ascites">
+                        <option value="none">None</option>
+                        <option value="mild">Mild</option>
+                        <option value="moderate">Moderate to Severe</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Encephalopathy</label>
+                    <select id="hepatic-encephalopathy">
+                        <option value="none">None</option>
+                        <option value="grade1-2">Grade 1-2</option>
+                        <option value="grade3-4">Grade 3-4</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-calculate" onclick="calculateHepaticAdjustment()">
+                <i class="fas fa-calculator"></i> Calculate Child-Pugh Score
+            </button>
+            <div id="hepatic-result"></div>
+        </div>
+    </div>
+
+    <!-- TDM Schedule Tab -->
+    <div id="monitoring-tab" class="tab-content">
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-heartbeat"></i>
+                Therapeutic Drug Monitoring Schedule
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Medication</label>
+                    <select id="tdm-medication">
+                        <option value="">Select medication...</option>
+                        <option value="vancomycin">Vancomycin</option>
+                        <option value="gentamicin">Gentamicin</option>
+                        <option value="digoxin">Digoxin</option>
+                        <option value="lithium">Lithium</option>
+                        <option value="phenytoin">Phenytoin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="tdm-start-date">
+                </div>
+            </div>
+            <button class="btn-calculate" onclick="generateTDMSchedule()">
+                <i class="fas fa-calendar-alt"></i> Generate Schedule
+            </button>
+            <div id="tdm-result"></div>
+        </div>
+    </div>
+
+    <!-- Clinical Pathway Tab -->
+    <div id="pathway-tab" class="tab-content">
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-route"></i>
+                ADR Management Clinical Pathway
+            </div>
+            <div class="form-group">
+                <label>ADR Type</label>
+                <select id="pathway-adr-type">
+                    <option value="">Select ADR type...</option>
+                    <option value="hepatotoxicity">Hepatotoxicity</option>
+                    <option value="nephrotoxicity">Nephrotoxicity</option>
+                    <option value="anaphylaxis">Anaphylaxis</option>
+                    <option value="rash">Severe Cutaneous Reaction</option>
+                    <option value="neutropenia">Neutropenia</option>
+                </select>
+            </div>
+            <button class="btn-calculate" onclick="generatePathway()">
+                <i class="fas fa-map-marked-alt"></i> Generate Pathway
+            </button>
+            <div id="pathway-result"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Show selected tab
+        document.getElementById(tabName + '-tab').classList.add('active');
+        event.target.closest('.tab').classList.add('active');
+    }
+
+    function calculateDose() {
+        const medication = document.getElementById('dose-medication').value;
+        const weight = parseFloat(document.getElementById('dose-weight').value) || 70;
+        const age = parseFloat(document.getElementById('dose-age').value) || 50;
+        const creatinine = parseFloat(document.getElementById('dose-creatinine').value) || 1.0;
+
+        if (!medication) {
+            alert('Please select a medication');
+            return;
+        }
+
+        // Calculate CrCl (Cockcroft-Gault)
+        const crcl = ((140 - age) * weight) / (72 * creatinine);
+
+        let dose, frequency, notes;
+
+        switch(medication) {
+            case 'vancomycin':
+                dose = Math.round(15 * weight);
+                frequency = crcl > 50 ? 'Every 12 hours' : crcl > 20 ? 'Every 24 hours' : 'Every 48 hours';
+                notes = 'Target trough: 10-20 mg/L. Check levels before 4th dose.';
+                break;
+            case 'gentamicin':
+                dose = Math.round(5 * weight);
+                frequency = crcl > 60 ? 'Every 24 hours' : crcl > 40 ? 'Every 36 hours' : 'Every 48 hours';
+                notes = 'Target peak: 5-10 mg/L, trough: <2 mg/L';
+                break;
+            case 'warfarin':
+                dose = age > 65 ? 2.5 : 5;
+                frequency = 'Once daily';
+                notes = 'Target INR: 2-3. Check INR in 3-5 days.';
+                break;
+            case 'digoxin':
+                dose = crcl > 50 ? 0.25 : 0.125;
+                frequency = 'Once daily';
+                notes = 'Target level: 0.5-2.0 ng/mL. Check level in 1 week.';
+                break;
+        }
+
+        const resultHTML = `
+            <div class="result-card">
+                <div class="result-title">Recommended Dosing</div>
+                <div class="result-item">
+                    <span class="result-label">Medication:</span>
+                    <span class="result-value">${medication.charAt(0).toUpperCase() + medication.slice(1)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Dose:</span>
+                    <span class="result-value">${dose} mg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Frequency:</span>
+                    <span class="result-value">${frequency}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">CrCl:</span>
+                    <span class="result-value">${crcl.toFixed(1)} mL/min</span>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i>
+                    <span>${notes}</span>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('dose-result').innerHTML = resultHTML;
+    }
+
+    function calculateRenalAdjustment() {
+        const creatinine = parseFloat(document.getElementById('renal-creatinine').value) || 1.0;
+        const age = parseFloat(document.getElementById('renal-age').value) || 50;
+        const weight = parseFloat(document.getElementById('renal-weight').value) || 70;
+        const sex = document.getElementById('renal-sex').value;
+
+        // CKD-EPI equation (simplified)
+        const kappa = sex === 'female' ? 0.7 : 0.9;
+        const alpha = sex === 'female' ? -0.329 : -0.411;
+        const sexFactor = sex === 'female' ? 1.018 : 1.0;
+        
+        const egfr = 141 * Math.pow(Math.min(creatinine / kappa, 1), alpha) * 
+                     Math.pow(Math.max(creatinine / kappa, 1), -1.209) * 
+                     Math.pow(0.993, age) * sexFactor;
+
+        let stage, recommendation, alertClass;
+
+        if (egfr >= 90) {
+            stage = 'Stage 1 (Normal)';
+            recommendation = 'No dose adjustment needed';
+            alertClass = 'alert-success';
+        } else if (egfr >= 60) {
+            stage = 'Stage 2 (Mild)';
+            recommendation = 'Monitor renal function. Some drugs may need adjustment.';
+            alertClass = 'alert-success';
+        } else if (egfr >= 30) {
+            stage = 'Stage 3 (Moderate)';
+            recommendation = 'Dose adjustment required for most renally-cleared drugs. Reduce dose by 25-50%.';
+            alertClass = 'alert-warning';
+        } else if (egfr >= 15) {
+            stage = 'Stage 4 (Severe)';
+            recommendation = 'Significant dose reduction required (50-75%). Consider alternative medications.';
+            alertClass = 'alert-danger';
+        } else {
+            stage = 'Stage 5 (Kidney Failure)';
+            recommendation = 'Avoid nephrotoxic drugs. Consult nephrology. Dialysis may be needed.';
+            alertClass = 'alert-danger';
+        }
+
+        const resultHTML = `
+            <div class="result-card">
+                <div class="result-title">Renal Function Assessment</div>
+                <div class="result-item">
+                    <span class="result-label">eGFR:</span>
+                    <span class="result-value">${egfr.toFixed(1)} mL/min/1.73m²</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">CKD Stage:</span>
+                    <span class="result-value">${stage}</span>
+                </div>
+                <div class="alert ${alertClass}">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><strong>Recommendation:</strong> ${recommendation}</span>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('renal-result').innerHTML = resultHTML;
+    }
+
+    function calculateHepaticAdjustment() {
+        const bilirubin = parseFloat(document.getElementById('hepatic-bilirubin').value) || 1.0;
+        const albumin = parseFloat(document.getElementById('hepatic-albumin').value) || 4.0;
+        const inr = parseFloat(document.getElementById('hepatic-inr').value) || 1.0;
+        const ascites = document.getElementById('hepatic-ascites').value;
+        const encephalopathy = document.getElementById('hepatic-encephalopathy').value;
+
+        // Child-Pugh Score
+        let score = 0;
+
+        // Bilirubin
+        if (bilirubin < 2) score += 1;
+        else if (bilirubin <= 3) score += 2;
+        else score += 3;
+
+        // Albumin
+        if (albumin > 3.5) score += 1;
+        else if (albumin >= 2.8) score += 2;
+        else score += 3;
+
+        // INR
+        if (inr < 1.7) score += 1;
+        else if (inr <= 2.3) score += 2;
+        else score += 3;
+
+        // Ascites
+        if (ascites === 'none') score += 1;
+        else if (ascites === 'mild') score += 2;
+        else score += 3;
+
+        // Encephalopathy
+        if (encephalopathy === 'none') score += 1;
+        else if (encephalopathy === 'grade1-2') score += 2;
+        else score += 3;
+
+        let classification, recommendation, alertClass;
+
+        if (score <= 6) {
+            classification = 'Class A (Mild)';
+            recommendation = 'Minimal dose adjustment. Monitor liver function.';
+            alertClass = 'alert-success';
+        } else if (score <= 9) {
+            classification = 'Class B (Moderate)';
+            recommendation = 'Reduce dose by 25-50%. Avoid hepatotoxic drugs. Monitor closely.';
+            alertClass = 'alert-warning';
+        } else {
+            classification = 'Class C (Severe)';
+            recommendation = 'Reduce dose by 50-75%. Avoid hepatotoxic drugs. Consider alternatives. Consult hepatology.';
+            alertClass = 'alert-danger';
+        }
+
+        const resultHTML = `
+            <div class="result-card">
+                <div class="result-title">Hepatic Function Assessment</div>
+                <div class="result-item">
+                    <span class="result-label">Child-Pugh Score:</span>
+                    <span class="result-value">${score} points</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Classification:</span>
+                    <span class="result-value">${classification}</span>
+                </div>
+                <div class="alert ${alertClass}">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><strong>Recommendation:</strong> ${recommendation}</span>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('hepatic-result').innerHTML = resultHTML;
+    }
+
+    function generateTDMSchedule() {
+        const medication = document.getElementById('tdm-medication').value;
+        const startDate = new Date(document.getElementById('tdm-start-date').value || Date.now());
+
+        if (!medication) {
+            alert('Please select a medication');
+            return;
+        }
+
+        let schedule = [];
+
+        switch(medication) {
+            case 'vancomycin':
+                schedule = [
+                    { time: 'Before 4th dose (Day 2-3)', test: 'Trough level', target: '10-20 mg/L' },
+                    { time: 'Weekly', test: 'Trough level', target: '10-20 mg/L' },
+                    { time: 'Weekly', test: 'Renal function (Cr, BUN)', target: 'Baseline' }
+                ];
+                break;
+            case 'gentamicin':
+                schedule = [
+                    { time: 'After 3rd dose', test: 'Peak & Trough', target: 'Peak: 5-10, Trough: <2 mg/L' },
+                    { time: 'Every 3 days', test: 'Peak & Trough', target: 'Peak: 5-10, Trough: <2 mg/L' },
+                    { time: 'Every 3 days', test: 'Renal function', target: 'Baseline' }
+                ];
+                break;
+            case 'digoxin':
+                schedule = [
+                    { time: 'After 1 week', test: 'Digoxin level', target: '0.5-2.0 ng/mL' },
+                    { time: 'Monthly', test: 'Digoxin level', target: '0.5-2.0 ng/mL' },
+                    { time: 'Monthly', test: 'Electrolytes (K, Mg)', target: 'Normal' }
+                ];
+                break;
+            case 'lithium':
+                schedule = [
+                    { time: 'After 5 days', test: 'Lithium level', target: '0.6-1.2 mEq/L' },
+                    { time: 'Weekly x 4', test: 'Lithium level', target: '0.6-1.2 mEq/L' },
+                    { time: 'Monthly', test: 'Lithium level + TSH + Cr', target: 'Therapeutic' }
+                ];
+                break;
+            case 'phenytoin':
+                schedule = [
+                    { time: 'After 1 week', test: 'Phenytoin level', target: '10-20 mg/L' },
+                    { time: 'Monthly', test: 'Phenytoin level', target: '10-20 mg/L' },
+                    { time: 'Every 6 months', test: 'CBC, LFTs', target: 'Normal' }
+                ];
+                break;
+        }
+
+        const scheduleHTML = schedule.map(item => `
+            <div class="schedule-item">
+                <div class="schedule-time">
+                    <i class="fas fa-clock"></i> ${item.time}
+                </div>
+                <div class="schedule-test">
+                    <strong>Test:</strong> ${item.test}<br>
+                    <strong>Target:</strong> ${item.target}
+                </div>
+            </div>
+        `).join('');
+
+        const resultHTML = `
+            <div class="result-card">
+                <div class="result-title">TDM Schedule for ${medication.charAt(0).toUpperCase() + medication.slice(1)}</div>
+                <div class="monitoring-schedule">
+                    ${scheduleHTML}
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Adjust schedule based on clinical response and patient-specific factors.</span>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('tdm-result').innerHTML = resultHTML;
+    }
+
+    function generatePathway() {
+        const adrType = document.getElementById('pathway-adr-type').value;
+
+        if (!adrType) {
+            alert('Please select an ADR type');
+            return;
+        }
+
+        const pathways = {
+            hepatotoxicity: {
+                steps: [
+                    { step: 1, action: 'Immediate Actions', details: 'Stop suspected drug immediately. Check LFTs, bilirubin, INR.' },
+                    { step: 2, action: 'Assessment', details: 'Calculate RUCAM score. Rule out other causes (viral hepatitis, alcohol).' },
+                    { step: 3, action: 'Monitoring', details: 'Daily LFTs until improving. Consider N-acetylcysteine if severe.' },
+                    { step: 4, action: 'Consultation', details: 'Hepatology consult if ALT >10x ULN or INR >1.5.' },
+                    { step: 5, action: 'Follow-up', details: 'Weekly LFTs until normalized. Document in allergy list.' }
+                ]
+            },
+            nephrotoxicity: {
+                steps: [
+                    { step: 1, action: 'Immediate Actions', details: 'Stop nephrotoxic drug. Check Cr, BUN, electrolytes, urinalysis.' },
+                    { step: 2, action: 'Hydration', details: 'Ensure adequate hydration. IV fluids if needed.' },
+                    { step: 3, action: 'Monitoring', details: 'Daily renal function. Monitor urine output.' },
+                    { step: 4, action: 'Consultation', details: 'Nephrology consult if Cr >3.0 or oliguria.' },
+                    { step: 5, action: 'Follow-up', details: 'Weekly renal function until baseline. Avoid future nephrotoxins.' }
+                ]
+            },
+            anaphylaxis: {
+                steps: [
+                    { step: 1, action: 'Emergency', details: 'Call code. Epinephrine 0.3-0.5mg IM immediately.' },
+                    { step: 2, action: 'Airway', details: 'Assess airway. Prepare for intubation if needed.' },
+                    { step: 3, action: 'Medications', details: 'Antihistamines, corticosteroids, bronchodilators as needed.' },
+                    { step: 4, action: 'Monitoring', details: 'Continuous monitoring for 4-6 hours. Watch for biphasic reaction.' },
+                    { step: 5, action: 'Follow-up', details: 'Allergy testing. EpiPen prescription. Document allergy.' }
+                ]
+            },
+            rash: {
+                steps: [
+                    { step: 1, action: 'Assessment', details: 'Stop suspected drug. Assess severity (SJS/TEN vs simple rash).' },
+                    { step: 2, action: 'Immediate Care', details: 'If SJS/TEN suspected: ICU admission, dermatology consult.' },
+                    { step: 3, action: 'Treatment', details: 'Supportive care. Consider corticosteroids if severe.' },
+                    { step: 4, action: 'Monitoring', details: 'Daily skin assessment. Watch for progression.' },
+                    { step: 5, action: 'Follow-up', details: 'Dermatology follow-up. Document drug allergy.' }
+                ]
+            },
+            neutropenia: {
+                steps: [
+                    { step: 1, action: 'Immediate Actions', details: 'Stop causative drug. Check CBC with differential.' },
+                    { step: 2, action: 'Risk Assessment', details: 'If ANC <500: Neutropenic precautions, consider G-CSF.' },
+                    { step: 3, action: 'Infection Screening', details: 'Blood cultures if fever. Broad-spectrum antibiotics if febrile.' },
+                    { step: 4, action: 'Monitoring', details: 'Daily CBC until recovery. Monitor for infection signs.' },
+                    { step: 5, action: 'Follow-up', details: 'Hematology consult. Avoid future myelosuppressive drugs.' }
+                ]
+            }
+        };
+
+        const pathway = pathways[adrType];
+        const stepsHTML = pathway.steps.map(item => `
+            <div class="schedule-item">
+                <div class="schedule-time">
+                    <i class="fas fa-check-circle"></i> Step ${item.step}: ${item.action}
+                </div>
+                <div class="schedule-test">
+                    ${item.details}
+                </div>
+            </div>
+        `).join('');
+
+        const resultHTML = `
+            <div class="result-card">
+                <div class="result-title">Clinical Pathway: ${adrType.charAt(0).toUpperCase() + adrType.slice(1)}</div>
+                <div class="monitoring-schedule">
+                    ${stepsHTML}
+                </div>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><strong>Important:</strong> This is a general guideline. Adjust based on patient-specific factors and institutional protocols.</span>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('pathway-result').innerHTML = resultHTML;
+    }
+
+    // Set today's date as default
+    document.getElementById('tdm-start-date').valueAsDate = new Date();
+
+</script>
+
+<!-- Professional Footer Component -->
+{% include 'footer.html' %}
+
+</body>
+</html>
+

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading - MedAI-VIGI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            padding: 10px;
+        }
+
+        /* Medical grid background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        .loading-container {
+            text-align: center;
+            color: white;
+            max-width: 550px;
+            width: 90%;
+            padding: 30px 25px;
+            background: rgba(10, 10, 10, 0.9);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+            max-height: 95vh;
+            overflow: hidden;
+        }
+
+        .loading-logo {
+            position: relative;
+            margin-bottom: 20px;
+            width: 120px;
+            height: 120px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Medical Cross Logo */
+        .medical-logo {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-circle {
+            position: absolute;
+            width: 105px;
+            height: 105px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 2px solid rgba(37, 99, 235, 0.4);
+            animation: pulseCircle 3s ease-in-out infinite;
+            box-shadow: 0 0 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .logo-circle-outer {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid rgba(37, 99, 235, 0.2);
+            animation: rotateCircle 20s linear infinite;
+        }
+
+        .logo-cross {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cross-vertical {
+            position: absolute;
+            width: 20px;
+            height: 60px;
+            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        .cross-horizontal {
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            animation: glowPulse 2s ease-in-out 0.5s infinite;
+        }
+
+        .heartbeat-icon {
+            position: absolute;
+            font-size: 1.8rem;
+            color: #3b82f6;
+            z-index: 3;
+            animation: heartbeat 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.8));
+        }
+
+        /* Orbiting particles */
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+        }
+
+        .particle:nth-child(1) {
+            animation: orbit 4s linear infinite;
+        }
+
+        .particle:nth-child(2) {
+            animation: orbit 4s linear infinite 1s;
+        }
+
+        .particle:nth-child(3) {
+            animation: orbit 4s linear infinite 2s;
+        }
+
+        .particle:nth-child(4) {
+            animation: orbit 4s linear infinite 3s;
+        }
+
+        @keyframes pulseCircle {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes rotateCircle {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(59, 130, 246, 1);
+            }
+        }
+
+        @keyframes orbit {
+            0% {
+                transform: rotate(0deg) translateX(90px) rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg) translateX(90px) rotate(-360deg);
+            }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            10% {
+                transform: scale(1.1);
+            }
+            20% {
+                transform: scale(1);
+            }
+            30% {
+                transform: scale(1.15);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        .loading-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.3s forwards;
+            line-height: 1.2;
+        }
+
+        .loading-subtitle {
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            color: #a0aec0;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+        }
+
+        /* Medical Analysis Stages */
+        .analysis-stages {
+            margin: 15px 0;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 1s forwards;
+        }
+
+        .stage {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: rgba(10, 10, 10, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(37, 99, 235, 0.15);
+        }
+
+        .stage.active {
+            background: rgba(37, 99, 235, 0.1);
+            border-left-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+        }
+
+        .stage.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: #10b981;
+        }
+
+        .stage-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(37, 99, 235, 0.2);
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .stage.active .stage-icon {
+            background: #3b82f6;
+            color: white;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .stage.completed .stage-icon {
+            background: #10b981;
+            color: white;
+        }
+
+        .stage-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .stage-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+            color: #e2e8f0;
+        }
+
+        .stage-description {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            line-height: 1.3;
+        }
+
+        .stage.active .stage-title {
+            color: #3b82f6;
+        }
+
+        /* Enhanced Progress Bar */
+        .progress-container {
+            margin: 15px 0;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 1.2s forwards;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: #cbd5e0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(10, 10, 10, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
+            border-radius: 10px;
+            width: 0%;
+            position: relative;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* DNA Helix Animation */
+        .dna-loader {
+            width: 100px;
+            height: 100px;
+            margin: 30px auto;
+            position: relative;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 0.9s forwards;
+        }
+
+        .dna-strand {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .dna-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+        }
+
+        .dna-dot:nth-child(1) {
+            animation: dnaRotate 2s ease-in-out infinite;
+        }
+
+        .dna-dot:nth-child(2) {
+            animation: dnaRotate 2s ease-in-out 0.2s infinite;
+        }
+
+        .dna-dot:nth-child(3) {
+            animation: dnaRotate 2s ease-in-out 0.4s infinite;
+        }
+
+        .dna-dot:nth-child(4) {
+            animation: dnaRotate 2s ease-in-out 0.6s infinite;
+        }
+
+        .dna-dot:nth-child(5) {
+            animation: dnaRotate 2s ease-in-out 0.8s infinite;
+        }
+
+        @keyframes dnaRotate {
+
+            0%,
+            100% {
+                transform: translateX(0) translateY(0) scale(1);
+                background: #3b82f6;
+            }
+
+            25% {
+                transform: translateX(40px) translateY(-20px) scale(0.8);
+                background: #60a5fa;
+            }
+
+            50% {
+                transform: translateX(0) translateY(-40px) scale(1);
+                background: #2563eb;
+            }
+
+            75% {
+                transform: translateX(-40px) translateY(-20px) scale(0.8);
+                background: #60a5fa;
+            }
+        }
+
+        .loading-text {
+            font-size: 0.85rem;
+            color: #cbd5e0;
+            margin-top: 12px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 1.5s forwards;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Skip Button */
+        .skip-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(10, 10, 10, 0.8);
+            color: white;
+            border: 2px solid rgba(37, 99, 235, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .skip-button:hover {
+            background: rgba(37, 99, 235, 0.2);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .loading-container {
+                padding: 20px 15px;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 15px;
+                max-height: 98vh;
+            }
+
+            .loading-logo {
+                width: 140px;
+                height: 140px;
+                margin-bottom: 30px;
+            }
+
+            .medical-logo {
+                width: 140px;
+                height: 140px;
+            }
+
+            .logo-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .logo-circle-outer {
+                width: 140px;
+                height: 140px;
+            }
+
+            .cross-vertical {
+                width: 24px;
+                height: 70px;
+            }
+
+            .cross-horizontal {
+                width: 70px;
+                height: 24px;
+            }
+
+            .heartbeat-icon {
+                font-size: 2rem;
+            }
+
+            .particle {
+                width: 7px;
+                height: 7px;
+            }
+
+            @keyframes orbit {
+                0% {
+                    transform: rotate(0deg) translateX(70px) rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg) translateX(70px) rotate(-360deg);
+                }
+            }
+
+            .loading-title {
+                font-size: 1.6rem;
+                line-height: 1.3;
+            }
+
+            .loading-subtitle {
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+
+            .loading-subtitle + p {
+                font-size: 0.85rem !important;
+                margin-top: -20px !important;
+            }
+
+            .dna-loader {
+                width: 80px;
+                height: 80px;
+                margin: 20px auto;
+            }
+
+            .progress-container {
+                margin: 25px 0;
+            }
+
+            .progress-label {
+                font-size: 0.85rem;
+            }
+
+            .analysis-stages {
+                margin: 30px 0;
+            }
+
+            .stage {
+                padding: 12px;
+                margin-bottom: 10px;
+            }
+
+            .stage-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .stage-title {
+                font-size: 0.9rem;
+            }
+
+            .stage-description {
+                font-size: 0.8rem;
+            }
+
+            .loading-text {
+                font-size: 0.9rem;
+            }
+
+            .skip-button {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 3px;
+            }
+
+            .loading-container {
+                padding: 15px 10px;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 12px;
+                max-height: 98vh;
+            }
+
+            .loading-logo {
+                width: 110px;
+                height: 110px;
+                margin-bottom: 25px;
+            }
+
+            .medical-logo {
+                width: 110px;
+                height: 110px;
+            }
+
+            .logo-circle {
+                width: 95px;
+                height: 95px;
+            }
+
+            .logo-circle-outer {
+                width: 110px;
+                height: 110px;
+            }
+
+            .cross-vertical {
+                width: 20px;
+                height: 55px;
+            }
+
+            .cross-horizontal {
+                width: 55px;
+                height: 20px;
+            }
+
+            .heartbeat-icon {
+                font-size: 1.6rem;
+            }
+
+            .particle {
+                width: 6px;
+                height: 6px;
+            }
+
+            @keyframes orbit {
+                0% {
+                    transform: rotate(0deg) translateX(55px) rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg) translateX(55px) rotate(-360deg);
+                }
+            }
+
+            .loading-title {
+                font-size: 1.4rem;
+            }
+
+            .loading-subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 35px;
+            }
+
+            .loading-subtitle + p {
+                font-size: 0.8rem !important;
+                margin-top: -25px !important;
+                margin-bottom: 25px !important;
+            }
+
+            .dna-loader {
+                width: 70px;
+                height: 70px;
+                margin: 15px auto;
+            }
+
+            .progress-container {
+                margin: 20px 0;
+            }
+
+            .progress-label {
+                font-size: 0.8rem;
+            }
+
+            .progress-bar {
+                height: 6px;
+            }
+
+            .analysis-stages {
+                margin: 25px 0;
+            }
+
+            .stage {
+                padding: 10px;
+                margin-bottom: 8px;
+            }
+
+            .stage-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+
+            .stage-title {
+                font-size: 0.85rem;
+            }
+
+            .stage-description {
+                font-size: 0.75rem;
+                line-height: 1.3;
+            }
+
+            .loading-text {
+                font-size: 0.85rem;
+            }
+
+            .skip-button {
+                bottom: 15px;
+                right: 15px;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-container">
+        <div class="loading-logo">
+            <div class="medical-logo">
+                <div class="logo-circle-outer"></div>
+                <div class="logo-circle"></div>
+                <div class="logo-cross">
+                    <div class="cross-vertical"></div>
+                    <div class="cross-horizontal"></div>
+                </div>
+                <i class="fas fa-heartbeat heartbeat-icon"></i>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+        </div>
+
+        <h1 class="loading-title">MedAI-VIGI</h1>
+        <p class="loading-subtitle">An Intelligent System for Automated ADR Identification</p>
+        <p style="color: #718096; font-size: 0.8rem; margin-top: -10px; margin-bottom: 15px; opacity: 0; animation: fadeInUp 0.8s ease 0.8s forwards;">
+            <i class="fas fa-shield-alt"></i> Protecting Patient Safety
+        </p>
+
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>Analysis Progress</span>
+                <span id="progress-percentage">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="analysis-stages">
+            <div class="stage" id="stage-1">
+                <div class="stage-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="stage-content">
+                    <div class="stage-title">Clinical Database Connection</div>
+                    <div class="stage-description">Establishing secure connection to medical records system</div>
+                </div>
+            </div>
+
+            <div class="stage" id="stage-2">
+                <div class="stage-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="stage-content">
+                    <div class="stage-title">AI Model Initialization</div>
+                    <div class="stage-description">Loading Gemini AI and machine learning algorithms</div>
+                </div>
+            </div>
+
+            <div class="stage" id="stage-3">
+                <div class="stage-icon">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="stage-content">
+                    <div class="stage-title">Pharmacological Database</div>
+                    <div class="stage-description">Accessing drug interactions and ADR profiles</div>
+                </div>
+            </div>
+
+            <div class="stage" id="stage-4">
+                <div class="stage-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stage-content">
+                    <div class="stage-title">Risk Assessment Engine</div>
+                    <div class="stage-description">Calibrating predictive models and safety protocols</div>
+                </div>
+            </div>
+
+            <div class="stage" id="stage-5">
+                <div class="stage-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stage-content">
+                    <div class="stage-title">Clinical Interface Ready</div>
+                    <div class="stage-description">All systems operational - launching dashboard</div>
+                </div>
+            </div>
+        </div>
+
+        <p class="loading-text" id="loading-text">Initializing clinical analysis system...</p>
+    </div>
+
+    <button class="skip-button" onclick="window.location.href='/patient-details'">
+        <i class="fas fa-forward"></i> Skip to Dashboard
+    </button>
+
+    <script>
+        // Analysis stages configuration
+        const stages = [
+            { id: 'stage-1', duration: 800, text: '🏥 Connecting to clinical database...' },
+            { id: 'stage-2', duration: 900, text: '🧠 Activating AI neural networks...' },
+            { id: 'stage-3', duration: 1000, text: '💊 Loading pharmacological data...' },
+            { id: 'stage-4', duration: 900, text: '📊 Calibrating risk prediction models...' },
+            { id: 'stage-5', duration: 800, text: '✅ System ready! Launching clinical interface...' }
+        ];
+
+        let currentStage = 0;
+        let progress = 0;
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercentage = document.getElementById('progress-percentage');
+        const loadingText = document.getElementById('loading-text');
+
+        // Update progress bar
+        function updateProgress(targetProgress) {
+            const increment = (targetProgress - progress) / 20;
+            const interval = setInterval(() => {
+                progress += increment;
+                if (progress >= targetProgress) {
+                    progress = targetProgress;
+                    clearInterval(interval);
+                }
+                progressFill.style.width = progress + '%';
+                progressPercentage.textContent = Math.round(progress) + '%';
+            }, 30);
+        }
+
+        // Process each stage
+        function processStage(index) {
+            if (index >= stages.length) {
+                // All stages complete, redirect
+                setTimeout(() => {
+                    window.location.href = '/patient-details';
+                }, 500);
+                return;
+            }
+
+            const stage = stages[index];
+            const stageElement = document.getElementById(stage.id);
+
+            // Mark previous stage as completed
+            if (index > 0) {
+                const prevStage = document.getElementById(stages[index - 1].id);
+                prevStage.classList.remove('active');
+                prevStage.classList.add('completed');
+                const prevIcon = prevStage.querySelector('.stage-icon i');
+                prevIcon.className = 'fas fa-check';
+            }
+
+            // Activate current stage
+            stageElement.classList.add('active');
+            loadingText.textContent = stage.text;
+
+            // Update progress
+            const targetProgress = ((index + 1) / stages.length) * 100;
+            updateProgress(targetProgress);
+
+            // Move to next stage
+            setTimeout(() => {
+                processStage(index + 1);
+            }, stage.duration);
+        }
+
+        // Start the loading sequence
+        setTimeout(() => {
+            processStage(0);
+        }, 1000);
+
+        // Keyboard shortcut to skip (press 'S')
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 's' || e.key === 'S') {
+                window.location.href = '/patient-details';
+            }
+        });
+    </script>
+</body>
+
+</html>

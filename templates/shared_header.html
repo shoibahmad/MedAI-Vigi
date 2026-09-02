@@ -1,0 +1,165 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════════════════
+     🎨 PHENORX-VIGI SHARED HEADER - INCLUDE IN ALL PAGES
+     ═══════════════════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Global Header -->
+<header class="global-header">
+    <div class="header-container">
+        <!-- Logo -->
+        <a href="/" class="header-logo">
+            <div class="logo-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="logo-text">
+                <div class="logo-title">PhenoRx</div>
+                <div class="logo-subtitle">ADR Intelligence System</div>
+            </div>
+        </a>
+
+        <!-- Navigation -->
+        <nav class="header-nav" id="headerNav">
+            <a href="/" class="nav-link" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/drug-interactions" class="nav-link" data-page="drug-interactions">
+                <i class="fas fa-pills"></i>
+                <span>Drug Interactions</span>
+            </a>
+            <a href="/clinical-decision-support" class="nav-link" data-page="clinical-support">
+                <i class="fas fa-stethoscope"></i>
+                <span>Clinical Support</span>
+            </a>
+            <a href="/patient-counselling" class="nav-link nav-link-highlight" data-page="patient-counselling">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Counselling</span>
+            </a>
+            <a href="/chatbot" class="nav-link" data-page="chatbot">
+                <i class="fas fa-robot"></i>
+                <span>Medi Chatbot</span>
+            </a>
+            <a href="/about" class="nav-link" data-page="about" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
+            </a>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</header>
+
+<!-- Highlighted Nav Link Styles -->
+<style>
+    /* Patient Counselling Highlighted Nav Link - Cohesive Blue Theme */
+    .nav-link-highlight {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%) !important;
+        color: #60a5fa !important;
+        border: 1px solid rgba(59, 130, 246, 0.4) !important;
+        border-radius: 10px !important;
+        padding: 10px 18px !important;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.15) !important;
+        position: relative;
+        transition: all 0.3s ease !important;
+    }
+
+    .nav-link-highlight i {
+        color: #3b82f6 !important;
+    }
+
+    .nav-link-highlight span {
+        color: #60a5fa !important;
+        font-weight: 600 !important;
+    }
+
+    .nav-link-highlight:hover {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(59, 130, 246, 0.15) 100%) !important;
+        border-color: rgba(59, 130, 246, 0.6) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25) !important;
+    }
+
+    .nav-link-highlight:hover i,
+    .nav-link-highlight:hover span {
+        color: #93c5fd !important;
+    }
+
+    /* Subtle NEW indicator - small dot instead of badge */
+    .nav-link-highlight::after {
+        content: '';
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 6px;
+        height: 6px;
+        background: #3b82f6;
+        border-radius: 50%;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+        animation: subtle-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes subtle-pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.6;
+            transform: scale(1.2);
+        }
+    }
+</style>
+
+<!-- Shared Header JavaScript -->
+<script>
+    // Set active navigation link based on current page
+    function setActiveNavLink() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+
+            if (href === currentPath ||
+                (currentPath === '/' && href === '/') ||
+                (currentPath.includes('assessment') && href === '/assessment') ||
+                (currentPath.includes('patient-details') && href === '/patient-details') ||
+                (currentPath.includes('drug-interactions') && href === '/drug-interactions') ||
+                (currentPath.includes('clinical-decision-support') && href === '/clinical-decision-support') ||
+                (currentPath.includes('patient-counselling') && href === '/patient-counselling')) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Toggle mobile menu
+    function toggleMobileMenu() {
+        const nav = document.getElementById('headerNav');
+        nav.classList.toggle('active');
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function (event) {
+        const nav = document.getElementById('headerNav');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+
+        if (nav.classList.contains('active') &&
+            !nav.contains(event.target) &&
+            !toggle.contains(event.target)) {
+            nav.classList.remove('active');
+        }
+    });
+
+
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        setActiveNavLink();
+    });
+</script>

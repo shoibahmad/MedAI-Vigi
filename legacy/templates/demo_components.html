@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Demo - MedAI-VIGI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding-top: 90px;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .demo-section {
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .demo-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .demo-subtitle {
+            color: #a0aec0;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .content-block {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .content-block h2 {
+            color: #3b82f6;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .content-block p {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #3b82f6;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            color: #e2e8f0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            color: #a0aec0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Use the new professional navbar -->
+    {% include 'navbar.html' %}
+
+    <div class="demo-container">
+        <div class="demo-section">
+            <h1 class="demo-title">
+                <i class="fas fa-flask"></i> Component Demo Page
+            </h1>
+            <p class="demo-subtitle">
+                This page demonstrates the new professional navbar and footer components
+            </p>
+
+            <div class="content-block">
+                <h2><i class="fas fa-info-circle"></i> About These Components</h2>
+                <p>
+                    The new navbar and footer components have been designed to provide a professional, 
+                    modern look for the MedAI-VIGI application. They are fully responsive and work 
+                    seamlessly across all devices.
+                </p>
+            </div>
+
+            <div class="content-block">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="feature-title">Fully Responsive</div>
+                        <div class="feature-desc">
+                            Works perfectly on desktop, tablet, and mobile devices
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-paint-brush"></i>
+                        </div>
+                        <div class="feature-title">Modern Design</div>
+                        <div class="feature-desc">
+                            Clean, professional styling with smooth animations
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bars"></i>
+                        </div>
+                        <div class="feature-title">Mobile Menu</div>
+                        <div class="feature-desc">
+                            Hamburger menu for easy navigation on mobile
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        <div class="feature-title">Social Links</div>
+                        <div class="feature-desc">
+                            Footer includes social media integration
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h2><i class="fas fa-code"></i> How to Use</h2>
+                <p>
+                    To use these components in your templates, simply include them:
+                </p>
+                <pre style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; color: #4ade80; overflow-x: auto;">
+&lt;!-- At the top of your page (after &lt;body&gt;) --&gt;
+{% include 'navbar.html' %}
+
+&lt;!-- Your page content here --&gt;
+
+&lt;!-- At the bottom of your page (before &lt;/body&gt;) --&gt;
+{% include 'footer.html' %}</pre>
+            </div>
+
+            <!-- Dummy content to show scrolling -->
+            <div class="content-block">
+                <h2><i class="fas fa-scroll"></i> Scroll to See Navbar Behavior</h2>
+                <p>
+                    Scroll down this page to see how the navbar automatically hides when scrolling down 
+                    and reappears when scrolling up. This provides a better user experience by maximizing 
+                    screen space while keeping navigation accessible.
+                </p>
+                <div style="height: 400px; background: rgba(37, 99, 235, 0.05); border-radius: 8px; 
+                            display: flex; align-items: center; justify-content: center; margin-top: 20px;">
+                    <p style="font-size: 1.2rem; color: #a0aec0;">
+                        <i class="fas fa-arrow-down"></i> Keep scrolling to see the footer
+                    </p>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h2><i class="fas fa-check-circle"></i> Component Status</h2>
+                <p style="color: #4ade80; font-weight: 600;">
+                    ✓ Navbar Component: Created and Ready<br>
+                    ✓ Footer Component: Created and Ready<br>
+                    ✓ Responsive Design: Fully Implemented<br>
+                    ✓ Mobile Menu: Working<br>
+                    ✓ Animations: Smooth and Professional
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use the new professional footer -->
+    {% include 'footer.html' %}
+
+</body>
+</html>

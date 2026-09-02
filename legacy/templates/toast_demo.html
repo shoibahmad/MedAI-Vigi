@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toast Notification Demo - MedAI-VIGI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/toast.css') }}" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.85);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        p {
+            color: #a0aec0;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .demo-btn {
+            padding: 20px;
+            border: 2px solid;
+            border-radius: 16px;
+            background: rgba(10, 10, 10, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .demo-btn i {
+            font-size: 2.5rem;
+        }
+
+        .demo-btn.success {
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #10b981;
+        }
+
+        .demo-btn.success:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .demo-btn.error {
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+
+        .demo-btn.error:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        }
+
+        .demo-btn.warning {
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #f59e0b;
+        }
+
+        .demo-btn.warning:hover {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+        }
+
+        .demo-btn.info {
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #3b82f6;
+        }
+
+        .demo-btn.info:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #60a5fa;
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1><i class="fas fa-bell"></i> Toast Notifications</h1>
+        <p>Click the buttons below to see beautiful toast notifications sliding up from the bottom center!</p>
+        
+        <div class="button-grid">
+            <button class="demo-btn success" onclick="showSuccess('Patient data saved successfully!', 'Success')">
+                <i class="fas fa-check-circle"></i>
+                <span>Success Toast</span>
+            </button>
+            
+            <button class="demo-btn error" onclick="showError('Failed to process patient data. Please try again.', 'Error')">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Error Toast</span>
+            </button>
+            
+            <button class="demo-btn warning" onclick="showWarning('High risk detected! Enhanced monitoring recommended.', 'Warning')">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Warning Toast</span>
+            </button>
+            
+            <button class="demo-btn info" onclick="showInfo('New drug interaction data available for review.', 'Information')">
+                <i class="fas fa-info-circle"></i>
+                <span>Info Toast</span>
+            </button>
+        </div>
+
+        <div class="back-link">
+            <a href="{{ url_for('about') }}">
+                <i class="fas fa-arrow-left"></i>
+                Back to About Page
+            </a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+    <script>
+        // Show welcome toast on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                showInfo('Welcome to the Toast Notification Demo!', 'Welcome', 4000);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

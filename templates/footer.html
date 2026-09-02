@@ -1,0 +1,386 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════════════════
+     🎨 PROFESSIONAL RESPONSIVE FOOTER COMPONENT
+     ═══════════════════════════════════════════════════════════════════════════════════════ -->
+
+<footer class="professional-footer">
+    <div class="footer-container">
+        <!-- Footer Top Section -->
+        <div class="footer-top">
+            <!-- Company Info -->
+            <div class="footer-column">
+                <div class="footer-brand">
+                    <div class="footer-brand-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="footer-brand-text">
+                        <h3>PhenoRx</h3>
+                        <p>ADR Intelligence System</p>
+                    </div>
+                </div>
+                <p class="footer-description">
+                    Advanced AI-powered system for automated adverse drug reaction identification and clinical decision
+                    support.
+                </p>
+                <div class="footer-social">
+                    <a href="#" class="social-link" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-link" aria-label="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-link" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="social-link" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="footer-column">
+                <h4 class="footer-heading">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="/"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="/drug-interactions"><i class="fas fa-chevron-right"></i> Drug Interactions</a></li>
+                    <li><a href="/clinical-decision-support"><i class="fas fa-chevron-right"></i> Clinical Support</a>
+                    </li>
+                    <li><a href="/patient-counselling"><i class="fas fa-chevron-right"></i> Patient Counselling</a></li>
+                    <li><a href="/about"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                </ul>
+            </div>
+
+            <!-- Resources -->
+            <div class="footer-column">
+                <h4 class="footer-heading">Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="/documentation"><i class="fas fa-chevron-right"></i> Documentation</a></li>
+                    <li><a href="/api-reference"><i class="fas fa-chevron-right"></i> API Reference</a></li>
+                    <li><a href="/research-papers"><i class="fas fa-chevron-right"></i> Research Papers</a></li>
+                    <li><a href="/faqs"><i class="fas fa-chevron-right"></i> FAQs</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="footer-column">
+                <h4 class="footer-heading">Contact Us</h4>
+                <ul class="footer-contact">
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Integral University, Kursi Road, Lucknow - 226026</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        <span>+91 8853741966</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <span>phenorx@iul.ac.in</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Pharm.D Research Project</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer Bottom Section -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">
+                    &copy; 2025 PhenoRx. All rights reserved.
+                </p>
+                <div class="footer-bottom-links">
+                    <a href="/privacy-policy">Privacy Policy</a>
+                    <span class="separator">|</span>
+                    <a href="/terms-of-service">Terms of Service</a>
+                    <span class="separator">|</span>
+                    <a href="/cookie-policy">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Footer Styles -->
+<style>
+    .professional-footer {
+        background: linear-gradient(180deg, rgba(10, 10, 10, 0.95) 0%, rgba(5, 5, 5, 0.98) 100%);
+        border-top: 2px solid rgba(37, 99, 235, 0.3);
+        color: #cbd5e0;
+        margin-top: 60px;
+        position: relative;
+    }
+
+    .professional-footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+    }
+
+    .footer-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 60px 20px 20px;
+    }
+
+    /* Footer Top Section */
+    .footer-top {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-bottom: 40px;
+        padding-bottom: 40px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .footer-column {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* Footer Brand */
+    .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .footer-brand-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .footer-brand-icon i {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .footer-brand-text h3 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+    }
+
+    .footer-brand-text p {
+        font-size: 0.75rem;
+        color: #a0aec0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0;
+    }
+
+    .footer-description {
+        color: #a0aec0;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    /* Social Links */
+    .footer-social {
+        display: flex;
+        gap: 12px;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+        background: rgba(37, 99, 235, 0.1);
+        border: 1px solid rgba(37, 99, 235, 0.3);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3b82f6;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+        background: rgba(37, 99, 235, 0.2);
+        border-color: #3b82f6;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .social-link i {
+        font-size: 1rem;
+    }
+
+    /* Footer Headings */
+    .footer-heading {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin: 0 0 15px 0;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .footer-heading::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, transparent);
+        border-radius: 2px;
+    }
+
+    /* Footer Links */
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .footer-links li a {
+        color: #a0aec0;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .footer-links li a i {
+        font-size: 0.7rem;
+        color: #3b82f6;
+        transition: transform 0.3s ease;
+    }
+
+    .footer-links li a:hover {
+        color: #3b82f6;
+        transform: translateX(5px);
+    }
+
+    .footer-links li a:hover i {
+        transform: translateX(3px);
+    }
+
+    /* Footer Contact */
+    .footer-contact {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .footer-contact li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        color: #a0aec0;
+        font-size: 0.95rem;
+    }
+
+    .footer-contact li i {
+        color: #3b82f6;
+        font-size: 1rem;
+        margin-top: 2px;
+        min-width: 20px;
+    }
+
+    /* Footer Bottom */
+    .footer-bottom {
+        padding-top: 20px;
+    }
+
+    .footer-bottom-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .copyright {
+        color: #718096;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .footer-bottom-links {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .footer-bottom-links a {
+        color: #a0aec0;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .footer-bottom-links a:hover {
+        color: #3b82f6;
+    }
+
+    .footer-bottom-links .separator {
+        color: #4a5568;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .footer-container {
+            padding: 40px 15px 20px;
+        }
+
+        .footer-top {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .footer-bottom-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .footer-bottom-links {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .footer-brand {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .footer-social {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+        }
+    }
+</style>

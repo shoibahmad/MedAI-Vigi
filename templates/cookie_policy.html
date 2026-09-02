@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy - PhenoRx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1771389944029472"
+     crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e2e8f0;
+            padding-top: 90px;
+            min-height: 100vh;
+        }
+
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .legal-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .legal-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .legal-date {
+            color: #a0aec0;
+            font-size: 0.95rem;
+        }
+
+        .legal-content {
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .legal-content h2 {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            margin: 30px 0 15px 0;
+        }
+
+        .legal-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .legal-content p {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .legal-content ul {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .legal-content li {
+            margin-bottom: 10px;
+        }
+
+        .legal-content strong {
+            color: #e2e8f0;
+        }
+
+        .cookie-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .cookie-table th {
+            background: rgba(37, 99, 235, 0.2);
+            color: #3b82f6;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .cookie-table td {
+            padding: 12px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            color: #cbd5e0;
+        }
+
+        .cookie-table tr:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .legal-title {
+                font-size: 2rem;
+            }
+            .legal-content {
+                padding: 25px;
+            }
+            .cookie-table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="legal-container">
+        <div class="legal-header">
+            <h1 class="legal-title">
+                <i class="fas fa-cookie-bite"></i> Cookie Policy
+            </h1>
+            <p class="legal-date">Last Updated: November 2025</p>
+        </div>
+
+        <div class="legal-content">
+            <h2>1. What Are Cookies?</h2>
+            <p>
+                Cookies are small text files that are placed on your computer or mobile device when you visit a website. 
+                They are widely used to make websites work more efficiently and provide information to website owners. 
+                Cookies help us understand how you use PhenoRx and improve your experience.
+            </p>
+
+            <h2>2. How We Use Cookies</h2>
+            <p>
+                PhenoRx uses cookies and similar technologies for several purposes:
+            </p>
+            <ul>
+                <li><strong>Essential Cookies:</strong> Required for the website to function properly</li>
+                <li><strong>Session Management:</strong> To maintain your session and remember your preferences</li>
+                <li><strong>Performance:</strong> To understand how you interact with the application</li>
+                <li><strong>Functionality:</strong> To remember your settings and preferences</li>
+            </ul>
+
+            <h2>3. Types of Cookies We Use</h2>
+            
+            <table class="cookie-table">
+                <thead>
+                    <tr>
+                        <th>Cookie Type</th>
+                        <th>Purpose</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Session Cookies</strong></td>
+                        <td>Maintain your session while using the application. Store temporary data like patient information and assessment results.</td>
+                        <td>Session (deleted when browser closes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Preference Cookies</strong></td>
+                        <td>Remember your settings and preferences such as language, display options, and interface customizations.</td>
+                        <td>Persistent (up to 1 year)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Analytics Cookies</strong></td>
+                        <td>Help us understand how users interact with the application to improve functionality and user experience.</td>
+                        <td>Persistent (up to 2 years)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Security Cookies</strong></td>
+                        <td>Protect against fraudulent activity and ensure secure access to the application.</td>
+                        <td>Session or Persistent</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>4. Browser Storage Technologies</h2>
+            <p>
+                In addition to cookies, PhenoRx uses other browser storage technologies:
+            </p>
+            <ul>
+                <li><strong>Local Storage:</strong> Stores data locally in your browser for improved performance and offline functionality</li>
+                <li><strong>Session Storage:</strong> Temporarily stores data during your browsing session, including:
+                    <ul style="margin-top: 10px;">
+                        <li>Patient assessment data</li>
+                        <li>Prediction results</li>
+                        <li>Form inputs</li>
+                        <li>User preferences</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h2>5. Third-Party Cookies</h2>
+            <p>
+                Some cookies on PhenoRx are set by third-party services we use:
+            </p>
+            <ul>
+                <li><strong>Google Gemini AI:</strong> May set cookies when processing AI analysis requests</li>
+                <li><strong>Content Delivery Networks (CDNs):</strong> Used to deliver fonts, icons, and other resources efficiently</li>
+                <li><strong>Analytics Services:</strong> May use cookies to track usage patterns (if implemented)</li>
+            </ul>
+            <p>
+                These third parties have their own privacy policies and cookie policies. We recommend reviewing them.
+            </p>
+
+            <h2>6. Managing Cookies</h2>
+            <p>
+                You have several options for managing cookies:
+            </p>
+
+            <h3>Browser Settings</h3>
+            <p>
+                Most web browsers allow you to control cookies through their settings:
+            </p>
+            <ul>
+                <li><strong>Chrome:</strong> Settings > Privacy and Security > Cookies and other site data</li>
+                <li><strong>Firefox:</strong> Options > Privacy & Security > Cookies and Site Data</li>
+                <li><strong>Safari:</strong> Preferences > Privacy > Cookies and website data</li>
+                <li><strong>Edge:</strong> Settings > Privacy, search, and services > Cookies and site permissions</li>
+            </ul>
+
+            <h3>Cookie Preferences</h3>
+            <p>
+                You can choose to:
+            </p>
+            <ul>
+                <li>Accept all cookies</li>
+                <li>Reject non-essential cookies</li>
+                <li>Delete cookies after each session</li>
+                <li>Block third-party cookies</li>
+            </ul>
+
+            <h2>7. Impact of Disabling Cookies</h2>
+            <p>
+                If you disable cookies, some features of PhenoRx may not function properly:
+            </p>
+            <ul>
+                <li>Session data may not be preserved</li>
+                <li>Your preferences may not be remembered</li>
+                <li>Some features may be unavailable</li>
+                <li>You may need to re-enter information more frequently</li>
+            </ul>
+            <p>
+                <strong>Essential cookies are required for the application to function.</strong> Disabling them may 
+                prevent you from using PhenoRx effectively.
+            </p>
+
+            <h2>8. Data Protection and Privacy</h2>
+            <p>
+                Cookies and stored data are subject to our Privacy Policy. We take appropriate measures to:
+            </p>
+            <ul>
+                <li>Protect cookie data from unauthorized access</li>
+                <li>Use encryption where appropriate</li>
+                <li>Limit data collection to what is necessary</li>
+                <li>Comply with applicable data protection laws</li>
+            </ul>
+
+            <h2>9. Healthcare Data Considerations</h2>
+            <p>
+                When using PhenoRx for patient care:
+            </p>
+            <ul>
+                <li>Be aware that patient data may be temporarily stored in browser storage</li>
+                <li>Clear browser data when using shared computers</li>
+                <li>Use private/incognito browsing mode for sensitive cases</li>
+                <li>Follow your institution's policies regarding patient data</li>
+                <li>Ensure compliance with HIPAA and other healthcare privacy regulations</li>
+            </ul>
+
+            <h2>10. Updates to This Policy</h2>
+            <p>
+                We may update this Cookie Policy from time to time to reflect changes in:
+            </p>
+            <ul>
+                <li>Our use of cookies and tracking technologies</li>
+                <li>Legal requirements</li>
+                <li>Best practices in data protection</li>
+            </ul>
+            <p>
+                We will notify you of significant changes by updating the "Last Updated" date at the top of this policy.
+            </p>
+
+            <h2>11. Your Consent</h2>
+            <p>
+                By using PhenoRx, you consent to our use of cookies as described in this policy. If you do not 
+                agree with our use of cookies, you should adjust your browser settings or discontinue use of the 
+                application.
+            </p>
+
+            <h2>12. Contact Us</h2>
+            <p>
+                If you have questions about our use of cookies or this Cookie Policy, please contact us:
+            </p>
+            <ul>
+                <li><strong>Email:</strong> phenorx@iul.ac.in</li>
+                <li><strong>Phone:</strong> +91 8853741966</li>
+                <li><strong>Address:</strong> Integral University, Kursi Road, Lucknow - 226026, India</li>
+            </ul>
+
+            <h2>13. Additional Resources</h2>
+            <p>
+                For more information about cookies and online privacy:
+            </p>
+            <ul>
+                <li><a href="https://www.allaboutcookies.org" target="_blank" style="color: #3b82f6;">All About Cookies</a></li>
+                <li><a href="https://www.youronlinechoices.com" target="_blank" style="color: #3b82f6;">Your Online Choices</a></li>
+                <li><a href="https://www.networkadvertising.org" target="_blank" style="color: #3b82f6;">Network Advertising Initiative</a></li>
+            </ul>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+</html>

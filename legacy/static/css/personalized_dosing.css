@@ -1,0 +1,705 @@
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   💊 PERSONALIZED MEDICATION DOSING SYSTEM STYLES
+   MeAI-VIGI: An Intelligent System for Automated ADR Identification
+   ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/* Dosing Section Container */
+.personalized-dosing-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(79, 209, 197, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+.dosing-section-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(79, 209, 197, 0.2);
+}
+
+.dosing-section-header i {
+    color: #3b82f6;
+    font-size: 1.5rem;
+}
+
+.dosing-section-header h3 {
+    color: #e2e8f0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.dosing-section-description {
+    color: #a0aec0;
+    font-size: 1rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+/* Medication Selection */
+.medication-selection {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.medication-selection select {
+    flex: 1;
+    min-width: 250px;
+    padding: 14px 16px;
+    border: 2px solid rgba(79, 209, 197, 0.3);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: rgba(15, 32, 39, 0.6);
+    color: #e2e8f0;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.medication-selection select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.2);
+    background: rgba(15, 32, 39, 0.8);
+}
+
+.medication-selection select option {
+    background: #1a2f3a;
+    color: #e2e8f0;
+    padding: 10px;
+}
+
+.medication-selection button {
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(79, 209, 197, 0.3);
+}
+
+.medication-selection button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(79, 209, 197, 0.5);
+}
+
+/* Medications Container */
+.medications-dosing-container {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+/* Medication Dosing Card */
+.medication-dosing-card {
+    background: rgba(15, 32, 39, 0.8);
+    border: 2px solid rgba(79, 209, 197, 0.2);
+    border-radius: 16px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.medication-dosing-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 8px 25px rgba(79, 209, 197, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Medication Header */
+.medication-dosing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(79, 209, 197, 0.2);
+}
+
+.medication-dosing-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.medication-dosing-title i {
+    color: #3b82f6;
+    font-size: 1.3rem;
+}
+
+.medication-dosing-title h4 {
+    color: #e2e8f0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.medication-category-badge {
+    background: rgba(79, 209, 197, 0.2);
+    color: #3b82f6;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.remove-medication-btn {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-medication-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: scale(1.1);
+}
+
+/* Dosing Input Grid */
+.dosing-input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.dosing-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.dosing-input-group label {
+    font-weight: 600;
+    color: #cbd5e0;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dosing-input-group label i {
+    color: #3b82f6;
+    font-size: 0.9rem;
+}
+
+.dosing-input-group input {
+    padding: 12px 14px;
+    border: 2px solid rgba(79, 209, 197, 0.3);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: rgba(15, 32, 39, 0.6);
+    color: #e2e8f0;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.dosing-input-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.2);
+    background: rgba(15, 32, 39, 0.8);
+}
+
+.dosing-input-group input::placeholder {
+    color: #718096;
+    font-weight: 400;
+}
+
+/* Input with Unit */
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-with-unit input {
+    flex: 1;
+}
+
+.unit-label {
+    color: #3b82f6;
+    font-weight: 600;
+    font-size: 0.95rem;
+    min-width: 50px;
+}
+
+/* Dosing Actions */
+.dosing-actions {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.btn-calculate-dose {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    font-size: 1rem;
+}
+
+.btn-calculate-dose:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+/* Dosing Results */
+.dosing-results {
+    background: rgba(79, 209, 197, 0.1);
+    border: 2px solid rgba(79, 209, 197, 0.3);
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 20px;
+}
+
+.dosing-results-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(79, 209, 197, 0.2);
+}
+
+.dosing-results-header i {
+    color: #3b82f6;
+    font-size: 1.3rem;
+}
+
+.dosing-results-header h5 {
+    color: #e2e8f0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Dosing Summary */
+.dosing-summary {
+    margin-bottom: 25px;
+}
+
+.dosing-comparison {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.dose-item {
+    background: rgba(15, 32, 39, 0.6);
+    padding: 15px 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid rgba(79, 209, 197, 0.2);
+}
+
+.dose-item.personalized {
+    background: rgba(79, 209, 197, 0.2);
+    border-color: #3b82f6;
+}
+
+.dose-label {
+    display: block;
+    color: #a0aec0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dose-value {
+    display: block;
+    color: #e2e8f0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.dose-arrow {
+    color: #3b82f6;
+    font-size: 1.5rem;
+}
+
+.dose-change {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(15, 32, 39, 0.4);
+    border-radius: 8px;
+}
+
+.dose-frequency {
+    text-align: center;
+    color: #cbd5e0;
+    font-size: 1rem;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(15, 32, 39, 0.4);
+    border-radius: 8px;
+}
+
+.dose-frequency i {
+    color: #3b82f6;
+    margin-right: 8px;
+}
+
+/* Adjustment Factors */
+.adjustment-factors {
+    margin-bottom: 25px;
+}
+
+.adjustment-factors h6 {
+    color: #e2e8f0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.adjustment-factors h6 i {
+    color: #3b82f6;
+}
+
+.factors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.factor-item {
+    background: rgba(15, 32, 39, 0.6);
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid rgba(79, 209, 197, 0.2);
+}
+
+.factor-item.total {
+    background: rgba(79, 209, 197, 0.2);
+    border-color: #3b82f6;
+}
+
+.factor-label {
+    color: #a0aec0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.factor-value {
+    color: #e2e8f0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Clinical Rationale */
+.clinical-rationale {
+    margin-bottom: 25px;
+}
+
+.clinical-rationale h6 {
+    color: #e2e8f0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clinical-rationale h6 i {
+    color: #3b82f6;
+}
+
+.rationale-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rationale-list li {
+    background: rgba(15, 32, 39, 0.6);
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    color: #cbd5e0;
+    border-left: 4px solid #3b82f6;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Monitoring Recommendations */
+.monitoring-recommendations h6 {
+    color: #e2e8f0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.monitoring-recommendations h6 i {
+    color: #f59e0b;
+}
+
+.monitoring-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.monitoring-list li {
+    background: rgba(245, 158, 11, 0.1);
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    color: #cbd5e0;
+    border-left: 4px solid #f59e0b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Global Actions */
+.dosing-global-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 2px solid rgba(79, 209, 197, 0.2);
+}
+
+.dosing-global-actions button {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+}
+
+.btn-calculate-all {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-calculate-all:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.btn-clear-all {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-clear-all:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-export-dosing {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.btn-export-dosing:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+}
+
+/* Notification System */
+.dosing-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(15, 32, 39, 0.95);
+    border: 2px solid;
+    border-radius: 12px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.dosing-notification.show {
+    transform: translateX(0);
+}
+
+.dosing-notification-success {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.dosing-notification-error {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.dosing-notification-warning {
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.dosing-notification-info {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.dosing-notification i {
+    font-size: 1.3rem;
+}
+
+.dosing-notification span {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Empty State */
+.dosing-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #a0aec0;
+}
+
+.dosing-empty-state i {
+    font-size: 4rem;
+    color: rgba(79, 209, 197, 0.3);
+    margin-bottom: 20px;
+}
+
+.dosing-empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.dosing-empty-state small {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .personalized-dosing-section {
+        padding: 20px;
+    }
+    
+    .medication-selection {
+        flex-direction: column;
+    }
+    
+    .medication-selection select {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .medication-selection button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .dosing-input-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dosing-comparison {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .dose-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .factors-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dosing-global-actions {
+        flex-direction: column;
+    }
+    
+    .dosing-global-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .dosing-notification {
+        right: 10px;
+        left: 10px;
+        top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .medication-dosing-card {
+        padding: 15px;
+    }
+    
+    .medication-dosing-title h4 {
+        font-size: 1.1rem;
+    }
+    
+    .factors-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dose-value {
+        font-size: 1.2rem;
+    }
+}
+
+

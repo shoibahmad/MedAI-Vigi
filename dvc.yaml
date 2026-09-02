@@ -1,0 +1,37 @@
+stages:
+  generate_data:
+    cmd: python scripts/data_generator.py
+    deps:
+      - scripts/data_generator.py
+      - config/ml_config.yaml
+    outs:
+      - data/clinical_data.csv
+
+  train_model:
+    cmd: python scripts/model_trainer.py
+    deps:
+      - data/clinical_data.csv
+      - scripts/model_trainer.py
+      - config/ml_config.yaml
+    outs:
+      - models/adr_model.pkl
+      - models/adr_preprocessor.pkl
+
+  evaluate_model:
+    cmd: python scripts/evaluate_model.py
+    deps:
+      - models/adr_model.pkl
+      - data/clinical_data.csv
+      - scripts/evaluate_model.py
+    outs:
+      - reports/model_evaluation_report.md
+
+  track_experiments:
+    cmd: python scripts/experiment_tracker.py
+    deps:
+      - models/adr_model.pkl
+      - data/clinical_data.csv
+      - scripts/experiment_tracker.py
+    metrics:
+      - reports/experiment_metrics.json:
+          cache: false

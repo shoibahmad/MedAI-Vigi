@@ -1,0 +1,19 @@
+{
+  "name": "phenorx",
+  "version": "2.2.0",
+  "description": "Adverse Drug Reaction (ADR) Risk Prediction Service",
+  "main": "static/js/script.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/js/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage tests/js/*.test.js"
+  },
+  "keywords": [
+    "adr",
+    "pharmacovigilance",
+    "clinical-decision-support",
+    "machine-learning"
+  ],
+  "author": "Shoaib Ahmad",
+  "license": "MIT"
+}

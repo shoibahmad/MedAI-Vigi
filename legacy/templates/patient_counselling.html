@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Counselling - MedAI-VIGI</title>
+    <meta name="description"
+        content="Industry-standard patient counselling form for medication education, ADR awareness, and treatment planning.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/patient_counselling.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header glass-card">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-hand-holding-medical"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Patient Counselling</h1>
+                        <p class="subtitle">Comprehensive Medication Education & Safety</p>
+                    </div>
+                </div>
+                <div class="session-info">
+                    <div class="session-badge">
+                        <i class="fas fa-clock"></i>
+                        <span id="session-timer">00:00</span>
+                    </div>
+                    <div class="session-id">
+                        <span>Session: </span>
+                        <strong id="counselling-session-id">-</strong>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Patient Info Banner -->
+        <div class="patient-banner glass-card">
+            <div class="patient-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="patient-details">
+                <h3 id="patient-name-display">Patient Name</h3>
+                <div class="patient-meta">
+                    <span><i class="fas fa-id-card"></i> <span id="patient-id-display">-</span></span>
+                    <span><i class="fas fa-birthday-cake"></i> <span id="patient-age-display">-</span> years</span>
+                    <span><i class="fas fa-pills"></i> <span id="medication-display">-</span></span>
+                </div>
+            </div>
+            <div class="risk-indicator" id="risk-badge">
+                <span class="risk-label">ADR Risk</span>
+                <span class="risk-value" id="risk-level-display">-</span>
+            </div>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-container glass-card">
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-circle"><i class="fas fa-clipboard-check"></i></div>
+                    <span>Session Setup</span>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle"><i class="fas fa-pills"></i></div>
+                    <span>Medication Education</span>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle"><i class="fas fa-exclamation-triangle"></i></div>
+                    <span>ADR Awareness</span>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-circle"><i class="fas fa-brain"></i></div>
+                    <span>Comprehension</span>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-circle"><i class="fas fa-calendar-check"></i></div>
+                    <span>Follow-Up</span>
+                </div>
+                <div class="step" data-step="6">
+                    <div class="step-circle"><i class="fas fa-signature"></i></div>
+                    <span>Consent</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Main Form Container -->
+        <form id="counselling-form" class="counselling-form">
+
+            <!-- Step 1: Session Setup -->
+            <section class="form-section active glass-card" data-section="1">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Session Setup</h2>
+                        <p>Configure the counselling session parameters</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="session-type">
+                            <i class="fas fa-tag"></i>
+                            Session Type *
+                        </label>
+                        <select id="session-type" name="session_type" required>
+                            <option value="">Select session type...</option>
+                            <option value="initial">Initial Counselling</option>
+                            <option value="followup">Follow-up Counselling</option>
+                            <option value="medication_change">Medication Change</option>
+                            <option value="adr_event">ADR Event Counselling</option>
+                            <option value="discharge">Discharge Counselling</option>
+                            <option value="refill">Refill Counselling</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="counselling-mode">
+                            <i class="fas fa-video"></i>
+                            Counselling Mode *
+                        </label>
+                        <select id="counselling-mode" name="counselling_mode" required>
+                            <option value="">Select mode...</option>
+                            <option value="in_person">In-Person</option>
+                            <option value="telehealth">Telehealth/Video</option>
+                            <option value="bedside">Bedside</option>
+                            <option value="phone">Phone Consultation</option>
+                            <option value="pre_discharge">Pre-Discharge</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="counsellor-name">
+                            <i class="fas fa-user-md"></i>
+                            Counsellor Name *
+                        </label>
+                        <input type="text" id="counsellor-name" name="counsellor_name"
+                            placeholder="Enter counsellor's name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="counsellor-designation">
+                            <i class="fas fa-graduation-cap"></i>
+                            Designation
+                        </label>
+                        <select id="counsellor-designation" name="counsellor_designation">
+                            <option value="">Select designation...</option>
+                            <option value="pharmacist">Clinical Pharmacist</option>
+                            <option value="physician">Physician</option>
+                            <option value="nurse">Registered Nurse</option>
+                            <option value="pharmacy_tech">Pharmacy Technician</option>
+                            <option value="other">Other Healthcare Provider</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="language-preference">
+                            <i class="fas fa-language"></i>
+                            Language Preference
+                        </label>
+                        <select id="language-preference" name="language_preference">
+                            <option value="english">English</option>
+                            <option value="hindi">Hindi</option>
+                            <option value="spanish">Spanish</option>
+                            <option value="french">French</option>
+                            <option value="arabic">Arabic</option>
+                            <option value="mandarin">Mandarin</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="health-literacy">
+                            <i class="fas fa-book-reader"></i>
+                            Estimated Health Literacy
+                        </label>
+                        <select id="health-literacy" name="health_literacy">
+                            <option value="high">High - Medical Background</option>
+                            <option value="adequate" selected>Adequate - General Understanding</option>
+                            <option value="low">Low - Simplified Explanations Needed</option>
+                            <option value="very_low">Very Low - Visual Aids Required</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="learning-barriers">
+                        <i class="fas fa-universal-access"></i>
+                        Learning Barriers / Special Considerations
+                    </label>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="barriers" value="vision">
+                            <span><i class="fas fa-eye-slash"></i> Vision Impairment</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="barriers" value="hearing">
+                            <span><i class="fas fa-deaf"></i> Hearing Impairment</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="barriers" value="cognitive">
+                            <span><i class="fas fa-brain"></i> Cognitive Limitations</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="barriers" value="language">
+                            <span><i class="fas fa-language"></i> Language Barrier</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="barriers" value="caregiver">
+                            <span><i class="fas fa-users"></i> Caregiver Present</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="barriers" value="none">
+                            <span><i class="fas fa-check-circle"></i> No Barriers</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Medication Education -->
+            <section class="form-section glass-card" data-section="2">
+                <div class="section-header">
+                    <div class="section-icon gradient-green">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Medication Education</h2>
+                        <p>Drug-specific education and administration guidance</p>
+                    </div>
+                </div>
+
+                <!-- Medication Card (Auto-populated) -->
+                <div class="medication-card" id="medication-card">
+                    <div class="med-card-header">
+                        <div class="med-icon">
+                            <i class="fas fa-capsules"></i>
+                        </div>
+                        <div class="med-info">
+                            <h3 id="med-name">Loading medication...</h3>
+                            <p id="med-dose">Dose: Loading...</p>
+                        </div>
+                        <div class="med-risk-badge" id="med-risk-badge">
+                            <span>Risk Level</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Topics Checklist -->
+                <div class="education-checklist">
+                    <h4><i class="fas fa-list-check"></i> Topics Covered</h4>
+
+                    <div class="checklist-grid">
+                        <label class="checklist-item">
+                            <input type="checkbox" name="topics" value="purpose">
+                            <div class="checklist-content">
+                                <span class="topic-title">Purpose & Benefits</span>
+                                <span class="topic-desc">Explained why this medication is prescribed</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="topics" value="administration">
+                            <div class="checklist-content">
+                                <span class="topic-title">How to Take</span>
+                                <span class="topic-desc">Dosing instructions, timing, with/without food</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="topics" value="storage">
+                            <div class="checklist-content">
+                                <span class="topic-title">Storage Requirements</span>
+                                <span class="topic-desc">Temperature, light exposure, moisture</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="topics" value="missed_dose">
+                            <div class="checklist-content">
+                                <span class="topic-title">Missed Dose Guidance</span>
+                                <span class="topic-desc">What to do if a dose is missed</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="topics" value="food_interactions">
+                            <div class="checklist-content">
+                                <span class="topic-title">Food Interactions</span>
+                                <span class="topic-desc">Grapefruit, alcohol, dairy, etc.</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="topics" value="drug_interactions">
+                            <div class="checklist-content">
+                                <span class="topic-title">Drug Interactions</span>
+                                <span class="topic-desc">OTC drugs, supplements, other medications</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="topics" value="lifestyle">
+                            <div class="checklist-content">
+                                <span class="topic-title">Lifestyle Modifications</span>
+                                <span class="topic-desc">Driving, sun exposure, exercise</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="topics" value="refill">
+                            <div class="checklist-content">
+                                <span class="topic-title">Refill Process</span>
+                                <span class="topic-desc">How and when to refill prescription</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Additional Notes -->
+                <div class="form-group full-width">
+                    <label for="education-notes">
+                        <i class="fas fa-sticky-note"></i>
+                        Additional Education Notes
+                    </label>
+                    <textarea id="education-notes" name="education_notes" rows="4"
+                        placeholder="Enter any specific education points discussed, patient questions, or clarifications provided..."></textarea>
+                </div>
+            </section>
+
+            <!-- Step 3: ADR Awareness -->
+            <section class="form-section glass-card" data-section="3">
+                <div class="section-header">
+                    <div class="section-icon gradient-orange">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>ADR Awareness & Reporting</h2>
+                        <p>Side effects education and escalation criteria</p>
+                    </div>
+                </div>
+
+                <!-- Risk Summary Card -->
+                <div class="risk-summary-card" id="risk-summary-card">
+                    <div class="risk-summary-header">
+                        <h3><i class="fas fa-chart-line"></i> AI-Predicted Risk Profile</h3>
+                    </div>
+                    <div class="risk-summary-content">
+                        <div class="risk-item">
+                            <span class="risk-label">Risk Level</span>
+                            <span class="risk-value" id="adr-risk-level">Loading...</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Predicted ADR Type</span>
+                            <span class="risk-value" id="adr-type">Loading...</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Confidence Score</span>
+                            <span class="risk-value" id="adr-confidence">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expected Side Effects -->
+                <div class="side-effects-panel">
+                    <h4><i class="fas fa-info-circle"></i> Common Side Effects (Expected)</h4>
+                    <div class="effects-list" id="common-effects">
+                        <p class="loading-text">Loading from prediction data...</p>
+                    </div>
+                </div>
+
+                <!-- Warning Signs -->
+                <div class="warning-signs-panel">
+                    <h4><i class="fas fa-exclamation-circle"></i> Warning Signs (Red Flags)</h4>
+                    <p class="panel-desc">Patient advised to seek immediate medical attention if:</p>
+                    <div class="warning-list" id="warning-signs">
+                        <p class="loading-text">Loading warning signs...</p>
+                    </div>
+                </div>
+
+                <!-- ADR Checklist -->
+                <div class="adr-checklist">
+                    <h4><i class="fas fa-check-double"></i> ADR Education Completed</h4>
+                    <div class="checklist-grid">
+                        <label class="checklist-item">
+                            <input type="checkbox" name="adr_topics" value="common_effects">
+                            <div class="checklist-content">
+                                <span class="topic-title">Common Side Effects</span>
+                                <span class="topic-desc">Mild effects patient may experience</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="adr_topics" value="warning_signs">
+                            <div class="checklist-content">
+                                <span class="topic-title">Warning Signs</span>
+                                <span class="topic-desc">Serious symptoms requiring immediate attention</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="adr_topics" value="when_to_seek_help">
+                            <div class="checklist-content">
+                                <span class="topic-title">When to Seek Help</span>
+                                <span class="topic-desc">Clear escalation criteria explained</span>
+                            </div>
+                        </label>
+
+                        <label class="checklist-item">
+                            <input type="checkbox" name="adr_topics" value="self_reporting">
+                            <div class="checklist-content">
+                                <span class="topic-title">Self-Reporting Instructions</span>
+                                <span class="topic-desc">How to report ADRs to healthcare team</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- QR Code for Self-Reporting -->
+                <div class="qr-section">
+                    <div class="qr-content">
+                        <div class="qr-placeholder" id="qr-code">
+                            <i class="fas fa-qrcode"></i>
+                            <p>Scan to self-report ADRs</p>
+                        </div>
+                        <div class="qr-info">
+                            <h5>Patient Self-Reporting Portal</h5>
+                            <p>Provide patient with QR code or link to report any adverse reactions</p>
+                            <button type="button" class="btn btn-outline" id="generate-qr-btn">
+                                <i class="fas fa-qrcode"></i> Generate QR Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Comprehension Assessment -->
+            <section class="form-section glass-card" data-section="4">
+                <div class="section-header">
+                    <div class="section-icon gradient-purple">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Comprehension Assessment</h2>
+                        <p>Teach-Back method to verify patient understanding</p>
+                    </div>
+                </div>
+
+                <div class="teach-back-info">
+                    <i class="fas fa-info-circle"></i>
+                    <p><strong>Teach-Back Method:</strong> Ask patient to explain key points in their own words to
+                        verify understanding. Check each item the patient correctly demonstrates.</p>
+                </div>
+
+                <div class="comprehension-grid">
+                    <div class="comprehension-item">
+                        <div class="comp-header">
+                            <i class="fas fa-question-circle"></i>
+                            <h5>What is this medication for?</h5>
+                        </div>
+                        <div class="comp-options">
+                            <label class="radio-option">
+                                <input type="radio" name="comp_purpose" value="demonstrated">
+                                <span class="status-pass"><i class="fas fa-check"></i> Demonstrated</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_purpose" value="partial">
+                                <span class="status-partial"><i class="fas fa-minus"></i> Partial</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_purpose" value="needs_reinforcement">
+                                <span class="status-fail"><i class="fas fa-redo"></i> Needs Reinforcement</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="comprehension-item">
+                        <div class="comp-header">
+                            <i class="fas fa-question-circle"></i>
+                            <h5>How and when should you take this medication?</h5>
+                        </div>
+                        <div class="comp-options">
+                            <label class="radio-option">
+                                <input type="radio" name="comp_dosing" value="demonstrated">
+                                <span class="status-pass"><i class="fas fa-check"></i> Demonstrated</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_dosing" value="partial">
+                                <span class="status-partial"><i class="fas fa-minus"></i> Partial</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_dosing" value="needs_reinforcement">
+                                <span class="status-fail"><i class="fas fa-redo"></i> Needs Reinforcement</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="comprehension-item">
+                        <div class="comp-header">
+                            <i class="fas fa-question-circle"></i>
+                            <h5>What side effects should you watch for?</h5>
+                        </div>
+                        <div class="comp-options">
+                            <label class="radio-option">
+                                <input type="radio" name="comp_side_effects" value="demonstrated">
+                                <span class="status-pass"><i class="fas fa-check"></i> Demonstrated</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_side_effects" value="partial">
+                                <span class="status-partial"><i class="fas fa-minus"></i> Partial</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_side_effects" value="needs_reinforcement">
+                                <span class="status-fail"><i class="fas fa-redo"></i> Needs Reinforcement</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="comprehension-item">
+                        <div class="comp-header">
+                            <i class="fas fa-question-circle"></i>
+                            <h5>When should you contact your healthcare provider?</h5>
+                        </div>
+                        <div class="comp-options">
+                            <label class="radio-option">
+                                <input type="radio" name="comp_when_call" value="demonstrated">
+                                <span class="status-pass"><i class="fas fa-check"></i> Demonstrated</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_when_call" value="partial">
+                                <span class="status-partial"><i class="fas fa-minus"></i> Partial</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_when_call" value="needs_reinforcement">
+                                <span class="status-fail"><i class="fas fa-redo"></i> Needs Reinforcement</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="comprehension-item">
+                        <div class="comp-header">
+                            <i class="fas fa-question-circle"></i>
+                            <h5>What should you do if you miss a dose?</h5>
+                        </div>
+                        <div class="comp-options">
+                            <label class="radio-option">
+                                <input type="radio" name="comp_missed_dose" value="demonstrated">
+                                <span class="status-pass"><i class="fas fa-check"></i> Demonstrated</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_missed_dose" value="partial">
+                                <span class="status-partial"><i class="fas fa-minus"></i> Partial</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="comp_missed_dose" value="needs_reinforcement">
+                                <span class="status-fail"><i class="fas fa-redo"></i> Needs Reinforcement</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comprehension Score -->
+                <div class="comprehension-score-card">
+                    <div class="score-ring">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="score-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="score-fill" id="score-circle" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <div class="score-value" id="comprehension-score">0%</div>
+                    </div>
+                    <div class="score-info">
+                        <h4>Comprehension Score</h4>
+                        <p id="score-interpretation">Complete the assessment above</p>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="comprehension-notes">
+                        <i class="fas fa-clipboard"></i>
+                        Assessment Notes
+                    </label>
+                    <textarea id="comprehension-notes" name="comprehension_notes" rows="3"
+                        placeholder="Any additional observations about patient understanding, areas requiring follow-up, or special accommodations made..."></textarea>
+                </div>
+            </section>
+
+            <!-- Step 5: Follow-Up Planning -->
+            <section class="form-section glass-card" data-section="5">
+                <div class="section-header">
+                    <div class="section-icon gradient-cyan">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Follow-Up Planning</h2>
+                        <p>Schedule monitoring and next appointments</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="next-appointment">
+                            <i class="fas fa-calendar-alt"></i>
+                            Next Follow-Up Appointment
+                        </label>
+                        <input type="datetime-local" id="next-appointment" name="next_appointment">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="followup-type">
+                            <i class="fas fa-stethoscope"></i>
+                            Follow-Up Type
+                        </label>
+                        <select id="followup-type" name="followup_type">
+                            <option value="">Select type...</option>
+                            <option value="clinic_visit">Clinic Visit</option>
+                            <option value="phone_call">Phone Follow-Up</option>
+                            <option value="telehealth">Telehealth Visit</option>
+                            <option value="lab_work">Laboratory Work</option>
+                            <option value="specialist">Specialist Referral</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lab-monitoring">
+                            <i class="fas fa-vials"></i>
+                            Lab Monitoring Required
+                        </label>
+                        <select id="lab-monitoring" name="lab_monitoring">
+                            <option value="none">No Lab Monitoring</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Bi-Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="as_needed">As Clinically Indicated</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="refill-date">
+                            <i class="fas fa-prescription-bottle"></i>
+                            Medication Refill Date
+                        </label>
+                        <input type="date" id="refill-date" name="refill_date">
+                    </div>
+                </div>
+
+                <!-- Reminder Preferences -->
+                <div class="reminder-section">
+                    <h4><i class="fas fa-bell"></i> Patient Reminder Preferences</h4>
+                    <div class="reminder-grid">
+                        <label class="reminder-option">
+                            <input type="checkbox" name="reminders" value="sms">
+                            <div class="reminder-content">
+                                <i class="fas fa-sms"></i>
+                                <span>SMS Reminders</span>
+                            </div>
+                        </label>
+                        <label class="reminder-option">
+                            <input type="checkbox" name="reminders" value="email">
+                            <div class="reminder-content">
+                                <i class="fas fa-envelope"></i>
+                                <span>Email Reminders</span>
+                            </div>
+                        </label>
+                        <label class="reminder-option">
+                            <input type="checkbox" name="reminders" value="phone">
+                            <div class="reminder-content">
+                                <i class="fas fa-phone"></i>
+                                <span>Phone Call</span>
+                            </div>
+                        </label>
+                        <label class="reminder-option">
+                            <input type="checkbox" name="reminders" value="app">
+                            <div class="reminder-content">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>App Notification</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="patient-phone">
+                            <i class="fas fa-phone-alt"></i>
+                            Patient Phone
+                        </label>
+                        <input type="tel" id="patient-phone" name="patient_phone" placeholder="+91 XXXXX XXXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="patient-email">
+                            <i class="fas fa-at"></i>
+                            Patient Email
+                        </label>
+                        <input type="email" id="patient-email" name="patient_email" placeholder="patient@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emergency-contact">
+                            <i class="fas fa-user-friends"></i>
+                            Emergency Contact
+                        </label>
+                        <input type="text" id="emergency-contact" name="emergency_contact" placeholder="Name & Phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pharmacy-info">
+                            <i class="fas fa-clinic-medical"></i>
+                            Preferred Pharmacy
+                        </label>
+                        <input type="text" id="pharmacy-info" name="pharmacy_info"
+                            placeholder="Pharmacy name & location">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="followup-notes">
+                        <i class="fas fa-notes-medical"></i>
+                        Follow-Up Notes
+                    </label>
+                    <textarea id="followup-notes" name="followup_notes" rows="3"
+                        placeholder="Specific follow-up instructions, specialist referrals, or additional monitoring requirements..."></textarea>
+                </div>
+            </section>
+
+            <!-- Step 6: Consent & Documentation -->
+            <section class="form-section glass-card" data-section="6">
+                <div class="section-header">
+                    <div class="section-icon gradient-gold">
+                        <i class="fas fa-signature"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Consent & Documentation</h2>
+                        <p>Digital acknowledgment and session completion</p>
+                    </div>
+                </div>
+
+                <!-- Consent Statement -->
+                <div class="consent-statement">
+                    <h4><i class="fas fa-file-contract"></i> Counselling Acknowledgment</h4>
+                    <div class="consent-text">
+                        <p>By signing below, the patient acknowledges that:</p>
+                        <ul>
+                            <li>I have received comprehensive medication counselling regarding my prescribed
+                                medication(s)</li>
+                            <li>I understand how to take my medication, including dosing, timing, and administration
+                            </li>
+                            <li>I am aware of potential side effects and know when to seek medical attention</li>
+                            <li>I have had the opportunity to ask questions and have them answered satisfactorily</li>
+                            <li>I understand the importance of medication adherence and follow-up appointments</li>
+                            <li>I consent to receiving reminder communications via my preferred method</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Patient Materials -->
+                <div class="materials-section">
+                    <h4><i class="fas fa-file-pdf"></i> Patient Materials Provided</h4>
+                    <div class="materials-grid">
+                        <label class="material-item">
+                            <input type="checkbox" name="materials" value="medication_guide">
+                            <div class="material-content">
+                                <i class="fas fa-book-medical"></i>
+                                <span>Medication Guide</span>
+                            </div>
+                        </label>
+                        <label class="material-item">
+                            <input type="checkbox" name="materials" value="schedule_card">
+                            <div class="material-content">
+                                <i class="fas fa-calendar"></i>
+                                <span>Pill Schedule Card</span>
+                            </div>
+                        </label>
+                        <label class="material-item">
+                            <input type="checkbox" name="materials" value="emergency_card">
+                            <div class="material-content">
+                                <i class="fas fa-id-card-alt"></i>
+                                <span>Emergency Contact Card</span>
+                            </div>
+                        </label>
+                        <label class="material-item">
+                            <input type="checkbox" name="materials" value="dietary_guide">
+                            <div class="material-content">
+                                <i class="fas fa-utensils"></i>
+                                <span>Dietary Guidelines</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Digital Signature -->
+                <div class="signature-section">
+                    <div class="signature-box">
+                        <h5><i class="fas fa-user"></i> Patient Signature</h5>
+                        <canvas id="patient-signature-pad" class="signature-pad"></canvas>
+                        <div class="signature-actions">
+                            <button type="button" class="btn btn-sm btn-outline" id="clear-patient-sig">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                        </div>
+                        <input type="hidden" id="patient-signature-data" name="patient_signature">
+                    </div>
+
+                    <div class="signature-box">
+                        <h5><i class="fas fa-user-md"></i> Counsellor Signature</h5>
+                        <canvas id="counsellor-signature-pad" class="signature-pad"></canvas>
+                        <div class="signature-actions">
+                            <button type="button" class="btn btn-sm btn-outline" id="clear-counsellor-sig">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                        </div>
+                        <input type="hidden" id="counsellor-signature-data" name="counsellor_signature">
+                    </div>
+                </div>
+
+                <!-- Session Summary -->
+                <div class="session-summary">
+                    <h4><i class="fas fa-clipboard-list"></i> Session Summary</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">Session Duration</span>
+                            <span class="summary-value" id="final-duration">--:--</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Topics Covered</span>
+                            <span class="summary-value" id="topics-count">0 / 8</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Comprehension Score</span>
+                            <span class="summary-value" id="final-comp-score">0%</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Follow-Up Scheduled</span>
+                            <span class="summary-value" id="followup-scheduled">Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="final-actions">
+                    <button type="button" class="btn btn-secondary" id="save-draft-btn">
+                        <i class="fas fa-save"></i> Save Draft
+                    </button>
+                    <button type="button" class="btn btn-outline" id="generate-pdf-btn">
+                        <i class="fas fa-file-pdf"></i> Generate PDF
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submit-counselling-btn">
+                        <i class="fas fa-check-circle"></i> Complete Counselling
+                    </button>
+                </div>
+            </section>
+
+        </form>
+
+        <!-- Navigation Buttons -->
+        <div class="form-navigation glass-card">
+            <button type="button" class="nav-btn btn-prev" id="prev-btn" disabled>
+                <i class="fas fa-arrow-left"></i>
+                <span>Previous</span>
+            </button>
+            <div class="step-indicator">
+                <span id="current-step">1</span> / <span>6</span>
+            </div>
+            <button type="button" class="nav-btn btn-next" id="next-btn">
+                <span>Next</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/static/js/patient_counselling.js"></script>
+</body>
+
+</html>

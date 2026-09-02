@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQs - PhenoRx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1771389944029472"
+     crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e2e8f0;
+            padding-top: 90px;
+            min-height: 100vh;
+        }
+
+        .faq-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .faq-title {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .faq-subtitle {
+            color: #a0aec0;
+            font-size: 1.2rem;
+        }
+
+        .faq-item {
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(37, 99, 235, 0.4);
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(37, 99, 235, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .faq-question h3 {
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            flex: 1;
+        }
+
+        .faq-icon {
+            color: #3b82f6;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-answer-content {
+            padding: 20px 25px;
+            color: #cbd5e0;
+            line-height: 1.8;
+        }
+
+        .faq-answer-content ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .faq-answer-content li {
+            margin-bottom: 8px;
+        }
+
+        .faq-category {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .faq-title {
+                font-size: 2rem;
+            }
+            .faq-question {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="faq-container">
+        <div class="faq-header">
+            <h1 class="faq-title">
+                <i class="fas fa-question-circle"></i> Frequently Asked Questions
+            </h1>
+            <p class="faq-subtitle">Find answers to common questions about PhenoRx</p>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-info-circle"></i> General Questions</h2>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>What is PhenoRx?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    PhenoRx is an advanced AI-powered system designed for automated adverse drug reaction (ADR) 
+                    identification and clinical decision support. It combines machine learning algorithms with 
+                    Google's Gemini AI to provide comprehensive drug safety analysis, interaction checking, and 
+                    personalized dosing recommendations for healthcare professionals.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Who developed PhenoRx?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    PhenoRx was developed by Pharm.D students at Integral University, Lucknow, as part of their 
+                    research project in clinical pharmacy and pharmacovigilance. The system represents the 
+                    integration of pharmaceutical knowledge with modern artificial intelligence technology.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Is PhenoRx a replacement for clinical judgment?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    No. PhenoRx is a clinical decision support tool designed to assist healthcare professionals, 
+                    not replace them. All predictions, recommendations, and analyses should be reviewed and validated 
+                    by qualified healthcare professionals before implementation. The system supplements professional 
+                    medical judgment with data-driven insights.
+                </div>
+            </div>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-cogs"></i> Features & Functionality</h2>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>What features does PhenoRx offer?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    PhenoRx offers several key features:
+                    <ul>
+                        <li>ADR Risk Assessment with probability scores</li>
+                        <li>Real-time Drug Interaction Checking</li>
+                        <li>Personalized Dosing Recommendations</li>
+                        <li>Pharmacogenomic Analysis</li>
+                        <li>Therapeutic Drug Monitoring Tools</li>
+                        <li>AI-Powered Clinical Insights</li>
+                        <li>Comprehensive Medical Report Generation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>How accurate is the ADR prediction?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    The ADR prediction model is trained on clinical data and provides probability scores with 
+                    confidence intervals. While the system demonstrates high accuracy in testing, it should be 
+                    used as one of many tools in clinical decision-making. The AI analysis provides additional 
+                    context and reasoning to support the predictions.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Can I check interactions between multiple drugs?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Yes! The Drug Interactions module allows you to add multiple medications and check for 
+                    interactions between all combinations. The system provides severity levels (major, moderate, 
+                    minor) and specific recommendations for each interaction detected.
+                </div>
+            </div>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-user-md"></i> Usage & Access</h2>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Who can use PhenoRx?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    PhenoRx is designed for healthcare professionals including:
+                    <ul>
+                        <li>Physicians and Medical Doctors</li>
+                        <li>Clinical Pharmacists</li>
+                        <li>Pharmacy Students and Residents</li>
+                        <li>Nurses and Healthcare Providers</li>
+                        <li>Clinical Researchers</li>
+                    </ul>
+                    The system requires medical knowledge to interpret results appropriately.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Is there a mobile version available?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    The web interface is fully responsive and works on mobile devices, tablets, and desktops. 
+                    You can access PhenoRx through any modern web browser on your mobile device. A dedicated 
+                    mobile app may be developed in the future based on user feedback.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Do I need to create an account?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Currently, the system does not require account creation for basic usage. However, patient 
+                    information and assessment results are stored in your browser's session storage. For production 
+                    deployment, user accounts may be implemented to enable data persistence and multi-device access.
+                </div>
+            </div>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-shield-alt"></i> Privacy & Security</h2>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Is patient data secure?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Patient data security is a priority. Currently, data is stored locally in your browser and 
+                    not transmitted to external servers except for AI analysis. For production deployment, 
+                    appropriate security measures including encryption, secure authentication, and HIPAA compliance 
+                    would be implemented. Please refer to our Privacy Policy for detailed information.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>How is AI used in the system?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    PhenoRx uses two types of AI:
+                    <ul>
+                        <li><strong>Machine Learning Models:</strong> Trained on clinical data for ADR prediction</li>
+                        <li><strong>Google Gemini AI:</strong> Provides natural language analysis and clinical insights</li>
+                    </ul>
+                    The AI components enhance the system's capabilities but all recommendations should be 
+                    validated by healthcare professionals.
+                </div>
+            </div>
+        </div>
+
+        <h2 class="faq-category"><i class="fas fa-life-ring"></i> Support & Contact</h2>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>How can I get technical support?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    For technical support or questions, you can contact us:
+                    <ul>
+                        <li><strong>Email:</strong> phenorx@iul.ac.in</li>
+                        <li><strong>Phone:</strong> +91 8853741966</li>
+                        <li><strong>Address:</strong> Integral University, Kursi Road, Lucknow - 226026</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Can I contribute to the project?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    We welcome contributions from the healthcare and technology community! If you're interested 
+                    in contributing to PhenoRx through research, development, or clinical validation, please 
+                    contact us at phenorx@iul.ac.in. We're particularly interested in collaborations that 
+                    can enhance the system's capabilities and clinical utility.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <h3>Where can I find more documentation?</h3>
+                <i class="fas fa-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Comprehensive documentation is available in the Documentation section of our website. 
+                    You can also find API reference guides, research papers, and technical specifications. 
+                    For specific questions not covered in the documentation, please contact our support team.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+
+    <script>
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            const allItems = document.querySelectorAll('.faq-item');
+            
+            // Close all other items
+            allItems.forEach(item => {
+                if (item !== faqItem && item.classList.contains('active')) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            // Toggle current item
+            faqItem.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

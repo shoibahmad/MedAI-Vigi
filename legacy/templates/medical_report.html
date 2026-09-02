@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Report - ADR Risk Assessment</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .action-bar {
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 2px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #3b82f6;
+        }
+
+        /* Medical Report Container */
+        #medical-report {
+            background: white;
+            color: #1a202c;
+            border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .report-page {
+            padding: 40px;
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+        }
+
+        /* Report Header */
+        .report-header {
+            border-bottom: 4px solid #3b82f6;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .hospital-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        .hospital-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+        }
+
+        .hospital-details h1 {
+            font-size: 24px;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .hospital-details p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .report-meta {
+            text-align: right;
+            color: #718096;
+        }
+
+        .report-meta div {
+            margin-bottom: 5px;
+        }
+
+        .report-title {
+            text-align: center;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .report-title h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .report-title p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Patient Information Section */
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #2d3748;
+            border-left: 4px solid #3b82f6;
+            padding-left: 12px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        /* Clinical Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: #3b82f6;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        /* Risk Assessment Section */
+        .risk-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .risk-level {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .risk-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .risk-high {
+            background: #fee;
+            color: #c53030;
+            border: 2px solid #fc8181;
+        }
+
+        .risk-medium {
+            background: #fef5e7;
+            color: #d97706;
+            border: 2px solid #fbbf24;
+        }
+
+        .risk-low {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #34d399;
+        }
+
+        /* Gemini Analysis Section */
+        .analysis-box {
+            background: #edf2f7;
+            border-left: 4px solid #4299e1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .analysis-box h4 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .analysis-box p {
+            color: #4a5568;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .analysis-box ul {
+            margin-left: 20px;
+            color: #4a5568;
+        }
+
+        .analysis-box li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        /* Recommendations Section */
+        .recommendation-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #48bb78;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+        }
+
+        .recommendation-item strong {
+            color: #2d3748;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Footer */
+        .report-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #718096;
+            font-size: 12px;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 60px;
+            margin: 40px 0 30px 0;
+            padding: 0 20px;
+        }
+
+        .signature-box {
+            flex: 1;
+            text-align: center;
+            min-width: 250px;
+        }
+
+        .signature-line {
+            border-top: 2px solid #2d3748;
+            padding-top: 10px;
+            margin-top: 60px;
+        }
+
+        .signature-label {
+            font-size: 14px;
+            color: #4a5568;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .action-bar {
+                display: none;
+            }
+
+            .report-page {
+                padding: 20px;
+                box-shadow: none;
+            }
+
+            .page-break {
+                page-break-after: always;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .report-page {
+                padding: 20px;
+            }
+
+            .hospital-info {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .report-meta {
+                text-align: left;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .signature-section {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'shared_header.html' %}
+    
+    <div class="container">
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div>
+                <h3 style="color: #3b82f6; margin-bottom: 5px;">Medical Report Generator</h3>
+                <p style="color: #a0aec0; font-size: 14px;">ADR Risk Assessment Report</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="downloadPDF()" class="btn btn-download">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </button>
+                <button onclick="window.print()" class="btn btn-download" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-print"></i>
+                    Print Report
+                </button>
+                <button onclick="window.history.back()" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Back
+                </button>
+            </div>
+        </div>
+
+        <!-- Medical Report -->
+        <div id="medical-report">
+            <div class="report-page">
+                <!-- Report Header -->
+                <div class="report-header">
+                    <div class="hospital-info">
+                        <div class="hospital-logo">
+                            <div class="logo-icon">
+                                <i class="fas fa-hospital"></i>
+                            </div>
+                            <div class="hospital-details">
+                                <h1>Medical Center</h1>
+                                <p>Clinical Decision Support System</p>
+                                <p>Department of Clinical Pharmacology</p>
+                            </div>
+                        </div>
+                        <div class="report-meta">
+                            <div><strong>Report ID:</strong> <span id="report-id">ADR-2024-001</span></div>
+                            <div><strong>Generated:</strong> <span id="report-date"></span></div>
+                            <div><strong>Time:</strong> <span id="report-time"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-title">
+                    <h2>ADVERSE DRUG REACTION RISK ASSESSMENT REPORT</h2>
+                    <p>Comprehensive Clinical Analysis & Recommendations</p>
+                </div>
+
+                <!-- Patient Information -->
+                <div class="info-section">
+                    <h3 class="section-title">Patient Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Patient Name</span>
+                            <span class="info-value" id="patient-name">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Patient ID / MRN</span>
+                            <span class="info-value" id="patient-id">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Age</span>
+                            <span class="info-value" id="patient-age">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Gender</span>
+                            <span class="info-value" id="patient-gender">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Attending Clinician</span>
+                            <span class="info-value" id="clinician-name">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Department</span>
+                            <span class="info-value" id="department">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clinical Data -->
+                <div class="info-section">
+                    <h3 class="section-title">Clinical Parameters</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                                <th>Unit</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clinical-data-table">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Medication Information -->
+                <div class="info-section">
+                    <h3 class="section-title">Medication Details</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Medication Name</span>
+                            <span class="info-value" id="medication-name">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Dosage</span>
+                            <span class="info-value" id="medication-dosage">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Route</span>
+                            <span class="info-value" id="medication-route">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Duration</span>
+                            <span class="info-value" id="medication-duration">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comorbidities -->
+                <div class="info-section">
+                    <h3 class="section-title">Comorbidities & Medical History</h3>
+                    <div id="comorbidities-list" style="background: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Risk Assessment -->
+                <div class="info-section">
+                    <h3 class="section-title">ADR Risk Assessment</h3>
+                    <div class="risk-card">
+                        <div class="risk-header">
+                            <div>
+                                <h4 style="color: #718096; margin-bottom: 5px;">Overall ADR Risk Probability</h4>
+                                <div class="risk-level" id="risk-probability">-</div>
+                            </div>
+                            <div class="risk-badge" id="risk-badge">-</div>
+                        </div>
+                        <div id="risk-details" style="color: #4a5568; line-height: 1.8;">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specific ADR Types -->
+                <div class="info-section">
+                    <h3 class="section-title">Specific ADR Type Predictions</h3>
+                    <div id="adr-types-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Gemini AI Analysis -->
+                <div class="info-section">
+                    <h3 class="section-title">AI-Powered Clinical Analysis (Gemini)</h3>
+                    <div class="analysis-box">
+                        <h4><i class="fas fa-brain"></i> Clinical Interpretation</h4>
+                        <div id="gemini-analysis" style="white-space: pre-wrap;">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clinical Recommendations -->
+                <div class="info-section">
+                    <h3 class="section-title">Clinical Recommendations</h3>
+                    <div id="recommendations-list">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Monitoring Plan -->
+                <div class="info-section">
+                    <h3 class="section-title">Monitoring & Follow-up Plan</h3>
+                    <div id="monitoring-plan" style="background: #f7fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Signature Section -->
+                <div class="signature-section">
+                    <div class="signature-box">
+                        <div class="signature-line">
+                            <div class="signature-label">Attending Physician Signature</div>
+                        </div>
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-line">
+                            <div class="signature-label">Clinical Pharmacist Signature</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Footer -->
+                <div class="report-footer">
+                    <p><strong>Disclaimer:</strong> This report is generated by an AI-powered clinical decision support system. 
+                    All recommendations should be reviewed by qualified healthcare professionals before implementation.</p>
+                    <p style="margin-top: 10px;">© 2024 MedAI-VIGI: An Intelligent System for Automated ADR Identification</p>
+                    <p>Report generated automatically on <span id="footer-date"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load data from sessionStorage or URL parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Medical Report - Loading data...');
+            
+            // Set current date and time
+            const now = new Date();
+            document.getElementById('report-date').textContent = now.toLocaleDateString('en-US', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            document.getElementById('report-time').textContent = now.toLocaleTimeString('en-US');
+            document.getElementById('footer-date').textContent = now.toLocaleString('en-US');
+
+            // Generate unique report ID
+            const reportId = 'ADR-' + now.getFullYear() + '-' + String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+            document.getElementById('report-id').textContent = reportId;
+
+            // Try to get data from multiple sources
+            let assessmentData = {};
+            let predictionResults = {};
+            
+            // Method 1: Try sessionStorage
+            try {
+                const storedAssessment = sessionStorage.getItem('assessmentData');
+                const storedResults = sessionStorage.getItem('predictionResults');
+                
+                if (storedAssessment) {
+                    assessmentData = JSON.parse(storedAssessment);
+                    console.log('Loaded assessment data from sessionStorage:', assessmentData);
+                }
+                
+                if (storedResults) {
+                    predictionResults = JSON.parse(storedResults);
+                    console.log('Loaded prediction results from sessionStorage:', predictionResults);
+                }
+            } catch (e) {
+                console.error('Error loading from sessionStorage:', e);
+            }
+
+            // Method 2: Try URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('data')) {
+                try {
+                    const urlData = JSON.parse(decodeURIComponent(urlParams.get('data')));
+                    assessmentData = urlData.assessment || assessmentData;
+                    predictionResults = urlData.results || predictionResults;
+                    console.log('Loaded data from URL parameters');
+                } catch (e) {
+                    console.error('Error loading from URL:', e);
+                }
+            }
+
+            // Method 3: Try localStorage as fallback
+            if (Object.keys(assessmentData).length === 0) {
+                try {
+                    const localAssessment = localStorage.getItem('lastAssessmentData');
+                    const localResults = localStorage.getItem('lastPredictionResults');
+                    
+                    if (localAssessment) {
+                        assessmentData = JSON.parse(localAssessment);
+                        console.log('Loaded assessment data from localStorage');
+                    }
+                    
+                    if (localResults) {
+                        predictionResults = JSON.parse(localResults);
+                        console.log('Loaded prediction results from localStorage');
+                    }
+                } catch (e) {
+                    console.error('Error loading from localStorage:', e);
+                }
+            }
+
+            // Load patient information
+            document.getElementById('patient-name').textContent = 
+                assessmentData.patient_name || 
+                sessionStorage.getItem('patientName') || 
+                urlParams.get('patientName') || 
+                'Not Provided';
+                
+            document.getElementById('patient-id').textContent = 
+                assessmentData.patient_id || 
+                sessionStorage.getItem('patientId') || 
+                urlParams.get('patientId') || 
+                'N/A';
+                
+            document.getElementById('patient-age').textContent = 
+                (assessmentData.age || sessionStorage.getItem('age') || '-') + ' years';
+                
+            document.getElementById('patient-gender').textContent = 
+                assessmentData.gender || 
+                sessionStorage.getItem('gender') || 
+                'Not Specified';
+                
+            document.getElementById('clinician-name').textContent = 
+                assessmentData.clinician_name || 
+                sessionStorage.getItem('clinicianName') || 
+                'Not Provided';
+                
+            document.getElementById('department').textContent = 
+                assessmentData.department || 
+                sessionStorage.getItem('department') || 
+                'Clinical Pharmacology';
+
+            // Populate all sections
+            populateClinicalData(assessmentData);
+            populateMedicationInfo(assessmentData);
+            populateComorbidities(assessmentData);
+            populateRiskAssessment(predictionResults);
+            populateADRTypes(predictionResults);
+            populateGeminiAnalysis(predictionResults);
+            populateRecommendations(predictionResults);
+            populateMonitoringPlan(predictionResults);
+
+            console.log('Medical Report - All data populated');
+        });
+
+        function populateClinicalData(data) {
+            const table = document.getElementById('clinical-data-table');
+            const clinicalParams = [
+                { name: 'Weight', value: data.weight, unit: 'kg', key: 'weight' },
+                { name: 'Height', value: data.height, unit: 'cm', key: 'height' },
+                { name: 'BMI', value: data.bmi || calculateBMI(data.weight, data.height), unit: 'kg/m²', key: 'bmi' },
+                { name: 'Creatinine', value: data.creatinine, unit: 'mg/dL', key: 'creatinine' },
+                { name: 'eGFR', value: data.egfr, unit: 'mL/min/1.73m²', key: 'egfr' },
+                { name: 'AST', value: data.ast, unit: 'U/L', key: 'ast' },
+                { name: 'ALT', value: data.alt, unit: 'U/L', key: 'alt' },
+                { name: 'Systolic BP', value: data.systolic_bp, unit: 'mmHg', key: 'systolic_bp' },
+                { name: 'Diastolic BP', value: data.diastolic_bp, unit: 'mmHg', key: 'diastolic_bp' },
+                { name: 'Heart Rate', value: data.heart_rate, unit: 'bpm', key: 'heart_rate' }
+            ];
+
+            clinicalParams.forEach(param => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td><strong>${param.name}</strong></td>
+                    <td>${param.value || '-'}</td>
+                    <td>${param.unit}</td>
+                    <td>${getParameterStatus(param.key, param.value)}</td>
+                `;
+            });
+        }
+
+        function calculateBMI(weight, height) {
+            if (!weight || !height) return null;
+            const heightM = height / 100;
+            return (weight / (heightM * heightM)).toFixed(1);
+        }
+
+        function getParameterStatus(key, value) {
+            if (!value) return '<span style="color: #718096;">-</span>';
+            
+            const ranges = {
+                creatinine: { normal: [0.6, 1.2], unit: 'mg/dL' },
+                egfr: { normal: [90, 120], unit: 'mL/min' },
+                ast: { normal: [10, 40], unit: 'U/L' },
+                alt: { normal: [7, 56], unit: 'U/L' },
+                systolic_bp: { normal: [90, 120], unit: 'mmHg' },
+                diastolic_bp: { normal: [60, 80], unit: 'mmHg' },
+                heart_rate: { normal: [60, 100], unit: 'bpm' },
+                bmi: { normal: [18.5, 24.9], unit: 'kg/m²' }
+            };
+
+            const range = ranges[key];
+            if (!range) return '<span style="color: #718096;">-</span>';
+
+            const numValue = parseFloat(value);
+            if (numValue >= range.normal[0] && numValue <= range.normal[1]) {
+                return '<span style="color: #065f46; font-weight: 600;">✓ Normal</span>';
+            } else if (numValue < range.normal[0]) {
+                return '<span style="color: #d97706; font-weight: 600;">⚠ Low</span>';
+            } else {
+                return '<span style="color: #c53030; font-weight: 600;">⚠ High</span>';
+            }
+        }
+
+        function populateMedicationInfo(data) {
+            document.getElementById('medication-name').textContent = data.medication_name || 'Not Specified';
+            document.getElementById('medication-dosage').textContent = data.dosage || 'Not Specified';
+            document.getElementById('medication-route').textContent = data.route || 'Not Specified';
+            document.getElementById('medication-duration').textContent = (data.duration || 'Not Specified') + (data.duration ? ' days' : '');
+        }
+
+        function populateComorbidities(data) {
+            const container = document.getElementById('comorbidities-list');
+            const comorbidities = [];
+            
+            const conditions = [
+                'diabetes', 'hypertension', 'heart_disease', 'kidney_disease', 
+                'liver_disease', 'asthma', 'copd', 'cancer', 'depression', 
+                'anxiety', 'thyroid_disorder', 'autoimmune_disease'
+            ];
+
+            conditions.forEach(condition => {
+                if (data[condition] === 'Yes' || data[condition] === true || data[condition] === 1) {
+                    comorbidities.push(condition.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+                }
+            });
+
+            if (comorbidities.length > 0) {
+                container.innerHTML = '<ul style="margin-left: 20px; color: #2d3748;">' + 
+                    comorbidities.map(c => `<li style="margin-bottom: 8px;"><strong>${c}</strong></li>`).join('') + 
+                    '</ul>';
+            } else {
+                container.innerHTML = '<p style="color: #718096;">No significant comorbidities reported</p>';
+            }
+        }
+
+        function populateRiskAssessment(results) {
+            console.log('Populating Risk Assessment with:', results);
+            
+            // Calculate ADR probability from multiple possible sources
+            let probability = 0;
+            
+            if (results.adr_probability !== undefined) {
+                probability = results.adr_probability;
+            } else if (results.probability !== undefined) {
+                probability = results.probability;
+            } else if (results.no_adr_probability !== undefined) {
+                // Convert no_adr_probability to adr_probability
+                probability = (100 - results.no_adr_probability) / 100;
+            } else if (results.top_adr_risks) {
+                // Get highest ADR risk from top risks
+                const risks = Object.values(results.top_adr_risks);
+                if (risks.length > 0) {
+                    probability = Math.max(...risks) / 100;
+                }
+            }
+            
+            console.log('Calculated ADR Probability:', probability);
+            
+            // Fix: Check if probability is already in percentage form (>1) or decimal form (<1)
+            const isAlreadyPercentage = probability > 1;
+            const displayProbability = isAlreadyPercentage ? probability : (probability * 100);
+            
+            // For risk level calculation, ensure we use decimal form (0-1)
+            const decimalProbability = isAlreadyPercentage ? (probability / 100) : probability;
+            const riskLevel = results.risk_level || getRiskLevel(decimalProbability);
+            console.log('Risk Level:', riskLevel);
+            
+            document.getElementById('risk-probability').textContent = displayProbability.toFixed(1) + '%';
+            
+            const badge = document.getElementById('risk-badge');
+            badge.textContent = riskLevel;
+            badge.className = 'risk-badge risk-' + riskLevel.toLowerCase();
+
+            const details = document.getElementById('risk-details');
+            details.innerHTML = `
+                <p><strong>Risk Classification:</strong> ${riskLevel} Risk</p>
+                <p><strong>Confidence Score:</strong> ${((results.confidence || 0.85) * 100).toFixed(1)}%</p>
+                <p><strong>Assessment Method:</strong> Machine Learning Model + AI Analysis</p>
+                <p style="margin-top: 10px;">${getRiskDescription(riskLevel)}</p>
+            `;
+        }
+
+        function getRiskLevel(probability) {
+            if (probability >= 0.7) return 'High';
+            if (probability >= 0.4) return 'Medium';
+            return 'Low';
+        }
+
+        function getRiskDescription(level) {
+            const descriptions = {
+                'High': 'Significant risk of adverse drug reaction. Enhanced monitoring and preventive measures strongly recommended. Consider alternative therapy or dose adjustment.',
+                'Medium': 'Moderate risk of adverse drug reaction. Regular monitoring advised. Review patient factors and medication regimen.',
+                'Low': 'Low probability of adverse drug reaction. Standard monitoring protocols appropriate. Continue current therapy with routine follow-up.'
+            };
+            return descriptions[level] || '';
+        }
+
+        function populateADRTypes(results) {
+            const container = document.getElementById('adr-types-grid');
+            
+            // Try multiple possible keys for ADR types
+            let adrTypes = results.adr_types || 
+                          results.specific_adr_predictions || 
+                          results.adr_predictions ||
+                          results.specific_risks ||
+                          {};
+
+            console.log('ADR Types Data:', adrTypes);
+
+            // If adrTypes is an array, convert to object
+            if (Array.isArray(adrTypes)) {
+                const typesObj = {};
+                adrTypes.forEach(item => {
+                    if (typeof item === 'object' && item.type && item.probability) {
+                        typesObj[item.type] = item.probability;
+                    }
+                });
+                adrTypes = typesObj;
+            }
+
+            if (!adrTypes || Object.keys(adrTypes).length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; text-align: center;">
+                        <i class="fas fa-info-circle" style="font-size: 24px; color: #3b82f6; margin-bottom: 10px;"></i>
+                        <p style="color: #718096; margin-bottom: 5px;">No specific ADR type predictions available</p>
+                        <p style="color: #a0aec0; font-size: 13px;">Specific ADR type analysis requires additional clinical data</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            // Sort ADR types by probability (highest first)
+            const sortedTypes = Object.entries(adrTypes).sort((a, b) => b[1] - a[1]);
+            
+            sortedTypes.forEach(([type, probability]) => {
+                // Fix: Check if probability is already in percentage form (>1) or decimal form (<1)
+                const isAlreadyPercentage = probability > 1;
+                const displayProbability = isAlreadyPercentage ? probability : (probability * 100);
+                
+                // For risk level calculation, ensure we use decimal form (0-1)
+                const decimalProbability = isAlreadyPercentage ? (probability / 100) : probability;
+                const riskLevel = getRiskLevel(decimalProbability);
+                
+                const card = document.createElement('div');
+                card.style.cssText = 'background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; transition: all 0.3s ease;';
+                
+                // Add hover effect
+                card.onmouseenter = function() {
+                    this.style.boxShadow = '0 4px 12px rgba(79, 209, 197, 0.2)';
+                    this.style.transform = 'translateY(-2px)';
+                };
+                card.onmouseleave = function() {
+                    this.style.boxShadow = '';
+                    this.style.transform = '';
+                };
+                
+                // Format type name
+                const typeName = type.replace(/_/g, ' ')
+                                    .replace(/\b\w/g, l => l.toUpperCase());
+                
+                // Get icon for ADR type
+                const icon = getADRTypeIcon(type);
+                
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 20px;">${icon}</span>
+                        <h5 style="color: #2d3748; font-size: 14px; font-weight: 600; flex: 1;">${typeName}</h5>
+                    </div>
+                    <div style="font-size: 28px; font-weight: 700; color: #3b82f6; margin-bottom: 10px;">
+                        ${displayProbability.toFixed(1)}%
+                    </div>
+                    <span class="risk-badge risk-${riskLevel.toLowerCase()}" style="font-size: 11px; padding: 4px 10px;">
+                        ${riskLevel} Risk
+                    </span>
+                    <p style="color: #718096; font-size: 12px; margin-top: 10px; line-height: 1.4;">
+                        ${getADRTypeDescription(type, riskLevel)}
+                    </p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function getADRTypeIcon(type) {
+            const icons = {
+                'hepatotoxicity': '🫀',
+                'nephrotoxicity': '🫘',
+                'cardiotoxicity': '❤️',
+                'neurotoxicity': '🧠',
+                'hematologic': '🩸',
+                'gastrointestinal': '🫃',
+                'dermatologic': '🧴',
+                'allergic': '⚠️',
+                'metabolic': '⚖️',
+                'respiratory': '🫁'
+            };
+            
+            const lowerType = type.toLowerCase();
+            for (const [key, icon] of Object.entries(icons)) {
+                if (lowerType.includes(key)) {
+                    return icon;
+                }
+            }
+            return '💊';
+        }
+
+        function getADRTypeDescription(type, riskLevel) {
+            const descriptions = {
+                'High': 'Significant risk - Enhanced monitoring and preventive measures required',
+                'Medium': 'Moderate risk - Regular monitoring and clinical assessment advised',
+                'Low': 'Low risk - Standard monitoring protocols appropriate'
+            };
+            return descriptions[riskLevel] || 'Clinical monitoring recommended';
+        }
+
+        function populateGeminiAnalysis(results) {
+            const container = document.getElementById('gemini-analysis');
+            
+            // Try multiple possible keys for Gemini analysis
+            let analysis = results.gemini_analysis || 
+                          results.ai_analysis || 
+                          results.clinical_interpretation ||
+                          results.gemini_report ||
+                          results.ai_report;
+            
+            console.log('Gemini Analysis Data:', analysis);
+            
+            if (!analysis || analysis === 'AI analysis not available for this assessment.') {
+                // Check if there's a report text
+                if (results.report_text) {
+                    analysis = results.report_text;
+                } else if (results.analysis) {
+                    analysis = results.analysis;
+                } else {
+                    container.innerHTML = `
+                        <div style="background: #fef5e7; border: 1px solid #f59e0b; border-radius: 6px; padding: 15px; color: #92400e;">
+                            <p><i class="fas fa-info-circle"></i> <strong>AI analysis not available for this assessment.</strong></p>
+                            <p style="margin-top: 8px; font-size: 13px;">The Gemini AI analysis could not be generated. This may be due to API limitations or missing data.</p>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+            
+            // Format the analysis text
+            container.innerHTML = formatAnalysisText(analysis);
+        }
+
+        function formatAnalysisText(text) {
+            if (!text) return '<p style="color: #718096;">Analysis not available</p>';
+            
+            // Convert to string if it's an object
+            if (typeof text === 'object') {
+                text = JSON.stringify(text, null, 2);
+            }
+            
+            // Convert markdown-style formatting to HTML
+            let formatted = text;
+            
+            // Headers (## Header)
+            formatted = formatted.replace(/^## (.*?)$/gm, '<h4 style="color: #2d3748; margin: 20px 0 10px 0; font-size: 16px;">$1</h4>');
+            formatted = formatted.replace(/^### (.*?)$/gm, '<h5 style="color: #4a5568; margin: 15px 0 8px 0; font-size: 14px;">$1</h5>');
+            
+            // Bold text
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #2d3748;">$1</strong>');
+            
+            // Italic text
+            formatted = formatted.replace(/\*(.*?)\*/g, '<em style="color: #4a5568;">$1</em>');
+            
+            // Bullet points
+            formatted = formatted.replace(/^- (.*?)$/gm, '<li style="margin-bottom: 8px; color: #4a5568;">$1</li>');
+            formatted = formatted.replace(/(<li.*?<\/li>)/s, '<ul style="margin: 10px 0 10px 20px;">$1</ul>');
+            
+            // Numbered lists
+            formatted = formatted.replace(/^\d+\. (.*?)$/gm, '<li style="margin-bottom: 8px; color: #4a5568;">$1</li>');
+            
+            // Paragraphs
+            formatted = formatted.replace(/\n\n/g, '</p><p style="margin-top: 12px; color: #4a5568; line-height: 1.8;">');
+            
+            // Line breaks
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Wrap in paragraph if not already wrapped
+            if (!formatted.startsWith('<')) {
+                formatted = '<p style="color: #4a5568; line-height: 1.8;">' + formatted + '</p>';
+            }
+            
+            return formatted;
+        }
+
+        function populateRecommendations(results) {
+            const container = document.getElementById('recommendations-list');
+            
+            // Try multiple possible keys for recommendations
+            let recommendations = results.recommendations || 
+                                results.clinical_recommendations || 
+                                results.suggested_actions ||
+                                results.action_items ||
+                                [];
+
+            console.log('Recommendations Data:', recommendations);
+
+            // If recommendations is an object, convert to array
+            if (typeof recommendations === 'object' && !Array.isArray(recommendations)) {
+                recommendations = Object.values(recommendations);
+            }
+
+            if (!recommendations || recommendations.length === 0) {
+                // Generate default recommendations based on risk level
+                const riskLevel = results.risk_level || getRiskLevel(results.adr_probability || 0);
+                recommendations = getDefaultRecommendations(riskLevel);
+            }
+
+            container.innerHTML = '';
+            recommendations.forEach((rec, index) => {
+                const item = document.createElement('div');
+                item.className = 'recommendation-item';
+                
+                let title = '';
+                let description = '';
+                
+                if (typeof rec === 'string') {
+                    title = rec;
+                } else if (typeof rec === 'object') {
+                    title = rec.title || rec.recommendation || rec.action || 'Recommendation';
+                    description = rec.description || rec.details || rec.rationale || '';
+                }
+                
+                item.innerHTML = `
+                    <strong>${index + 1}. ${title}</strong>
+                    ${description ? `<p style="color: #4a5568; margin-top: 5px; line-height: 1.6;">${description}</p>` : ''}
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function getDefaultRecommendations(riskLevel) {
+            const recommendations = {
+                'High': [
+                    'Enhanced monitoring protocol required - assess patient daily for first week',
+                    'Consider dose reduction or alternative therapy options',
+                    'Implement preventive measures and patient education on warning signs',
+                    'Schedule follow-up within 3-5 days of treatment initiation',
+                    'Review all concomitant medications for potential interactions'
+                ],
+                'Medium': [
+                    'Regular monitoring advised - weekly assessments recommended',
+                    'Review patient risk factors and medication regimen',
+                    'Patient education on potential adverse effects',
+                    'Schedule follow-up within 1-2 weeks',
+                    'Monitor laboratory parameters as clinically indicated'
+                ],
+                'Low': [
+                    'Standard monitoring protocols appropriate',
+                    'Continue current therapy with routine follow-up',
+                    'Patient education on general medication safety',
+                    'Schedule routine follow-up as per standard care',
+                    'Monitor for any unexpected adverse effects'
+                ]
+            };
+            
+            return recommendations[riskLevel] || recommendations['Medium'];
+        }
+
+        function populateMonitoringPlan(results) {
+            const container = document.getElementById('monitoring-plan');
+            const monitoring = results.monitoring_plan || 
+                             results.monitoring_recommendations || 
+                             results.monitoring_protocol ||
+                             {};
+
+            console.log('Monitoring Plan Data:', monitoring);
+
+            let html = '<h4 style="color: #2d3748; margin-bottom: 15px; font-size: 16px;"><i class="fas fa-heartbeat" style="color: #3b82f6; margin-right: 8px;"></i>Recommended Monitoring Parameters</h4>';
+            
+            // Check for various monitoring parameter formats
+            const parameters = monitoring.parameters || 
+                             monitoring.baseline_assessments || 
+                             monitoring.ongoing_monitoring ||
+                             [];
+
+            if (parameters && parameters.length > 0) {
+                html += '<ul style="margin-left: 20px; color: #4a5568; line-height: 1.8;">';
+                parameters.forEach(param => {
+                    if (typeof param === 'string') {
+                        html += `<li style="margin-bottom: 10px;"><strong>${param}</strong></li>`;
+                    } else if (typeof param === 'object') {
+                        const paramName = param.parameter || param.name || param.assessment || 'Monitoring Parameter';
+                        const frequency = param.frequency ? ` - <em>${param.frequency}</em>` : '';
+                        const rationale = param.rationale ? `<br><span style="font-size: 13px; color: #718096;">${param.rationale}</span>` : '';
+                        html += `<li style="margin-bottom: 12px;"><strong>${paramName}</strong>${frequency}${rationale}</li>`;
+                    }
+                });
+                html += '</ul>';
+            } else {
+                // Default monitoring parameters based on risk level
+                const riskLevel = results.risk_level || getRiskLevel(results.adr_probability || 0);
+                html += getDefaultMonitoringParameters(riskLevel);
+            }
+
+            // Follow-up schedule
+            html += '<h4 style="color: #2d3748; margin: 20px 0 10px 0; font-size: 16px;"><i class="fas fa-calendar-check" style="color: #3b82f6; margin-right: 8px;"></i>Follow-up Schedule</h4>';
+            
+            const schedule = monitoring.schedule || 
+                           monitoring.follow_up_schedule || 
+                           monitoring.followup ||
+                           getDefaultFollowUpSchedule(results.risk_level || 'Medium');
+            
+            if (Array.isArray(schedule)) {
+                html += '<ul style="margin-left: 20px; color: #4a5568; line-height: 1.8;">';
+                schedule.forEach(item => {
+                    html += `<li style="margin-bottom: 8px;">${item}</li>`;
+                });
+                html += '</ul>';
+            } else {
+                html += `<p style="color: #4a5568; line-height: 1.8;">${schedule}</p>`;
+            }
+
+            // Emergency indicators
+            if (monitoring.emergency_indicators && monitoring.emergency_indicators.length > 0) {
+                html += '<h4 style="color: #c53030; margin: 20px 0 10px 0; font-size: 16px;"><i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Emergency Warning Signs</h4>';
+                html += '<div style="background: #fee; border: 2px solid #fc8181; border-radius: 8px; padding: 15px;">';
+                html += '<p style="color: #742a2a; margin-bottom: 10px; font-weight: 600;">Seek immediate medical attention if any of the following occur:</p>';
+                html += '<ul style="margin-left: 20px; color: #742a2a; line-height: 1.8;">';
+                monitoring.emergency_indicators.forEach(indicator => {
+                    html += `<li style="margin-bottom: 8px;"><strong>${indicator}</strong></li>`;
+                });
+                html += '</ul>';
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function getDefaultMonitoringParameters(riskLevel) {
+            const parameters = {
+                'High': [
+                    'Vital signs (BP, HR, Temperature) - Daily for first week, then weekly',
+                    'Complete Blood Count (CBC) - Baseline, Day 3, Day 7, then weekly',
+                    'Liver Function Tests (AST, ALT, Bilirubin) - Baseline, weekly for first month',
+                    'Renal Function (Creatinine, eGFR) - Baseline, weekly for first month',
+                    'Daily symptom assessment and adverse event monitoring',
+                    'ECG monitoring if cardiotoxicity risk present',
+                    'Patient-reported outcomes and quality of life assessment'
+                ],
+                'Medium': [
+                    'Vital signs - Weekly for first month',
+                    'Laboratory monitoring (CBC, LFTs, RFTs) - Baseline, Week 2, Week 4',
+                    'Symptom assessment - Weekly for first month',
+                    'Adverse event monitoring - Ongoing',
+                    'Patient education and counseling'
+                ],
+                'Low': [
+                    'Vital signs - At routine follow-up visits',
+                    'Laboratory monitoring - As clinically indicated',
+                    'Symptom assessment - At follow-up visits',
+                    'Standard adverse event monitoring',
+                    'Patient education on medication safety'
+                ]
+            };
+            
+            const params = parameters[riskLevel] || parameters['Medium'];
+            let html = '<ul style="margin-left: 20px; color: #4a5568; line-height: 1.8;">';
+            params.forEach(param => {
+                html += `<li style="margin-bottom: 10px;"><strong>${param}</strong></li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+
+        function getDefaultFollowUpSchedule(riskLevel) {
+            const schedules = {
+                'High': 'Follow-up within 3-5 days of treatment initiation, then weekly for first month, then bi-weekly for second month, then monthly as clinically indicated',
+                'Medium': 'Follow-up within 1-2 weeks of treatment initiation, then monthly for first 3 months, then as clinically indicated',
+                'Low': 'Routine follow-up as per standard care protocol (typically 4-6 weeks), then as clinically indicated'
+            };
+            
+            return schedules[riskLevel] || schedules['Medium'];
+        }
+
+        // PDF Download Function
+        function downloadPDF() {
+            const element = document.getElementById('medical-report');
+            const opt = {
+                margin: 10,
+                filename: `ADR_Report_${document.getElementById('patient-name').textContent.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            // Show loading state
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+            btn.disabled = true;
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error('PDF generation error:', err);
+                alert('Error generating PDF. Please try printing instead.');
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            });
+        }
+
+        // Save current data to localStorage for persistence
+        function saveDataToLocalStorage() {
+            try {
+                const assessmentData = sessionStorage.getItem('assessmentData');
+                const predictionResults = sessionStorage.getItem('predictionResults');
+                
+                if (assessmentData) {
+                    localStorage.setItem('lastAssessmentData', assessmentData);
+                }
+                if (predictionResults) {
+                    localStorage.setItem('lastPredictionResults', predictionResults);
+                }
+                
+                console.log('Data saved to localStorage for persistence');
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
+
+        // Call save function
+        saveDataToLocalStorage();
+
+        // Debug: Log all available data
+        console.log('=== Medical Report Debug Info ===');
+        console.log('SessionStorage keys:', Object.keys(sessionStorage));
+        console.log('LocalStorage keys:', Object.keys(localStorage));
+        console.log('URL Parameters:', window.location.search);
+        console.log('================================');
+    </script>
+</body>
+</html>
+

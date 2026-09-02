@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - PhenoRx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e2e8f0;
+            padding-top: 90px;
+            min-height: 100vh;
+        }
+
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .legal-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .legal-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .legal-date {
+            color: #a0aec0;
+            font-size: 0.95rem;
+        }
+
+        .legal-content {
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .legal-content h2 {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            margin: 30px 0 15px 0;
+        }
+
+        .legal-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .legal-content p {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .legal-content ul {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .legal-content li {
+            margin-bottom: 10px;
+        }
+
+        .legal-content strong {
+            color: #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .legal-title {
+                font-size: 2rem;
+            }
+            .legal-content {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="legal-container">
+        <div class="legal-header">
+            <h1 class="legal-title">
+                <i class="fas fa-shield-alt"></i> Privacy Policy
+            </h1>
+            <p class="legal-date">Last Updated: November 2025</p>
+        </div>
+
+        <div class="legal-content">
+            <h2>1. Introduction</h2>
+            <p>
+                Welcome to PhenoRx. This Privacy Policy explains how we collect, use, disclose, and safeguard 
+                your information when you use our adverse drug reaction identification and clinical decision support system. 
+                Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, 
+                please do not access the application.
+            </p>
+
+            <h2>2. Information We Collect</h2>
+            <p>
+                We may collect information about you in a variety of ways. The information we may collect via the 
+                application includes:
+            </p>
+            <ul>
+                <li><strong>Patient Data:</strong> Age, gender, weight, height, and other demographic information</li>
+                <li><strong>Medical Information:</strong> Medication details, dosages, medical conditions, and clinical parameters</li>
+                <li><strong>Usage Data:</strong> Information about how you interact with the application</li>
+                <li><strong>Device Information:</strong> Browser type, operating system, and device identifiers</li>
+            </ul>
+
+            <h2>3. How We Use Your Information</h2>
+            <p>
+                We use the information we collect in the following ways:
+            </p>
+            <ul>
+                <li>To provide ADR risk assessment and clinical decision support</li>
+                <li>To generate personalized dosing recommendations</li>
+                <li>To check for drug interactions</li>
+                <li>To improve and optimize our application</li>
+                <li>To conduct research and analysis for system enhancement</li>
+                <li>To comply with legal obligations</li>
+            </ul>
+
+            <h2>4. Data Storage and Security</h2>
+            <p>
+                We implement appropriate technical and organizational security measures to protect your information:
+            </p>
+            <ul>
+                <li>Data is primarily stored locally in your browser's session storage</li>
+                <li>Sensitive patient information is not permanently stored on our servers</li>
+                <li>AI analysis requests are processed securely through encrypted connections</li>
+                <li>Access to any stored data is restricted to authorized personnel only</li>
+            </ul>
+            <p>
+                However, please note that no method of transmission over the Internet or electronic storage is 100% secure. 
+                While we strive to use commercially acceptable means to protect your information, we cannot guarantee 
+                its absolute security.
+            </p>
+
+            <h2>5. Third-Party Services</h2>
+            <p>
+                PhenoRx integrates with third-party services:
+            </p>
+            <ul>
+                <li><strong>Google Gemini AI:</strong> Used for generating clinical insights and analysis. Data sent to 
+                Gemini is processed according to Google's privacy policies.</li>
+                <li><strong>Analytics Services:</strong> We may use analytics tools to understand usage patterns and 
+                improve our service.</li>
+            </ul>
+            <p>
+                We are not responsible for the privacy practices of these third-party services. We encourage you to 
+                review their privacy policies.
+            </p>
+
+            <h2>6. HIPAA Compliance</h2>
+            <p>
+                For healthcare providers subject to HIPAA regulations:
+            </p>
+            <ul>
+                <li>PhenoRx is designed with HIPAA compliance considerations in mind</li>
+                <li>Protected Health Information (PHI) should be de-identified when possible</li>
+                <li>Healthcare organizations are responsible for ensuring their use of the system complies with HIPAA</li>
+                <li>Business Associate Agreements (BAA) may be required for production deployment</li>
+            </ul>
+
+            <h2>7. Data Retention</h2>
+            <p>
+                We retain your information only for as long as necessary to fulfill the purposes outlined in this 
+                privacy policy, unless a longer retention period is required or permitted by law. Session data is 
+                typically cleared when you close your browser or end your session.
+            </p>
+
+            <h2>8. Your Rights</h2>
+            <p>
+                Depending on your location, you may have the following rights regarding your personal information:
+            </p>
+            <ul>
+                <li>The right to access your personal information</li>
+                <li>The right to correct inaccurate information</li>
+                <li>The right to request deletion of your information</li>
+                <li>The right to restrict processing of your information</li>
+                <li>The right to data portability</li>
+                <li>The right to object to processing</li>
+            </ul>
+
+            <h2>9. Children's Privacy</h2>
+            <p>
+                PhenoRx is designed for use by healthcare professionals. We do not knowingly collect personal 
+                information from children under 13. If you believe we have collected information from a child under 13, 
+                please contact us immediately.
+            </p>
+
+            <h2>10. Changes to This Privacy Policy</h2>
+            <p>
+                We may update this Privacy Policy from time to time. We will notify you of any changes by posting the 
+                new Privacy Policy on this page and updating the "Last Updated" date. You are advised to review this 
+                Privacy Policy periodically for any changes.
+            </p>
+
+            <h2>11. Contact Us</h2>
+            <p>
+                If you have questions or concerns about this Privacy Policy, please contact us:
+            </p>
+            <ul>
+                <li><strong>Email:</strong> phenorx@iul.ac.in</li>
+                <li><strong>Phone:</strong> +91 8853741966</li>
+                <li><strong>Address:</strong> Integral University, Kursi Road, Lucknow - 226026, India</li>
+            </ul>
+
+            <h2>12. Disclaimer</h2>
+            <p>
+                PhenoRx is a clinical decision support tool intended to assist healthcare professionals. It is not 
+                a substitute for professional medical judgment. All clinical decisions should be made by qualified 
+                healthcare providers based on their professional expertise and patient-specific circumstances.
+            </p>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+</html>

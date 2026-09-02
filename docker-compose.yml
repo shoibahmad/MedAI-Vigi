@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # Main application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: phenorx-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_API_KEY_DRUG_INTERACTIONS=${GEMINI_API_KEY_DRUG_INTERACTIONS}
+    env_file:
+      - .env
+    volumes:
+      - ./models:/app/models
+      - ./logs:/app/logs
+      - ./data/patient_assessments.json:/app/data/patient_assessments.json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - phenorx-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Development service with hot-reload
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: phenorx-dev
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_API_KEY_DRUG_INTERACTIONS=${GEMINI_API_KEY_DRUG_INTERACTIONS}
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/__pycache__
+      - /app/myenv
+      - /app/.venv
+    command: ["python", "app.py"]
+    networks:
+      - phenorx-network
+    profiles:
+      - dev
+
+  # Redis cache (optional, for future caching)
+  redis:
+    image: redis:7-alpine
+    container_name: phenorx-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - phenorx-network
+    profiles:
+      - cache
+
+networks:
+  phenorx-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local

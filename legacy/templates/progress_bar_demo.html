@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Medical Progress Bar - Demo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0aec0;
+            margin-bottom: 40px;
+        }
+
+        /* Enhanced Medical Progress Bar Container */
+        .loading-progress {
+            width: 100%;
+            height: 80px;
+            position: relative;
+            margin-top: 30px;
+            background: rgba(10, 10, 10, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            overflow: visible;
+            padding: 15px;
+            box-shadow:
+                0 0 30px rgba(37, 99, 235, 0.2),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* DNA Helix Background */
+        .dna-helix-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 40px;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .dna-strand {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(37, 99, 235, 0.3) 20%,
+                    rgba(59, 130, 246, 0.5) 50%,
+                    rgba(37, 99, 235, 0.3) 80%,
+                    transparent 100%);
+        }
+
+        .dna-strand.top {
+            top: 8px;
+            animation: dnaWave 3s ease-in-out infinite;
+        }
+
+        .dna-strand.bottom {
+            bottom: 8px;
+            animation: dnaWave 3s ease-in-out infinite reverse;
+        }
+
+        .dna-connector {
+            position: absolute;
+            width: 2px;
+            height: 24px;
+            background: rgba(37, 99, 235, 0.4);
+            top: 50%;
+            transform: translateY(-50%);
+            animation: dnaConnectorSlide 3s linear infinite;
+        }
+
+        .dna-connector:nth-child(3) {
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .dna-connector:nth-child(4) {
+            left: 25%;
+            animation-delay: 0.3s;
+        }
+
+        .dna-connector:nth-child(5) {
+            left: 40%;
+            animation-delay: 0.6s;
+        }
+
+        .dna-connector:nth-child(6) {
+            left: 55%;
+            animation-delay: 0.9s;
+        }
+
+        .dna-connector:nth-child(7) {
+            left: 70%;
+            animation-delay: 1.2s;
+        }
+
+        .dna-connector:nth-child(8) {
+            left: 85%;
+            animation-delay: 1.5s;
+        }
+
+        /* ECG Heartbeat Wave */
+        .heartbeat-wave-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 50px;
+            transform: translateY(-50%);
+            overflow: hidden;
+        }
+
+        .heartbeat-wave {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .wave-line {
+            position: absolute;
+            width: 200%;
+            height: 2px;
+            top: 50%;
+            left: 0;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    transparent 48%,
+                    #3b82f6 48%,
+                    #3b82f6 48.5%,
+                    #60a5fa 49%,
+                    #3b82f6 49.5%,
+                    #3b82f6 50%,
+                    transparent 50%,
+                    transparent 100%);
+            background-size: 100px 2px;
+            animation: ecgWave 2s linear infinite;
+            filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.8));
+        }
+
+        /* Progress Fill with Glow */
+        .progress-fill-container {
+            position: relative;
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg,
+                    #2563eb 0%,
+                    #3b82f6 25%,
+                    #60a5fa 50%,
+                    #3b82f6 75%,
+                    #2563eb 100%);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            position: relative;
+            animation: progressGlow 2s ease-in-out infinite, progressFill 8s ease-out forwards;
+            box-shadow:
+                0 0 15px rgba(59, 130, 246, 0.6),
+                0 0 30px rgba(37, 99, 235, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .loading-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.4),
+                    transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Medical Particles */
+        .medical-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .medical-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #3b82f6;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+            animation: particleFloat 4s ease-in-out infinite;
+        }
+
+        .medical-particle:nth-child(1) {
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .medical-particle:nth-child(2) {
+            left: 35%;
+            animation-delay: 0.5s;
+        }
+
+        .medical-particle:nth-child(3) {
+            left: 55%;
+            animation-delay: 1s;
+        }
+
+        .medical-particle:nth-child(4) {
+            left: 75%;
+            animation-delay: 1.5s;
+        }
+
+        .medical-particle:nth-child(5) {
+            left: 90%;
+            animation-delay: 2s;
+        }
+
+        /* Percentage Display */
+        .progress-percentage {
+            position: absolute;
+            top: 50%;
+            right: -60px;
+            transform: translateY(-50%);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3b82f6;
+            text-shadow:
+                0 0 10px rgba(59, 130, 246, 0.6),
+                0 0 20px rgba(37, 99, 235, 0.4);
+            min-width: 55px;
+            text-align: right;
+            animation: percentagePulse 1s ease-in-out infinite;
+        }
+
+        .status-text {
+            text-align: center;
+            margin-top: 30px;
+            color: #3b82f6;
+            font-size: 1.1rem;
+            font-weight: 600;
+            animation: fadeInOut 2s ease-in-out infinite;
+        }
+
+        /* Keyframe Animations */
+        @keyframes dnaWave {
+
+            0%,
+            100% {
+                transform: translateY(0) scaleY(1);
+            }
+
+            50% {
+                transform: translateY(-3px) scaleY(1.1);
+            }
+        }
+
+        @keyframes dnaConnectorSlide {
+            0% {
+                opacity: 0.3;
+                transform: translateY(-50%) scaleY(0.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateY(-50%) scaleY(1.2);
+            }
+
+            100% {
+                opacity: 0.3;
+                transform: translateY(-50%) scaleY(0.8);
+            }
+        }
+
+        @keyframes ecgWave {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-100px);
+            }
+        }
+
+        @keyframes progressGlow {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+                box-shadow:
+                    0 0 15px rgba(59, 130, 246, 0.6),
+                    0 0 30px rgba(37, 99, 235, 0.4);
+            }
+
+            50% {
+                background-position: 100% 50%;
+                box-shadow:
+                    0 0 25px rgba(59, 130, 246, 0.9),
+                    0 0 50px rgba(37, 99, 235, 0.6);
+            }
+        }
+
+        @keyframes progressFill {
+            0% {
+                width: 0%;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(200%);
+            }
+        }
+
+        @keyframes particleFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.6;
+            }
+
+            25% {
+                transform: translateY(-15px) scale(1.2);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(-8px) scale(0.9);
+                opacity: 0.8;
+            }
+
+            75% {
+                transform: translateY(-20px) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes percentagePulse {
+
+            0%,
+            100% {
+                transform: translateY(-50%) scale(1);
+            }
+
+            50% {
+                transform: translateY(-50%) scale(1.05);
+            }
+        }
+
+        @keyframes fadeInOut {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+
+        .features {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .feature {
+            background: rgba(37, 99, 235, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .feature i {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .feature h3 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .feature p {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-container">
+        <h1><i class="fas fa-heartbeat"></i> Enhanced Medical Progress Bar</h1>
+        <p class="subtitle">Advanced medical-themed loading animation with DNA helix, ECG wave, and particles</p>
+
+        <!-- Enhanced Medical Progress Bar -->
+        <div class="loading-progress">
+            <!-- DNA Helix Background -->
+            <div class="dna-helix-container">
+                <div class="dna-strand top"></div>
+                <div class="dna-strand bottom"></div>
+                <div class="dna-connector"></div>
+                <div class="dna-connector"></div>
+                <div class="dna-connector"></div>
+                <div class="dna-connector"></div>
+                <div class="dna-connector"></div>
+                <div class="dna-connector"></div>
+            </div>
+
+            <!-- ECG Heartbeat Wave -->
+            <div class="heartbeat-wave-container">
+                <div class="heartbeat-wave">
+                    <div class="wave-line"></div>
+                </div>
+            </div>
+
+            <!-- Progress Fill with Particles -->
+            <div class="progress-fill-container">
+                <div class="loading-progress-bar" id="progress-fill"></div>
+                <div class="medical-particles">
+                    <div class="medical-particle"></div>
+                    <div class="medical-particle"></div>
+                    <div class="medical-particle"></div>
+                    <div class="medical-particle"></div>
+                    <div class="medical-particle"></div>
+                </div>
+            </div>
+
+            <!-- Percentage Display -->
+            <div class="progress-percentage" id="progress-percentage">0%</div>
+        </div>
+
+        <p class="status-text" id="status-text"><i class="fas fa-brain"></i> AI Processing in Progress...</p>
+
+        <div class="controls">
+            <button class="btn" onclick="restartAnimation()">
+                <i class="fas fa-redo"></i> Restart Animation
+            </button>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-dna"></i>
+                <h3>DNA Helix</h3>
+                <p>Animated double helix strands with pulsing connectors</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-heartbeat"></i>
+                <h3>ECG Wave</h3>
+                <p>Realistic heartbeat waveform animation</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-atom"></i>
+                <h3>Medical Particles</h3>
+                <p>Floating particles with smooth animations</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-percentage"></i>
+                <h3>Live Counter</h3>
+                <p>Animated percentage display with glow</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messages = [
+            '<i class="fas fa-brain"></i> AI Processing in Progress...',
+            '<i class="fas fa-database"></i> Analyzing Clinical Parameters...',
+            '<i class="fas fa-pills"></i> Evaluating Drug Interactions...',
+            '<i class="fas fa-chart-line"></i> Calculating Risk Factors...',
+            '<i class="fas fa-microscope"></i> Running Predictive Models...',
+            '<i class="fas fa-heartbeat"></i> Assessing Patient Safety...'
+        ];
+
+        let messageIndex = 0;
+        const statusElement = document.getElementById('status-text');
+
+        // Change message every 2 seconds
+        setInterval(() => {
+            messageIndex = (messageIndex + 1) % messages.length;
+            statusElement.innerHTML = messages[messageIndex];
+        }, 2000);
+
+        // Update percentage counter
+        let percentage = 0;
+        const percentageElement = document.getElementById('progress-percentage');
+
+        const percentageInterval = setInterval(() => {
+            if (percentage < 100) {
+                percentage += 1;
+                percentageElement.textContent = percentage + '%';
+            }
+        }, 80);
+
+        function restartAnimation() {
+            // Reset progress bar
+            const progressBar = document.getElementById('progress-fill');
+            progressBar.style.animation = 'none';
+
+            // Reset percentage
+            percentage = 0;
+            percentageElement.textContent = '0%';
+
+            // Restart animations
+            setTimeout(() => {
+                progressBar.style.animation = 'progressGlow 2s ease-in-out infinite, progressFill 8s ease-out forwards';
+            }, 10);
+        }
+    </script>
+</body>
+
+</html>

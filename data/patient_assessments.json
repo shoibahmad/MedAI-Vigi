@@ -1,0 +1,75 @@
+[
+  {
+    "patient_id": "ASWWJ1224",
+    "patient_name": "Zaid Ahmad Khan",
+    "timestamp": "2025-10-16T16:00:17.611013",
+    "patient_data": {
+      "age": 75,
+      "sex": "M",
+      "ethnicity": "White",
+      "bmi": 32.5,
+      "creatinine": 2.1,
+      "egfr": 35,
+      "ast_alt": 95,
+      "bilirubin": 1.8,
+      "albumin": 2.8,
+      "diabetes": 1,
+      "liver_disease": 1,
+      "ckd": 1,
+      "cardiac_disease": 1,
+      "index_drug_dose": 200,
+      "concomitant_drugs_count": 12,
+      "indication": "Cancer",
+      "cyp2c9": "Poor",
+      "cyp2d6": "PM",
+      "bp_systolic": 165,
+      "bp_diastolic": 95,
+      "heart_rate": 95,
+      "time_since_start_days": 45,
+      "cyp_inhibitors_flag": 1,
+      "qt_prolonging_flag": 1,
+      "hla_risk_allele_flag": 1,
+      "inpatient_flag": 1,
+      "prior_adr_history": 1,
+      "polypharmacy_flag": 1,
+      "cumulative_dose_mg": 9000,
+      "dose_density_mg_day": 200
+    },
+    "prediction_result": {
+      "all_adr_types": {
+        "Cardiovascular Event (Arrhythmia)": 0,
+        "Edema": 0.08,
+        "Electrolyte Imbalance": 0.09,
+        "Gastrointestinal (Nausea/Vomiting)": 0.39,
+        "Headache/Dizziness": 0,
+        "Hepatotoxicity": 21.32,
+        "Hypersensitivity": 0,
+        "Hypoglycemia": 0,
+        "Hypotension": 0,
+        "Jaundice": 7.47,
+        "Nephrotoxicity": 0.08,
+        "Neutropenia": 0,
+        "Rash": 0,
+        "Severe Cutaneous Reaction": 0,
+        "Tachycardia": 0
+      },
+      "no_adr_probability": 70.57,
+      "predicted_adr_type": "No ADR",
+      "risk_level": "Low",
+      "timestamp": "2025-10-16T16:00:17.231388",
+      "top_adr_risks": {
+        "Electrolyte Imbalance": 0.09,
+        "Gastrointestinal (Nausea/Vomiting)": 0.39,
+        "Hepatotoxicity": 21.32,
+        "Jaundice": 7.47,
+        "No ADR": 70.57
+      },
+      "top_specific_adr_risks": {
+        "Gastrointestinal (Nausea/Vomiting)": 0.39,
+        "Hepatotoxicity": 21.32,
+        "Jaundice": 7.47
+      }
+    },
+    "clinician": "AIMS Delhi"
+  }
+]

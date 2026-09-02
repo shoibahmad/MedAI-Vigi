@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details - MedAI-VIGI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* Medical grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header i {
+            color: #3b82f6;
+            -webkit-text-fill-color: #3b82f6;
+        }
+
+        .header p {
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+
+        /* Patient Details Form */
+        .patient-form-container {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .form-header h2 {
+            color: #e2e8f0;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .form-header i {
+            color: #3b82f6;
+        }
+
+        .form-header p {
+            color: #a0aec0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #cbd5e0;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group label i {
+            color: #3b82f6;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 14px 16px;
+            border: 2px solid rgba(37, 99, 235, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(10, 10, 10, 0.6);
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            transform: translateY(-1px);
+            background: rgba(10, 10, 10, 0.8);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #718096;
+        }
+
+        .form-group select option {
+            background: #0a0a0a;
+            color: #e2e8f0;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(37, 99, 235, 0.2);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            min-width: 160px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #0a0a0a;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 2px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Age Interpretation Styles */
+        .age-interpretation {
+            margin-top: 8px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-left: 4px solid;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .age-interpretation.infant {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: #f59e0b;
+            color: #fbbf24;
+        }
+
+        .age-interpretation.child {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        .age-interpretation.adolescent {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: #6366f1;
+            color: #818cf8;
+        }
+
+        .age-interpretation.young-adult {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+            color: #34d399;
+        }
+
+        .age-interpretation.adult {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+            color: #34d399;
+        }
+
+        .age-interpretation.middle-aged {
+            background: rgba(249, 115, 22, 0.15);
+            border-color: #f97316;
+            color: #fb923c;
+        }
+
+        .age-interpretation.elderly {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            color: #f87171;
+        }
+
+        .age-interpretation.very-elderly {
+            background: rgba(236, 72, 153, 0.15);
+            border-color: #ec4899;
+            color: #f472b6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .patient-form-container {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>
+                <i class="fas fa-user-md"></i>
+                Patient Details
+            </h1>
+            <p>Please provide patient information for the ADR risk assessment</p>
+        </header>
+
+        <!-- Patient Details Form -->
+        <div class="patient-form-container">
+            <div class="form-header">
+                <h2>
+                    <i class="fas fa-clipboard-list"></i>
+                    Patient Information Form
+                </h2>
+                <p>Complete the form below to proceed with the clinical assessment</p>
+            </div>
+
+            <form id="patient-details-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="patient-name">
+                            <i class="fas fa-user"></i>
+                            Patient Full Name *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="patient-name" 
+                            name="patient-name" 
+                            placeholder="Enter patient's full name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="patient-id">
+                            <i class="fas fa-id-card"></i>
+                            Patient ID / MRN
+                        </label>
+                        <input 
+                            type="text" 
+                            id="patient-id" 
+                            name="patient-id" 
+                            placeholder="Auto-generated ID"
+                            readonly
+                            style="background: rgba(37, 99, 235, 0.1); cursor: not-allowed;"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">
+                            <i class="fas fa-birthday-cake"></i>
+                            Age (years) *
+                        </label>
+                        <input 
+                            type="number" 
+                            id="age" 
+                            name="age" 
+                            min="0" 
+                            max="120" 
+                            placeholder="Enter age (0-120 years)"
+                            required
+                        >
+                        <div id="age-interpretation" class="age-interpretation" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">
+                            <i class="fas fa-venus-mars"></i>
+                            Gender
+                        </label>
+                        <select id="gender" name="gender">
+                            <option value="">Select gender...</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="clinician-name">
+                            <i class="fas fa-user-md"></i>
+                            Attending Clinician *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="clinician-name" 
+                            name="clinician-name" 
+                            placeholder="Enter clinician's name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="department">
+                            <i class="fas fa-hospital"></i>
+                            Department
+                        </label>
+                        <select id="department" name="department">
+                            <option value="">Select department...</option>
+                            <option value="Internal Medicine">Internal Medicine</option>
+                            <option value="Cardiology">Cardiology</option>
+                            <option value="Oncology">Oncology</option>
+                            <option value="Emergency">Emergency Medicine</option>
+                            <option value="ICU">Intensive Care Unit</option>
+                            <option value="Surgery">Surgery</option>
+                            <option value="Pharmacy">Pharmacy</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="clinical-notes">
+                        <i class="fas fa-notes-medical"></i>
+                        Clinical Notes (Optional)
+                    </label>
+                    <textarea 
+                        id="clinical-notes" 
+                        name="clinical-notes" 
+                        placeholder="Any relevant clinical information, allergies, or special considerations..."
+                    ></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i>
+                        Proceed to Assessment
+                    </button>
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Loading
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Age interpretation function
+        function interpretAge() {
+            const ageInput = document.getElementById('age');
+            const interpretationDiv = document.getElementById('age-interpretation');
+            const age = parseInt(ageInput.value);
+
+            if (!age || age < 0 || age > 120) {
+                interpretationDiv.style.display = 'none';
+                return;
+            }
+
+            let interpretation = '';
+            let className = '';
+
+            if (age < 1) {
+                interpretation = '👶 Infant: Requires specialized pediatric dosing and monitoring. Higher risk of ADRs due to immature organ systems.';
+                className = 'infant';
+            } else if (age < 12) {
+                interpretation = '🧒 Child: Pediatric dosing required. Weight-based calculations essential. Monitor for developmental effects.';
+                className = 'child';
+            } else if (age < 18) {
+                interpretation = '👦 Adolescent: Transitional dosing considerations. Monitor for hormonal effects and compliance issues.';
+                className = 'adolescent';
+            } else if (age < 30) {
+                interpretation = '👨 Young Adult: Standard adult dosing. Generally lower ADR risk. Monitor for lifestyle factors.';
+                className = 'young-adult';
+            } else if (age < 50) {
+                interpretation = '👩 Adult: Standard dosing protocols. Monitor for comorbidities and drug interactions.';
+                className = 'adult';
+            } else if (age < 65) {
+                interpretation = '👨‍💼 Middle-aged: Increased monitoring for age-related changes. Consider comorbidity burden.';
+                className = 'middle-aged';
+            } else if (age < 80) {
+                interpretation = '👴 Elderly: Enhanced monitoring required. Consider dose reduction. Higher ADR risk due to physiological changes.';
+                className = 'elderly';
+            } else {
+                interpretation = '👵 Very Elderly: Intensive monitoring essential. Significant dose adjustments likely needed. Very high ADR risk.';
+                className = 'very-elderly';
+            }
+
+            interpretationDiv.innerHTML = interpretation;
+            interpretationDiv.className = `age-interpretation ${className}`;
+            interpretationDiv.style.display = 'block';
+        }
+
+        // Generate random Patient ID
+        function generatePatientId() {
+            const prefix = 'MRN';
+            const timestamp = Date.now().toString().slice(-8);
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `${prefix}-${timestamp}-${random}`;
+        }
+
+        // Load existing patient info if available
+        document.addEventListener('DOMContentLoaded', function() {
+            const patientName = sessionStorage.getItem('patientName');
+            let patientId = sessionStorage.getItem('patientId');
+            const clinicianName = sessionStorage.getItem('clinicianName');
+            const age = sessionStorage.getItem('age');
+
+            // Generate new Patient ID if not exists
+            if (!patientId) {
+                patientId = generatePatientId();
+                sessionStorage.setItem('patientId', patientId);
+            }
+
+            if (patientName) document.getElementById('patient-name').value = patientName;
+            document.getElementById('patient-id').value = patientId;
+            if (clinicianName) document.getElementById('clinician-name').value = clinicianName;
+            if (age) {
+                document.getElementById('age').value = age;
+                interpretAge();
+            }
+
+            // Add age input listener
+            document.getElementById('age').addEventListener('input', interpretAge);
+        });
+
+        // Form submission handler
+        document.getElementById('patient-details-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const patientName = document.getElementById('patient-name').value.trim();
+            const patientId = document.getElementById('patient-id').value.trim();
+            const clinicianName = document.getElementById('clinician-name').value.trim();
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const department = document.getElementById('department').value;
+            const clinicalNotes = document.getElementById('clinical-notes').value.trim();
+            
+            if (!patientName || !clinicianName || !age) {
+                alert('Please fill in all required fields (Patient Name, Clinician Name, and Age).');
+                return;
+            }
+            
+            if (age < 0 || age > 120) {
+                alert('Please enter a valid age between 0 and 120 years.');
+                return;
+            }
+            
+            // Store all patient info in sessionStorage
+            sessionStorage.setItem('patientName', patientName);
+            sessionStorage.setItem('patientId', patientId); // Already generated, no fallback needed
+            sessionStorage.setItem('clinicianName', clinicianName);
+            sessionStorage.setItem('age', age);
+            sessionStorage.setItem('gender', gender);
+            sessionStorage.setItem('department', department);
+            sessionStorage.setItem('clinicalNotes', clinicalNotes);
+            sessionStorage.setItem('assessmentStartTime', new Date().toISOString());
+            
+            // Show loading state
+            const submitBtn = document.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Assessment...';
+            submitBtn.disabled = true;
+            
+            // Redirect to assessment page
+            setTimeout(() => {
+                window.location.href = '/assessment';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
+
+

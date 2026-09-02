@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - PhenoRx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1771389944029472"
+     crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e2e8f0;
+            padding-top: 90px;
+            min-height: 100vh;
+        }
+
+        .api-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .api-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .api-title {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .api-subtitle {
+            color: #a0aec0;
+            font-size: 1.2rem;
+        }
+
+        .api-section {
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .api-section h2 {
+            color: #3b82f6;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .api-section h3 {
+            color: #60a5fa;
+            font-size: 1.3rem;
+            margin: 25px 0 15px 0;
+        }
+
+        .endpoint {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .method {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .method.post {
+            background: #10b981;
+            color: white;
+        }
+
+        .method.get {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .endpoint-path {
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #4ade80;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .param-table th {
+            background: rgba(37, 99, 235, 0.2);
+            color: #3b82f6;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .param-table td {
+            padding: 12px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            color: #cbd5e0;
+        }
+
+        .param-table tr:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .api-title {
+                font-size: 2rem;
+            }
+            .endpoint-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="api-container">
+        <div class="api-header">
+            <h1 class="api-title">
+                <i class="fas fa-code"></i> API Reference
+            </h1>
+            <p class="api-subtitle">Complete API documentation for PhenoRx integration</p>
+        </div>
+
+        <!-- Base URL -->
+        <div class="api-section">
+            <h2><i class="fas fa-server"></i> Base URL</h2>
+            <div class="code-block">
+                <code>http://localhost:5000</code>
+            </div>
+            <p style="color: #a0aec0; margin-top: 10px;">
+                Replace with your production URL when deployed.
+            </p>
+        </div>
+
+        <!-- Authentication -->
+        <div class="api-section">
+            <h2><i class="fas fa-key"></i> Authentication</h2>
+            <p style="color: #cbd5e0;">
+                Currently, the API does not require authentication for local development. 
+                For production deployment, implement appropriate authentication mechanisms.
+            </p>
+        </div>
+
+        <!-- Endpoints -->
+        <div class="api-section">
+            <h2><i class="fas fa-plug"></i> Endpoints</h2>
+
+            <!-- Predict ADR -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/predict</span>
+                </div>
+                <p style="color: #cbd5e0; margin-bottom: 15px;">
+                    Predict adverse drug reaction risk based on patient data.
+                </p>
+
+                <h3>Request Body</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>age</td>
+                            <td>integer</td>
+                            <td>Yes</td>
+                            <td>Patient age (0-120)</td>
+                        </tr>
+                        <tr>
+                            <td>gender</td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>"Male" or "Female"</td>
+                        </tr>
+                        <tr>
+                            <td>weight</td>
+                            <td>float</td>
+                            <td>Yes</td>
+                            <td>Weight in kg</td>
+                        </tr>
+                        <tr>
+                            <td>height</td>
+                            <td>float</td>
+                            <td>Yes</td>
+                            <td>Height in cm</td>
+                        </tr>
+                        <tr>
+                            <td>medication</td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>Medication name</td>
+                        </tr>
+                        <tr>
+                            <td>dose</td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>Medication dose</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Example Request</h3>
+                <div class="code-block">
+                    <code>{
+  "age": 65,
+  "gender": "Male",
+  "weight": 75,
+  "height": 170,
+  "medication": "Warfarin",
+  "dose": "5mg",
+  "route": "Oral",
+  "duration": "Long-term"
+}</code>
+                </div>
+
+                <h3>Response</h3>
+                <div class="code-block">
+                    <code>{
+  "adr_probability": 0.65,
+  "risk_level": "High",
+  "confidence": 0.85,
+  "gemini_analysis": "Detailed AI analysis...",
+  "recommendations": [
+    "Monitor INR closely",
+    "Watch for bleeding signs"
+  ]
+}</code>
+                </div>
+            </div>
+
+            <!-- Drug Interactions -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/check-drug-interactions</span>
+                </div>
+                <p style="color: #cbd5e0; margin-bottom: 15px;">
+                    Check for interactions between multiple medications.
+                </p>
+
+                <h3>Request Body</h3>
+                <div class="code-block">
+                    <code>{
+  "medications": [
+    {"name": "Warfarin", "dose": "5mg"},
+    {"name": "Aspirin", "dose": "81mg"}
+  ]
+}</code>
+                </div>
+
+                <h3>Response</h3>
+                <div class="code-block">
+                    <code>{
+  "interactions": [
+    {
+      "drug1": "Warfarin",
+      "drug2": "Aspirin",
+      "severity": "major",
+      "description": "Increased bleeding risk",
+      "recommendation": "Monitor INR closely"
+    }
+  ],
+  "ai_insights": "Detailed analysis..."
+}</code>
+                </div>
+            </div>
+
+            <!-- Personalized Dosing -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/personalized-dosing</span>
+                </div>
+                <p style="color: #cbd5e0; margin-bottom: 15px;">
+                    Calculate personalized medication dosing based on patient factors.
+                </p>
+
+                <h3>Request Body</h3>
+                <div class="code-block">
+                    <code>{
+  "medication": "Warfarin",
+  "standard_dose": 5,
+  "age": 70,
+  "weight": 65,
+  "creatinine": 1.2,
+  "egfr": 55,
+  "cyp2c9": "Intermediate"
+}</code>
+                </div>
+
+                <h3>Response</h3>
+                <div class="code-block">
+                    <code>{
+  "recommended_dose": 3.5,
+  "dose_adjustment_factor": 0.7,
+  "rationale": [
+    "Age factor: 20% reduction",
+    "Renal factor: 30% reduction"
+  ],
+  "monitoring_requirements": {...}
+}</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Codes -->
+        <div class="api-section">
+            <h2><i class="fas fa-exclamation-triangle"></i> Error Codes</h2>
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>200</td>
+                        <td>Success</td>
+                    </tr>
+                    <tr>
+                        <td>400</td>
+                        <td>Bad Request - Invalid parameters</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>Not Found - Endpoint doesn't exist</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>Internal Server Error</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Rate Limiting -->
+        <div class="api-section">
+            <h2><i class="fas fa-tachometer-alt"></i> Rate Limiting</h2>
+            <p style="color: #cbd5e0;">
+                Currently no rate limiting is implemented for local development. 
+                For production, consider implementing rate limiting to prevent abuse.
+            </p>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+</html>

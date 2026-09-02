@@ -1,0 +1,10 @@
+{
+  "title": "ADR Risk Predictor - ML Models",
+  "id": "shoibahmad/phenorx-models",
+  "licenses": [
+    {
+      "name": "CC0-1.0"
+    }
+  ],
+  "description": "\n# ADR Risk Predictor Models\n\nMachine learning models for Adverse Drug Reaction (ADR) risk prediction.\n\n## Files:\n- `adr_model.pkl` - Main prediction model (591 MB)\n- `adr_preprocessor.pkl` - Data preprocessor\n\n## Usage:\n```python\nimport kaggle\nkaggle.api.dataset_download_files('shoibahmad/phenorx-models', path='.', unzip=True)\n```\n\n## Project:\nhttps://github.com/shoibahmad/PhenoRx\n"
+}

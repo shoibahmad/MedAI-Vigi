@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Papers - PhenoRx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e2e8f0;
+            padding-top: 90px;
+            min-height: 100vh;
+        }
+
+        .research-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .research-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .research-title {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .research-subtitle {
+            color: #a0aec0;
+            font-size: 1.2rem;
+        }
+
+        .paper-card {
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .paper-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        }
+
+        .paper-title {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .paper-authors {
+            color: #a0aec0;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .paper-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cbd5e0;
+            font-size: 0.9rem;
+        }
+
+        .meta-item i {
+            color: #3b82f6;
+        }
+
+        .paper-abstract {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .paper-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            background: rgba(37, 99, 235, 0.2);
+            color: #60a5fa;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .paper-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-paper {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .research-title {
+                font-size: 2rem;
+            }
+            .paper-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="research-container">
+        <div class="research-header">
+            <h1 class="research-title">
+                <i class="fas fa-graduation-cap"></i> Research Papers
+            </h1>
+            <p class="research-subtitle">Academic research and publications related to PhenoRx</p>
+        </div>
+
+        <!-- Paper 1 -->
+        <div class="paper-card">
+            <h2 class="paper-title">
+                PhenoRx: An Intelligent System for Automated Adverse Drug Reaction Identification Using Machine Learning
+            </h2>
+            <p class="paper-authors">
+                <i class="fas fa-users"></i> Pharm.D Students, Integral University, Lucknow
+            </p>
+            <div class="paper-meta">
+                <div class="meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>2024</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-university"></i>
+                    <span>Integral University</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-flask"></i>
+                    <span>Research Project</span>
+                </div>
+            </div>
+            <p class="paper-abstract">
+                This research presents PhenoRx, an advanced artificial intelligence-powered system designed 
+                for automated identification and prediction of adverse drug reactions (ADRs). The system leverages 
+                machine learning algorithms trained on clinical data and integrates Google's Gemini AI for 
+                comprehensive clinical decision support. Our approach combines traditional pharmacovigilance 
+                methods with modern AI techniques to provide real-time risk assessment, drug interaction checking, 
+                and personalized dosing recommendations. The system demonstrates high accuracy in ADR prediction 
+                and offers valuable insights for healthcare professionals in clinical practice.
+            </p>
+            <div class="paper-tags">
+                <span class="tag">Machine Learning</span>
+                <span class="tag">Pharmacovigilance</span>
+                <span class="tag">Clinical Decision Support</span>
+                <span class="tag">Artificial Intelligence</span>
+                <span class="tag">Drug Safety</span>
+            </div>
+            <div class="paper-actions">
+                <a href="#" class="btn-paper btn-primary">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+                <a href="#" class="btn-paper btn-secondary">
+                    <i class="fas fa-quote-right"></i> Cite
+                </a>
+            </div>
+        </div>
+
+        <!-- Paper 2 -->
+        <div class="paper-card">
+            <h2 class="paper-title">
+                Integration of Pharmacogenomics in Clinical Decision Support Systems: A Case Study
+            </h2>
+            <p class="paper-authors">
+                <i class="fas fa-users"></i> Department of Pharmacy Practice, Integral University
+            </p>
+            <div class="paper-meta">
+                <div class="meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>2024</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-university"></i>
+                    <span>Integral University</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-dna"></i>
+                    <span>Pharmacogenomics</span>
+                </div>
+            </div>
+            <p class="paper-abstract">
+                This study explores the integration of pharmacogenomic data into clinical decision support systems 
+                for personalized medicine. We demonstrate how genetic variations in drug-metabolizing enzymes 
+                (CYP450 family) and drug transporters can be incorporated into dosing algorithms to optimize 
+                therapeutic outcomes and minimize adverse effects. The PhenoRx system serves as a practical 
+                implementation of these concepts, providing healthcare professionals with actionable 
+                pharmacogenomic insights at the point of care.
+            </p>
+            <div class="paper-tags">
+                <span class="tag">Pharmacogenomics</span>
+                <span class="tag">Personalized Medicine</span>
+                <span class="tag">CYP450</span>
+                <span class="tag">Precision Dosing</span>
+            </div>
+            <div class="paper-actions">
+                <a href="#" class="btn-paper btn-primary">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+                <a href="#" class="btn-paper btn-secondary">
+                    <i class="fas fa-quote-right"></i> Cite
+                </a>
+            </div>
+        </div>
+
+        <!-- Paper 3 -->
+        <div class="paper-card">
+            <h2 class="paper-title">
+                Real-Time Drug Interaction Detection Using AI: Improving Patient Safety in Polypharmacy
+            </h2>
+            <p class="paper-authors">
+                <i class="fas fa-users"></i> Clinical Pharmacy Research Group, Integral University
+            </p>
+            <div class="paper-meta">
+                <div class="meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>2024</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-university"></i>
+                    <span>Integral University</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-pills"></i>
+                    <span>Drug Interactions</span>
+                </div>
+            </div>
+            <p class="paper-abstract">
+                Polypharmacy is a significant challenge in modern healthcare, particularly in elderly patients 
+                with multiple comorbidities. This research presents an AI-powered approach to real-time drug 
+                interaction detection and severity assessment. Our system analyzes complex medication regimens 
+                and provides evidence-based recommendations to prevent potentially harmful drug combinations. 
+                The integration of natural language processing and machine learning enables the system to 
+                continuously update its knowledge base with the latest clinical evidence.
+            </p>
+            <div class="paper-tags">
+                <span class="tag">Drug Interactions</span>
+                <span class="tag">Polypharmacy</span>
+                <span class="tag">Patient Safety</span>
+                <span class="tag">AI in Healthcare</span>
+            </div>
+            <div class="paper-actions">
+                <a href="#" class="btn-paper btn-primary">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+                <a href="#" class="btn-paper btn-secondary">
+                    <i class="fas fa-quote-right"></i> Cite
+                </a>
+            </div>
+        </div>
+
+        <!-- Related Resources -->
+        <div class="paper-card" style="background: rgba(37, 99, 235, 0.1);">
+            <h2 class="paper-title">
+                <i class="fas fa-book-open"></i> Related Resources
+            </h2>
+            <p class="paper-abstract">
+                For more information about adverse drug reactions, pharmacovigilance, and clinical decision 
+                support systems, please refer to the following resources:
+            </p>
+            <ul style="color: #cbd5e0; line-height: 2; margin-left: 20px;">
+                <li>WHO Programme for International Drug Monitoring</li>
+                <li>FDA Adverse Event Reporting System (FAERS)</li>
+                <li>Clinical Pharmacogenetics Implementation Consortium (CPIC)</li>
+                <li>PharmGKB - Pharmacogenomics Knowledge Base</li>
+                <li>UpToDate - Drug Interactions Database</li>
+            </ul>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+</html>

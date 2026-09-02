@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Interaction Checker - MedAI-VIGI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/toast.css') }}" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1771389944029472"
+     crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            line-height: 1.6;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Medical grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .nav-toggle {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .nav-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+
+        .nav-items {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            min-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-items.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .nav-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(37, 99, 235, 0.1);
+            color: #3b82f6;
+            padding-left: 25px;
+        }
+
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.15);
+            color: #3b82f6;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #a0aec0;
+            font-size: 1rem;
+        }
+
+        /* Main Grid Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Drug Input Panel */
+        .drug-input-panel {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            height: fit-content;
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            color: #3b82f6;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .drug-input-group {
+            margin-bottom: 20px;
+        }
+
+        .drug-input-group label {
+            display: block;
+            color: #cbd5e0;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .drug-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .drug-input-wrapper input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(10, 10, 10, 0.6);
+            border: 2px solid rgba(37, 99, 235, 0.3);
+            border-radius: 12px;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+
+        .drug-input-wrapper input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-add {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+        }
+
+        .drug-list {
+            margin-top: 20px;
+        }
+
+        .drug-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+
+        .dose-badge {
+            background: rgba(99, 179, 237, 0.2);
+            color: #60a5fa;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(99, 179, 237, 0.3);
+        }
+
+        .drug-chip .remove-btn {
+            cursor: pointer;
+            color: #f56565;
+            font-weight: bold;
+        }
+
+        .btn-check {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.6);
+        }
+
+        /* Network Graph Panel */
+        .network-panel {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        #network-graph {
+            width: 100%;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .severity-critical { background: #dc2626; }
+        .severity-major { background: #ea580c; }
+        .severity-moderate { background: #f59e0b; }
+        .severity-minor { background: #eab308; }
+        .severity-none { background: #22c55e; }
+
+        /* Interactions List */
+        .interactions-panel {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        .interaction-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+        }
+
+        .interaction-card.critical { border-left-color: #dc2626; }
+        .interaction-card.major { border-left-color: #ea580c; }
+        .interaction-card.moderate { border-left-color: #f59e0b; }
+        .interaction-card.minor { border-left-color: #eab308; }
+
+        .interaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .interaction-drugs {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .severity-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-badge.critical { background: #dc2626; color: white; }
+        .severity-badge.major { background: #ea580c; color: white; }
+        .severity-badge.moderate { background: #f59e0b; color: white; }
+        .severity-badge.minor { background: #eab308; color: white; }
+
+        .interaction-description {
+            color: #cbd5e0;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .interaction-recommendation {
+            background: rgba(37, 99, 235, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+            margin-top: 10px;
+        }
+
+        .interaction-recommendation strong {
+            color: #3b82f6;
+        }
+
+        /* Alternatives Section */
+        .alternatives-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .alternatives-title {
+            color: #3b82f6;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .alternative-drug {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(72, 187, 120, 0.1);
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            border-radius: 8px;
+            margin: 5px;
+            font-size: 0.9rem;
+            color: #48bb78;
+        }
+
+        /* AI Insights Panel */
+        .ai-insights-panel {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .gemini-badge {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .ai-insights-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .ai-badge {
+            background: rgba(37, 99, 235, 0.2);
+            color: #3b82f6;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .ai-insights-text {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 12px;
+            line-height: 1.8;
+            color: #e2e8f0;
+        }
+
+        .ai-insights-text strong {
+            color: #3b82f6;
+        }
+
+        .ai-insights-text p {
+            margin-bottom: 15px;
+        }
+
+        .ai-insights-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(37, 99, 235, 0.2);
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+
+        .error-message {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #fca5a5;
+        }
+
+        .error-message i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Food & Herb Interactions */
+        .food-herb-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .food-interactions, .herb-interactions {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .warning-item {
+            background: rgba(234, 179, 8, 0.1);
+            border-left: 3px solid #eab308;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .warning-item strong {
+            color: #eab308;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .food-herb-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .drug-input-panel, .network-panel, .interactions-panel {
+                padding: 20px;
+            }
+
+            #network-graph {
+                height: 400px;
+            }
+
+            .legend {
+                gap: 10px;
+            }
+
+            .legend-item {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .drug-input-wrapper {
+                flex-direction: column;
+            }
+
+            .btn-add {
+                width: 100%;
+            }
+
+            #network-graph {
+                height: 300px;
+            }
+
+            .interaction-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'shared_header.html' %}
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-network-wired"></i> Drug Interaction Checker</h1>
+            <p>Visual network analysis with severity classification and alternative suggestions</p>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Drug Input Panel -->
+            <div class="drug-input-panel">
+                <div class="panel-title">
+                    <i class="fas fa-pills"></i>
+                    Add Medications
+                </div>
+
+                <div class="drug-input-group">
+                    <label for="drug-input">Medication Name</label>
+                    <div class="drug-input-wrapper">
+                        <input type="text" id="drug-input" placeholder="Enter medication name...">
+                    </div>
+                </div>
+
+                <div class="drug-input-group">
+                    <label for="dose-input">Dose (optional)</label>
+                    <div class="drug-input-wrapper">
+                        <input type="text" id="dose-input" placeholder="e.g., 100mg, 5mg twice daily...">
+                        <button class="btn-add" onclick="addDrug()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="drug-list" id="drug-list">
+                    <!-- Drug chips will be added here -->
+                </div>
+
+                <button class="btn-check" onclick="checkInteractions()">
+                    <i class="fas fa-search"></i> Check Interactions
+                </button>
+            </div>
+
+            <!-- Network Graph Panel -->
+            <div class="network-panel">
+                <div class="panel-title">
+                    <i class="fas fa-project-diagram"></i>
+                    Interaction Network
+                </div>
+                <div id="network-graph"></div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color severity-critical"></div>
+                        <span>Critical</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color severity-major"></div>
+                        <span>Major</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color severity-moderate"></div>
+                        <span>Moderate</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color severity-minor"></div>
+                        <span>Minor</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color severity-none"></div>
+                        <span>No Interaction</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactions List -->
+        <div class="interactions-panel" id="interactions-panel" style="display: none;">
+            <div class="panel-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                Detected Interactions
+            </div>
+            <div id="interactions-list">
+                <!-- Interaction cards will be added here -->
+            </div>
+        </div>
+
+        <!-- AI Insights Section -->
+        <div class="ai-insights-panel" id="ai-insights-section" style="display: none;">
+            <div class="panel-title">
+                <i class="fas fa-robot"></i>
+                AI Clinical Insights
+                <span class="gemini-badge">Powered by Gemini AI</span>
+            </div>
+            <div id="ai-insights-content">
+                <!-- AI insights will be added here -->
+            </div>
+        </div>
+
+        <!-- Food & Herb Interactions -->
+        <div class="food-herb-panel" id="food-herb-panel" style="display: none;">
+            <div class="food-interactions">
+                <div class="panel-title">
+                    <i class="fas fa-utensils"></i>
+                    Food Interactions
+                </div>
+                <div id="food-warnings">
+                    <!-- Food warnings will be added here -->
+                </div>
+            </div>
+
+            <div class="herb-interactions">
+                <div class="panel-title">
+                    <i class="fas fa-leaf"></i>
+                    Herb Interactions
+                </div>
+                <div id="herb-warnings">
+                    <!-- Herb warnings will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let drugs = [];
+        let interactions = [];
+
+        // Sample drug interaction database
+        const interactionDatabase = {
+            'warfarin-aspirin': {
+                severity: 'critical',
+                description: 'Increased risk of bleeding. Both drugs affect blood clotting.',
+                recommendation: 'Avoid combination. Monitor INR closely if unavoidable.',
+                alternatives: ['Apixaban', 'Rivaroxaban']
+            },
+            'warfarin-ibuprofen': {
+                severity: 'major',
+                description: 'NSAIDs increase bleeding risk when combined with anticoagulants.',
+                recommendation: 'Use alternative pain reliever. Consider acetaminophen.',
+                alternatives: ['Acetaminophen', 'Tramadol']
+            },
+            'metformin-alcohol': {
+                severity: 'moderate',
+                description: 'Alcohol may increase risk of lactic acidosis.',
+                recommendation: 'Limit alcohol consumption. Monitor for symptoms.',
+                alternatives: []
+            },
+            'lisinopril-potassium': {
+                severity: 'major',
+                description: 'May cause dangerous hyperkalemia.',
+                recommendation: 'Monitor potassium levels regularly. Avoid potassium supplements.',
+                alternatives: []
+            }
+        };
+
+        // Food interactions database
+        const foodInteractions = {
+            'warfarin': ['Avoid large amounts of vitamin K-rich foods (kale, spinach, broccoli)', 'Limit alcohol consumption'],
+            'metformin': ['Take with food to reduce GI upset', 'Avoid excessive alcohol'],
+            'levothyroxine': ['Take on empty stomach', 'Avoid calcium and iron supplements within 4 hours'],
+            'lisinopril': ['Avoid high-potassium foods', 'Limit salt substitutes']
+        };
+
+        // Herb interactions database
+        const herbInteractions = {
+            'warfarin': ['St. John\'s Wort may decrease effectiveness', 'Ginkgo biloba increases bleeding risk'],
+            'metformin': ['Avoid excessive amounts of cinnamon', 'Ginseng may affect blood sugar'],
+            'lisinopril': ['Avoid licorice root', 'Hawthorn may enhance blood pressure lowering']
+        };
+
+        function addDrug() {
+            const drugInput = document.getElementById('drug-input');
+            const doseInput = document.getElementById('dose-input');
+            const drugName = drugInput.value.trim();
+            const dose = doseInput.value.trim();
+            
+            if (drugName) {
+                // Check if drug already exists
+                const existingDrug = drugs.find(d => d.name.toLowerCase() === drugName.toLowerCase());
+                if (!existingDrug) {
+                    drugs.push({
+                        name: drugName,
+                        dose: dose || 'Not specified'
+                    });
+                    updateDrugList();
+                    drugInput.value = '';
+                    doseInput.value = '';
+                }
+            }
+        }
+
+        function removeDrug(drugName) {
+            drugs = drugs.filter(d => d.name !== drugName);
+            updateDrugList();
+        }
+
+        function updateDrugList() {
+            const drugList = document.getElementById('drug-list');
+            drugList.innerHTML = drugs.map(drug => `
+                <div class="drug-chip">
+                    <i class="fas fa-pills"></i>
+                    <span>${drug.name}</span>
+                    <span class="dose-badge">${drug.dose}</span>
+                    <span class="remove-btn" onclick="removeDrug('${drug.name}')">×</span>
+                </div>
+            `).join('');
+        }
+
+        function checkInteractions() {
+            if (drugs.length < 2) {
+                alert('Please add at least 2 medications to check interactions');
+                return;
+            }
+
+            // Find interactions
+            interactions = [];
+            for (let i = 0; i < drugs.length; i++) {
+                for (let j = i + 1; j < drugs.length; j++) {
+                    const key1 = `${drugs[i].name.toLowerCase()}-${drugs[j].name.toLowerCase()}`;
+                    const key2 = `${drugs[j].name.toLowerCase()}-${drugs[i].name.toLowerCase()}`;
+                    
+                    if (interactionDatabase[key1]) {
+                        interactions.push({
+                            drug1: drugs[i].name,
+                            drug2: drugs[j].name,
+                            ...interactionDatabase[key1]
+                        });
+                    } else if (interactionDatabase[key2]) {
+                        interactions.push({
+                            drug1: drugs[i].name,
+                            drug2: drugs[j].name,
+                            ...interactionDatabase[key2]
+                        });
+                    }
+                }
+            }
+
+            // Draw network graph
+            drawNetworkGraph();
+            
+            // Display interactions
+            displayInteractions();
+            
+            // Display food/herb warnings
+            displayFoodHerbWarnings();
+            
+            // Get AI insights
+            getAIInsights();
+        }
+
+        function drawNetworkGraph() {
+            const svg = d3.select('#network-graph');
+            svg.selectAll('*').remove();
+
+            const width = document.getElementById('network-graph').clientWidth;
+            const height = 500;
+
+            const svgElement = svg.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Create nodes
+            const nodes = drugs.map(drug => ({ id: drug.name, name: drug.name, dose: drug.dose }));
+
+            // Create links
+            const links = interactions.map(int => ({
+                source: int.drug1,
+                target: int.drug2,
+                severity: int.severity
+            }));
+
+            // Color scale
+            const colorScale = {
+                'critical': '#dc2626',
+                'major': '#ea580c',
+                'moderate': '#f59e0b',
+                'minor': '#eab308',
+                'none': '#22c55e'
+            };
+
+            // Force simulation
+            const simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(150))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2));
+
+            // Draw links
+            const link = svgElement.append('g')
+                .selectAll('line')
+                .data(links)
+                .enter().append('line')
+                .attr('stroke', d => colorScale[d.severity])
+                .attr('stroke-width', 3)
+                .attr('opacity', 0.6);
+
+            // Draw nodes
+            const node = svgElement.append('g')
+                .selectAll('circle')
+                .data(nodes)
+                .enter().append('circle')
+                .attr('r', 20)
+                .attr('fill', '#3b82f6')
+                .attr('stroke', '#1d4ed8')
+                .attr('stroke-width', 2)
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+
+            // Add labels
+            const labels = svgElement.append('g')
+                .selectAll('text')
+                .data(nodes)
+                .enter().append('text')
+                .text(d => d.name)
+                .attr('font-size', 12)
+                .attr('fill', '#e2e8f0')
+                .attr('text-anchor', 'middle')
+                .attr('dy', 35);
+
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                labels
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y);
+            });
+
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+
+        function displayInteractions() {
+            const panel = document.getElementById('interactions-panel');
+            const list = document.getElementById('interactions-list');
+
+            if (interactions.length === 0) {
+                list.innerHTML = '<p style="color: #48bb78;"><i class="fas fa-check-circle"></i> No significant interactions detected!</p>';
+            } else {
+                list.innerHTML = interactions.map(int => `
+                    <div class="interaction-card ${int.severity}">
+                        <div class="interaction-header">
+                            <div class="interaction-drugs">
+                                ${int.drug1} + ${int.drug2}
+                            </div>
+                            <div class="severity-badge ${int.severity}">
+                                ${int.severity}
+                            </div>
+                        </div>
+                        <div class="interaction-description">
+                            ${int.description}
+                        </div>
+                        <div class="interaction-recommendation">
+                            <strong>Recommendation:</strong> ${int.recommendation}
+                        </div>
+                        ${int.alternatives.length > 0 ? `
+                            <div class="alternatives-section">
+                                <div class="alternatives-title">
+                                    <i class="fas fa-lightbulb"></i> Safer Alternatives:
+                                </div>
+                                ${int.alternatives.map(alt => `
+                                    <span class="alternative-drug">${alt}</span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+
+            panel.style.display = 'block';
+        }
+
+        function displayFoodHerbWarnings() {
+            const panel = document.getElementById('food-herb-panel');
+            const foodWarnings = document.getElementById('food-warnings');
+            const herbWarnings = document.getElementById('herb-warnings');
+
+            let foodHTML = '';
+            let herbHTML = '';
+
+            drugs.forEach(drug => {
+                const drugName = drug.name.toLowerCase();
+                if (foodInteractions[drugName]) {
+                    foodHTML += foodInteractions[drugName].map(warning => `
+                        <div class="warning-item">
+                            <strong>${drug.name}:</strong> ${warning}
+                        </div>
+                    `).join('');
+                }
+
+                if (herbInteractions[drugName]) {
+                    herbHTML += herbInteractions[drugName].map(warning => `
+                        <div class="warning-item">
+                            <strong>${drug.name}:</strong> ${warning}
+                        </div>
+                    `).join('');
+                }
+            });
+
+            foodWarnings.innerHTML = foodHTML || '<p style="color: #48bb78;">No food interactions detected</p>';
+            herbWarnings.innerHTML = herbHTML || '<p style="color: #48bb78;">No herb interactions detected</p>';
+
+            panel.style.display = 'grid';
+        }
+
+        async function getAIInsights() {
+            const aiInsightsSection = document.getElementById('ai-insights-section');
+            const aiInsightsContent = document.getElementById('ai-insights-content');
+            
+            // Show loading state
+            aiInsightsSection.style.display = 'block';
+            aiInsightsContent.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #3b82f6;"></i>
+                    <p style="margin-top: 20px; color: #a0aec0;">Generating AI-powered insights...</p>
+                </div>
+            `;
+            
+            try {
+                console.log('🤖 Fetching AI insights for medications:', drugs);
+                const response = await fetch('/get_ai_drug_insights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        medications: drugs,
+                        patient_age: 'Not specified',
+                        comorbidities: []
+                    })
+                });
+                
+                console.log('📡 Response status:', response.status, response.statusText);
+                
+                // Check if response is ok (status 200-299)
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ Server error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    aiInsightsContent.innerHTML = `
+                        <div class="error-message" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 30px; border-radius: 15px; text-align: center;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #fbbf24; margin-bottom: 20px;"></i>
+                            <h3 style="color: white; margin-bottom: 15px;">Analysis Error</h3>
+                            <p style="color: #fee2e2;">${data.error}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Display AI insights
+                aiInsightsContent.innerHTML = `
+                    <div class="ai-insights-header">
+                        <i class="fas fa-robot"></i>
+                        <span>AI-Powered Clinical Analysis</span>
+                        <span class="ai-badge">${data.ai_generated ? 'Gemini AI' : 'Fallback'}</span>
+                    </div>
+                    <div class="ai-insights-text">
+                        ${formatAIInsights(data.ai_insights)}
+                    </div>
+                    <div class="ai-insights-footer">
+                        <small>Generated: ${new Date(data.generated_at).toLocaleString()}</small>
+                        <small>Medications analyzed: ${data.medications_analyzed}</small>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error fetching AI insights:', error);
+                aiInsightsContent.innerHTML = `
+                    <div class="error-message" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; border-radius: 15px; text-align: center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #fbbf24; margin-bottom: 20px;"></i>
+                        <h3 style="color: white; margin-bottom: 15px;">Unable to generate AI insights at this time.</h3>
+                        <p style="color: #e2e8f0; margin-bottom: 10px;">Error: ${error.message}</p>
+                        <p style="color: #cbd5e0; font-size: 0.9rem; margin-bottom: 20px;">
+                            Please check the console for more details or ensure the Flask server is running.
+                        </p>
+                        <button onclick="getAIInsights()" style="background: white; color: #059669; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        function formatAIInsights(text) {
+            // Convert markdown-style formatting to HTML
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>')
+                .replace(/^(.*)$/gm, '<p>$1</p>')
+                .replace(/<p><\/p>/g, '')
+                .replace(/(\d+\.)/g, '<br><strong>$1</strong>');
+        }
+
+        // Allow Enter key to add drug
+        document.getElementById('drug-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addDrug();
+            }
+        });
+        
+        document.getElementById('dose-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addDrug();
+            }
+        });
+    </script>
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+    <!-- Professional Footer Component -->
+    {% include 'footer.html' %}
+
+</body>
+</html>
+
+

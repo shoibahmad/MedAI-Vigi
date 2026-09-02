@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+.repo_evaluator.py
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+myenv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+
+# Model files (optional - comment out if you want to include them)
+# *.pkl
+
+# Data files (optional - comment out if you want to include them)
+# *.csv
+# *.json
+
+# --- added during frontend migration cleanup ---
+kaggle.json
+# Frontend build output
+client/dist/
+client/node_modules/
+# Test + coverage artifacts
+coverage.xml
+.coverage
+.pytest_cache/
+
+# MLflow local tracking store (runtime artifact)
+mlruns/

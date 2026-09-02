@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: phenorx
+    env: python
+    buildCommand: chmod +x scripts/build.sh && ./scripts/build.sh
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --worker-class gthread --timeout 180
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: GEMINI_API_KEY
+        sync: false  # Set this in Render dashboard as a secret environment variable
+      - key: FLASK_ENV
+        value: production
+      - key: PRODUCTION
+        value: "true"
+    healthCheckPath: /health

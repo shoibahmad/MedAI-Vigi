@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - PhenoRx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/shared-theme.css') }}" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1771389944029472"
+     crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e2e8f0;
+            padding-top: 90px;
+            min-height: 100vh;
+        }
+
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .legal-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .legal-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .legal-date {
+            color: #a0aec0;
+            font-size: 0.95rem;
+        }
+
+        .legal-content {
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .legal-content h2 {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            margin: 30px 0 15px 0;
+        }
+
+        .legal-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .legal-content p {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .legal-content ul {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .legal-content li {
+            margin-bottom: 10px;
+        }
+
+        .legal-content strong {
+            color: #e2e8f0;
+        }
+
+        .alert-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-left: 4px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .legal-title {
+                font-size: 2rem;
+            }
+            .legal-content {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="legal-container">
+        <div class="legal-header">
+            <h1 class="legal-title">
+                <i class="fas fa-file-contract"></i> Terms of Service
+            </h1>
+            <p class="legal-date">Last Updated: November 2025</p>
+        </div>
+
+        <div class="legal-content">
+            <div class="alert-box">
+                <strong>Important Notice:</strong> By accessing and using PhenoRx, you agree to be bound by these 
+                Terms of Service. If you do not agree to these terms, please do not use this application.
+            </div>
+
+            <h2>1. Acceptance of Terms</h2>
+            <p>
+                These Terms of Service ("Terms") govern your access to and use of PhenoRx, an adverse drug reaction 
+                identification and clinical decision support system developed by Pharm.D students at Integral University, 
+                Lucknow. By accessing or using the application, you agree to comply with and be bound by these Terms.
+            </p>
+
+            <h2>2. Description of Service</h2>
+            <p>
+                PhenoRx provides:
+            </p>
+            <ul>
+                <li>Adverse drug reaction (ADR) risk assessment</li>
+                <li>Drug interaction checking</li>
+                <li>Personalized dosing recommendations</li>
+                <li>Pharmacogenomic analysis</li>
+                <li>Clinical decision support tools</li>
+                <li>AI-powered clinical insights</li>
+            </ul>
+
+            <h2>3. Intended Use and Limitations</h2>
+            <p>
+                <strong>PhenoRx is intended for use by qualified healthcare professionals only.</strong> The system 
+                is designed as a clinical decision support tool and should not be used as:
+            </p>
+            <ul>
+                <li>A replacement for professional medical judgment</li>
+                <li>The sole basis for clinical decisions</li>
+                <li>A diagnostic tool without clinical validation</li>
+                <li>A substitute for consulting with qualified healthcare providers</li>
+            </ul>
+
+            <h2>4. User Responsibilities</h2>
+            <p>
+                As a user of PhenoRx, you agree to:
+            </p>
+            <ul>
+                <li>Be a qualified healthcare professional or student under appropriate supervision</li>
+                <li>Use the system only for its intended purpose</li>
+                <li>Verify all recommendations with clinical judgment and current medical literature</li>
+                <li>Maintain patient confidentiality and comply with applicable privacy laws</li>
+                <li>Not use the system for any unlawful purpose</li>
+                <li>Not attempt to reverse engineer or compromise the system's security</li>
+                <li>Provide accurate and complete information when using the system</li>
+            </ul>
+
+            <h2>5. Medical Disclaimer</h2>
+            <div class="alert-box">
+                <strong>Critical Disclaimer:</strong> PhenoRx provides information and recommendations based on 
+                algorithms and AI analysis. However:
+                <ul style="margin-top: 10px;">
+                    <li>The system does not provide medical advice, diagnosis, or treatment</li>
+                    <li>All predictions and recommendations must be validated by qualified healthcare professionals</li>
+                    <li>Clinical decisions should be based on comprehensive patient assessment</li>
+                    <li>The system may not account for all patient-specific factors</li>
+                    <li>Users are solely responsible for clinical decisions made using this tool</li>
+                </ul>
+            </div>
+
+            <h2>6. Accuracy and Reliability</h2>
+            <p>
+                While we strive to provide accurate and up-to-date information:
+            </p>
+            <ul>
+                <li>We do not guarantee the accuracy, completeness, or reliability of any information provided</li>
+                <li>Medical knowledge evolves rapidly; information may become outdated</li>
+                <li>AI-generated insights should be critically evaluated</li>
+                <li>The system may not detect all drug interactions or adverse reactions</li>
+                <li>Users should consult current medical literature and guidelines</li>
+            </ul>
+
+            <h2>7. Limitation of Liability</h2>
+            <p>
+                To the fullest extent permitted by law:
+            </p>
+            <ul>
+                <li>PhenoRx and its developers shall not be liable for any direct, indirect, incidental, special, 
+                or consequential damages</li>
+                <li>We are not responsible for any harm resulting from use or misuse of the system</li>
+                <li>We do not assume liability for clinical decisions made using this tool</li>
+                <li>Users assume all risks associated with using the system</li>
+            </ul>
+
+            <h2>8. Intellectual Property</h2>
+            <p>
+                All content, features, and functionality of PhenoRx, including but not limited to:
+            </p>
+            <ul>
+                <li>Software code and algorithms</li>
+                <li>User interface design</li>
+                <li>Text, graphics, and logos</li>
+                <li>Machine learning models</li>
+            </ul>
+            <p>
+                Are owned by the developers and protected by copyright, trademark, and other intellectual property laws.
+            </p>
+
+            <h2>9. Research and Academic Use</h2>
+            <p>
+                PhenoRx is a research project developed for academic purposes. Users acknowledge that:
+            </p>
+            <ul>
+                <li>The system is under continuous development and improvement</li>
+                <li>Features and functionality may change without notice</li>
+                <li>The system is provided "as is" for research and educational purposes</li>
+                <li>Production deployment requires additional validation and regulatory compliance</li>
+            </ul>
+
+            <h2>10. Data Privacy and Security</h2>
+            <p>
+                Your use of PhenoRx is also governed by our Privacy Policy. By using the system, you consent to:
+            </p>
+            <ul>
+                <li>Collection and processing of data as described in the Privacy Policy</li>
+                <li>Use of cookies and similar technologies</li>
+                <li>Integration with third-party AI services (Google Gemini)</li>
+            </ul>
+
+            <h2>11. Modifications to Service</h2>
+            <p>
+                We reserve the right to:
+            </p>
+            <ul>
+                <li>Modify or discontinue the service at any time</li>
+                <li>Update features and functionality</li>
+                <li>Change these Terms of Service</li>
+                <li>Restrict access to certain features or users</li>
+            </ul>
+            <p>
+                Continued use of the service after changes constitutes acceptance of the modified terms.
+            </p>
+
+            <h2>12. Termination</h2>
+            <p>
+                We may terminate or suspend your access to PhenoRx immediately, without prior notice, for:
+            </p>
+            <ul>
+                <li>Violation of these Terms of Service</li>
+                <li>Misuse of the system</li>
+                <li>Any conduct that we deem inappropriate or harmful</li>
+            </ul>
+
+            <h2>13. Governing Law</h2>
+            <p>
+                These Terms shall be governed by and construed in accordance with the laws of India, without regard 
+                to its conflict of law provisions. Any disputes arising from these Terms or use of the service shall 
+                be subject to the exclusive jurisdiction of the courts in Lucknow, Uttar Pradesh, India.
+            </p>
+
+            <h2>14. Severability</h2>
+            <p>
+                If any provision of these Terms is found to be unenforceable or invalid, that provision shall be 
+                limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in 
+                full force and effect.
+            </p>
+
+            <h2>15. Contact Information</h2>
+            <p>
+                For questions about these Terms of Service, please contact:
+            </p>
+            <ul>
+                <li><strong>Email:</strong> phenorx@iul.ac.in</li>
+                <li><strong>Phone:</strong> +91 8853741966</li>
+                <li><strong>Address:</strong> Integral University, Kursi Road, Lucknow - 226026, India</li>
+            </ul>
+
+            <h2>16. Acknowledgment</h2>
+            <p>
+                By using PhenoRx, you acknowledge that:
+            </p>
+            <ul>
+                <li>You have read and understood these Terms of Service</li>
+                <li>You agree to be bound by these Terms</li>
+                <li>You are a qualified healthcare professional or student under supervision</li>
+                <li>You will use the system responsibly and ethically</li>
+                <li>You understand the limitations and disclaimers outlined herein</li>
+            </ul>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+</html>

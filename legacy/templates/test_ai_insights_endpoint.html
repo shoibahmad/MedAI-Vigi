@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test AI Insights Endpoint</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a202c;
+            color: white;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #2d3748;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success {
+            border-left: 4px solid #48bb78;
+        }
+        .error {
+            border-left: 4px solid #f56565;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 AI Insights Endpoint Test</h1>
+    <p>This page tests the <code>/get_ai_drug_insights</code> endpoint</p>
+    
+    <button onclick="testEndpoint()">Test AI Insights Endpoint</button>
+    <button onclick="testWithCurl()">Show cURL Command</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function testEndpoint() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>⏳ Testing endpoint...</p>';
+            resultDiv.className = '';
+            
+            try {
+                console.log('🚀 Starting test...');
+                console.log('📍 URL:', window.location.origin + '/get_ai_drug_insights');
+                
+                const testData = {
+                    medications: [
+                        { name: 'Warfarin', dose: '5mg' },
+                        { name: 'Aspirin', dose: '81mg' }
+                    ],
+                    patient_age: '65',
+                    comorbidities: ['Hypertension']
+                };
+                
+                console.log('📦 Request data:', testData);
+                
+                const response = await fetch('/get_ai_drug_insights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                console.log('📡 Response status:', response.status);
+                console.log('📡 Response headers:', [...response.headers.entries()]);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Success! Data:', data);
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Success!</h3>
+                    <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                    <p><strong>AI Generated:</strong> ${data.ai_generated}</p>
+                    <p><strong>Medications Analyzed:</strong> ${data.medications_analyzed}</p>
+                    <p><strong>Insights Length:</strong> ${data.insights_length} characters</p>
+                    <p><strong>Generated At:</strong> ${data.generated_at}</p>
+                    <hr>
+                    <h4>AI Insights Preview (first 500 chars):</h4>
+                    <p>${data.ai_insights.substring(0, 500)}...</p>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Error</h3>
+                    <p><strong>Message:</strong> ${error.message}</p>
+                    <p><strong>Check the browser console for more details</strong></p>
+                `;
+            }
+        }
+        
+        function testWithCurl() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = '';
+            resultDiv.innerHTML = `
+                <h3>📋 cURL Test Command</h3>
+                <p>Run this in your terminal:</p>
+                <pre style="background: #1a202c; padding: 15px; border-radius: 5px; overflow-x: auto;">curl -X POST http://localhost:5000/get_ai_drug_insights \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "medications": [
+      {"name": "Warfarin", "dose": "5mg"},
+      {"name": "Aspirin", "dose": "81mg"}
+    ],
+    "patient_age": "65",
+    "comorbidities": ["Hypertension"]
+  }'</pre>
+            `;
+        }
+    </script>
+</body>
+</html>
+
