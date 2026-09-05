@@ -272,7 +272,7 @@ PhenoRx/
 ├── schemas.py                   # Pydantic request/response validation
 │
 ├── routes/                      # API blueprints
-│   ├── views.py                 #   serves client/dist + the remaining Jinja pages
+│   ├── views.py                 #   serves client/dist (SPA shell + assets)
 │   ├── predict.py               #   /predict, /sample_data, /mitigation_strategies
 │   ├── report.py                #   /generate_report, /api/chat, AI drug insights
 │   ├── clinical.py              #   lab interpretation, assessments, counselling
@@ -288,19 +288,16 @@ PhenoRx/
 │
 ├── client/                      # React 19 + Vite SPA  ← the frontend
 │   ├── src/
-│   │   ├── pages/               #   one file per route (+ assessment/Sections.jsx)
+│   │   ├── pages/               #   one file per route (+ assessment/, legal/)
 │   │   ├── components/
 │   │   │   ├── ui/              #     shadcn/ui primitives
 │   │   │   ├── layout/          #     AppShell, TopBar, Footer
 │   │   │   └── clinical/        #     RiskMeter, LabInput, SignaturePad, ...
-│   │   ├── lib/                 #   api client, zod schemas, clinical + dosing logic
+│   │   ├── lib/                 #   api client, zod schemas, clinical logic, page content
 │   │   ├── hooks/               #   one TanStack Query hook per endpoint
 │   │   ├── context/             #   AssessmentContext (sessionStorage-backed)
 │   │   └── index.css            #   Tailwind v4 theme (light-only medical palette)
 │   └── dist/                    #   build output - Flask serves this
-│
-├── templates/                   # Jinja pages not yet migrated (about, docs, legal)
-├── static/                      # Assets for those Jinja pages only
 │
 ├── models/                      # Trained artifacts (adr_model.pkl, preprocessor)
 ├── data/                        # Datasets + saved assessments

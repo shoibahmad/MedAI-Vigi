@@ -1,33 +1,22 @@
 """
-Static serving for the React SPA, plus the Jinja pages not yet migrated.
+Static serving for the React SPA.
 
-The clinical workflow (landing, patient details, assessment, report, drug
-interactions, decision support, counselling, chatbot) is owned by the React client
-in client/. This blueprint serves that build and its assets, and keeps the
-remaining content and legal pages rendering from templates/ at their existing URLs.
+The entire user interface now lives in client/. This blueprint serves the built
+bundle and its assets, and routes every non-API path to the SPA shell so
+client-side routing handles deep links.
 """
 
 import os
 from typing import Any, Tuple, Union
 
-from flask import Blueprint, Response, current_app, jsonify, render_template, send_from_directory
+from flask import Blueprint, Response, current_app, jsonify, send_from_directory
 
 views_bp = Blueprint("views", __name__)
 
 # client/dist, resolved relative to this file so it works regardless of cwd.
-SPA_DIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "client", "dist")
-
-# Pages still rendered by Jinja. Each maps a URL path to its template.
-LEGACY_PAGES = {
-    "about": "about.html",
-    "documentation": "documentation.html",
-    "api_reference": "api_reference.html",
-    "research_papers": "research_papers.html",
-    "faqs": "faqs.html",
-    "privacy_policy": "privacy_policy.html",
-    "terms_of_service": "terms_of_service.html",
-    "cookie_policy": "cookie_policy.html",
-}
+SPA_DIST = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "client", "dist"
+)
 
 # Prefixes owned by the JSON API. A miss under these must stay a JSON 404 rather
 # than being swallowed by the SPA catch-all.
@@ -89,20 +78,6 @@ def index() -> Any:
 def spa_assets(filename: str) -> Any:
     """Hashed JS/CSS/font bundles emitted by Vite."""
     return send_from_directory(os.path.join(SPA_DIST, "assets"), filename)
-
-
-def _legacy_page(template: str) -> Any:
-    return render_template(template)
-
-
-# Register the un-migrated Jinja pages at the URLs the existing links already use.
-for _path, _template in LEGACY_PAGES.items():
-    views_bp.add_url_rule(
-        f"/{_path}",
-        endpoint=_path,
-        view_func=(lambda template=_template: _legacy_page(template)),
-        methods=["GET"],
-    )
 
 
 @views_bp.route("/<path:path>", methods=["GET"])

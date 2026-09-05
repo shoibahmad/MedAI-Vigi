@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { ServerStatusDot } from '@/components/layout/ServerStatusDot'
-import { LEGACY_LINKS, NAV_ITEMS } from '@/lib/navigation'
+import { CONTENT_LINKS, NAV_ITEMS } from '@/lib/navigation'
 
 function Brand({ onClick }) {
   return (
@@ -95,14 +95,15 @@ export function TopBar() {
 
                 <div className="my-2 border-t" />
 
-                {LEGACY_LINKS.map(({ href, label }) => (
-                  <a
-                    key={href}
-                    href={href}
+                {CONTENT_LINKS.map(({ to, label }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    onClick={() => setOpen(false)}
                     className={cn(linkBase, 'py-2.5 text-muted-foreground hover:bg-muted')}
                   >
                     {label}
-                  </a>
+                  </NavLink>
                 ))}
               </nav>
             </SheetContent>

@@ -1,10 +1,11 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
 import { AssessmentProvider } from '@/context/AssessmentContext'
 import { AppShell } from '@/components/layout/AppShell'
+import { LEGACY_URL_ALIASES } from '@/lib/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import Landing from '@/pages/Landing'
@@ -20,6 +21,16 @@ const Counselling = lazy(() => import('@/pages/Counselling'))
 const Chatbot = lazy(() => import('@/pages/Chatbot'))
 const Methodology = lazy(() => import('@/pages/Methodology'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
+
+// Content and legal pages, migrated off Jinja so the whole app shares one shell.
+const About = lazy(() => import('@/pages/About'))
+const Documentation = lazy(() => import('@/pages/Documentation'))
+const ApiReference = lazy(() => import('@/pages/ApiReference'))
+const ResearchPapers = lazy(() => import('@/pages/ResearchPapers'))
+const Faqs = lazy(() => import('@/pages/Faqs'))
+const Privacy = lazy(() => import('@/pages/legal/Privacy'))
+const Terms = lazy(() => import('@/pages/legal/Terms'))
+const Cookies = lazy(() => import('@/pages/legal/Cookies'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,6 +69,20 @@ export default function App() {
                   <Route path="/patient-counselling" element={<Counselling />} />
                   <Route path="/chatbot" element={<Chatbot />} />
                   <Route path="/methodology" element={<Methodology />} />
+
+                  <Route path="/about" element={<About />} />
+                  <Route path="/documentation" element={<Documentation />} />
+                  <Route path="/api-reference" element={<ApiReference />} />
+                  <Route path="/research-papers" element={<ResearchPapers />} />
+                  <Route path="/faqs" element={<Faqs />} />
+                  <Route path="/privacy-policy" element={<Privacy />} />
+                  <Route path="/terms-of-service" element={<Terms />} />
+                  <Route path="/cookie-policy" element={<Cookies />} />
+
+                  {/* The Jinja pages used underscores; keep those URLs working. */}
+                  {LEGACY_URL_ALIASES.map(({ from, to }) => (
+                    <Route key={from} path={from} element={<Navigate to={to} replace />} />
+                  ))}
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>

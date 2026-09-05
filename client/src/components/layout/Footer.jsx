@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Activity } from 'lucide-react'
-import { LEGACY_LINKS, LEGAL_LINKS, NAV_ITEMS } from '@/lib/navigation'
+import { CONTENT_LINKS, LEGAL_LINKS, NAV_ITEMS } from '@/lib/navigation'
 
 export function Footer() {
   return (
@@ -39,46 +39,30 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold">Resources</h3>
             <ul className="mt-3 space-y-2">
-              <li>
-                <Link
-                  to="/methodology"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Methodology
-                </Link>
-              </li>
-              {LEGACY_LINKS.map(({ href, label }) => (
-                <li key={href}>
-                  <a
-                    href={href}
+              {CONTENT_LINKS.map(({ to, label }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
-              <li>
-                <a
-                  href="/research_papers"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Research Papers
-                </a>
-              </li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-sm font-semibold">Legal</h3>
             <ul className="mt-3 space-y-2">
-              {LEGAL_LINKS.map(({ href, label }) => (
-                <li key={href}>
-                  <a
-                    href={href}
+              {LEGAL_LINKS.map(({ to, label }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

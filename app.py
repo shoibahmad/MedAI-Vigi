@@ -55,15 +55,15 @@ def create_app(config_class: Any = None) -> Flask:
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        # The SPA bundles its own JS/CSS/fonts, so no external script origins are
-        # needed. 'unsafe-inline' remains only for the un-migrated Jinja pages,
-        # which still carry inline <style> blocks; drop it once those are gone.
+        # The SPA bundles its own JS, CSS and fonts, so no external origins are
+        # needed at all. 'unsafe-inline' for styles is required by the inline
+        # style attributes React uses for the risk meter and probability bars.
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
             "script-src 'self'; "
-            "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+            "style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data: blob:; "
-            "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+            "font-src 'self' data:; "
             "connect-src 'self'; "
             "frame-ancestors 'none';"
         )
