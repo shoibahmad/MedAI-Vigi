@@ -13,6 +13,7 @@ import { PharmacogenomicsPanel } from '@/components/clinical/PharmacogenomicsPan
 import { AnalysisOverlay } from '@/components/clinical/AnalysisOverlay'
 import { Markdown } from '@/components/clinical/Markdown'
 import { AiRiskBanner } from '@/components/clinical/AiRiskBanner'
+import { withLegacyColors } from '@/lib/legacyColor'
 import { useAssessment } from '@/context/AssessmentContext'
 import {
   useDetailedAnalysis,
@@ -169,16 +170,23 @@ export default function Report() {
     try {
       // Loaded lazily: the bundle is large and only needed on export.
       const { default: html2pdf } = await import('html2pdf.js')
-      await html2pdf()
-        .set({
-          margin: 12,
-          filename: `ADR-Report-${patient.patient_id || 'patient'}.pdf`,
-          image: { type: 'jpeg', quality: 0.97 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        })
-        .from(printRef.current)
-        .save()
+
+      // html2canvas cannot parse oklab()/oklch(), which is what the browser
+      // resolves Tailwind's opacity modifiers to. Swap them for rgb() during the
+      // capture and restore afterwards.
+      await withLegacyColors(printRef.current, () =>
+        html2pdf()
+          .set({
+            margin: 12,
+            filename: `ADR-Report-${patient.patient_id || 'patient'}.pdf`,
+            image: { type: 'jpeg', quality: 0.97 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          })
+          .from(printRef.current)
+          .save(),
+      )
+      toast.success('Report exported')
     } catch (error) {
       toast.error('PDF export failed', { description: error.message })
     } finally {
