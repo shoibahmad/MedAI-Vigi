@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useAssessment } from '@/context/AssessmentContext'
 import { useChat } from '@/hooks/useApi'
+import { Markdown } from '@/components/clinical/Markdown'
 import { cn } from '@/lib/utils'
 
 const SUGGESTIONS = [
@@ -94,7 +95,13 @@ export default function Chatbot() {
                           : 'bg-muted',
                     )}
                   >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    {isUser ? (
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    ) : (
+                      <Markdown className="text-inherit [&_p:first-child]:mt-0 [&_p:last-child]:mb-0">
+                        {message.content}
+                      </Markdown>
+                    )}
                   </div>
                 </div>
               )

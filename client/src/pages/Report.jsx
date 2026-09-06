@@ -11,6 +11,7 @@ import { RiskMeter } from '@/components/clinical/RiskMeter'
 import { AdrProbabilityBars } from '@/components/clinical/AdrProbabilityBars'
 import { PharmacogenomicsPanel } from '@/components/clinical/PharmacogenomicsPanel'
 import { AnalysisOverlay } from '@/components/clinical/AnalysisOverlay'
+import { Markdown } from '@/components/clinical/Markdown'
 import { useAssessment } from '@/context/AssessmentContext'
 import {
   useDetailedAnalysis,
@@ -103,40 +104,6 @@ function InfoGrid({ rows }) {
         </div>
       ))}
     </dl>
-  )
-}
-
-/** Renders the model markdown response without pulling in a markdown library. */
-function NarrativeBlock({ text }) {
-  const blocks = String(text).split(/\n{2,}/)
-  return (
-    <div className="space-y-3 text-sm leading-relaxed">
-      {blocks.map((block, index) => {
-        const heading = block.match(/^#{2,4}\s+(.*)$/m)
-        if (heading) {
-          return (
-            <h3 key={index} className="pt-2 text-base font-semibold">
-              {heading[1]}
-            </h3>
-          )
-        }
-        if (/^[-*]\s+/m.test(block)) {
-          const items = block.split('\n').filter((l) => /^[-*]\s+/.test(l))
-          return (
-            <ul key={index} className="list-disc space-y-1.5 pl-5">
-              {items.map((item, i) => (
-                <li key={i}>{item.replace(/^[-*]\s+/, '')}</li>
-              ))}
-            </ul>
-          )
-        }
-        return (
-          <p key={index} className="whitespace-pre-wrap">
-            {block}
-          </p>
-        )
-      })}
-    </div>
   )
 }
 
@@ -481,8 +448,8 @@ export default function Report() {
                 {report ? (
                   <>
                     <SubHeading>Clinical narrative</SubHeading>
-                    <div className="mt-3">
-                      <NarrativeBlock text={report} />
+                    <div className="mt-3 rounded-lg border bg-muted/20 px-5 py-4">
+                      <Markdown className="max-w-prose">{report}</Markdown>
                     </div>
                   </>
                 ) : null}

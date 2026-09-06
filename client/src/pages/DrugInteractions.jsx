@@ -12,6 +12,7 @@ import { useAssessment } from '@/context/AssessmentContext'
 import { useDrugInteractions } from '@/hooks/useApi'
 import { MEDICATION_DATABASE, MEDICATION_NAMES } from '@/lib/dosing'
 import { AnalysisOverlay } from '@/components/clinical/AnalysisOverlay'
+import { Markdown } from '@/components/clinical/Markdown'
 import { cn } from '@/lib/utils'
 
 const SEVERITY_STYLES = {
@@ -223,9 +224,7 @@ export default function DrugInteractions() {
                 <h2 className="text-sm font-bold uppercase tracking-wide text-primary">
                   AI clinical analysis
                 </h2>
-                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">
-                  {result.analysis || result.summary}
-                </p>
+                <Markdown className="mt-3">{result.analysis || result.summary}</Markdown>
               </article>
             ) : null}
           </div>
