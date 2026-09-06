@@ -12,6 +12,7 @@ import { AdrProbabilityBars } from '@/components/clinical/AdrProbabilityBars'
 import { PharmacogenomicsPanel } from '@/components/clinical/PharmacogenomicsPanel'
 import { AnalysisOverlay } from '@/components/clinical/AnalysisOverlay'
 import { Markdown } from '@/components/clinical/Markdown'
+import { AiRiskBanner } from '@/components/clinical/AiRiskBanner'
 import { useAssessment } from '@/context/AssessmentContext'
 import {
   useDetailedAnalysis,
@@ -35,6 +36,13 @@ const CLINICAL_PARAMETERS = [
 ]
 
 // Mitigation priorities reuse the validated risk status palette.
+const PRIORITY_BORDER = {
+  Critical: 'border-l-risk-critical bg-risk-critical-bg/40',
+  High: 'border-l-risk-high bg-risk-high-bg/40',
+  Medium: 'border-l-risk-moderate bg-risk-moderate-bg/40',
+  Low: 'border-l-risk-low bg-risk-low-bg/40',
+}
+
 const PRIORITY_TONE = {
   Critical: 'bg-risk-critical-bg text-risk-critical border-risk-critical-border',
   High: 'bg-risk-high-bg text-risk-high border-risk-high-border',
@@ -424,6 +432,8 @@ export default function Report() {
                   generated={hasAiOutput ? aiGenerated : undefined}
                 />
 
+                <AiRiskBanner prediction={prediction} className="mt-5" />
+
                 {!hasAiOutput && !pending ? (
                   <div className="mt-5 rounded-lg border border-dashed p-6 text-center">
                     <p className="text-sm text-muted-foreground">
@@ -463,7 +473,14 @@ export default function Report() {
                         const score = Number(data.risk_score) || 0
                         const tone = riskClasses(riskTierFromScore(score).key)
                         return (
-                          <div key={system} className="rounded-lg border p-4">
+                          <div
+                            key={system}
+                            className={cn(
+                              'rounded-lg border border-l-[3px] p-4',
+                              tone.border,
+                              tone.bg,
+                            )}
+                          >
                             <div className="flex flex-wrap items-baseline justify-between gap-2">
                               <h5 className="text-sm font-semibold capitalize">
                                 {system.replace(/_/g, ' ')}
@@ -498,7 +515,13 @@ export default function Report() {
                     <SubHeading>Clinical recommendations</SubHeading>
                     <ul className="mt-3 space-y-3">
                       {strategies.map((item, index) => (
-                        <li key={index} className="flex gap-3">
+                        <li
+                          key={index}
+                          className={cn(
+                            'flex gap-3 rounded-lg border border-l-[3px] px-3 py-2.5',
+                            PRIORITY_BORDER[item.priority] || 'border-l-border',
+                          )}
+                        >
                           <span
                             className={cn(
                               'mt-0.5 shrink-0 rounded-full border px-2 py-0.5 text-xs font-semibold',

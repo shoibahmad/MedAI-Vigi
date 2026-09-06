@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { riskClasses } from '@/lib/risk'
 
 /**
  * Small markdown renderer for model output.
@@ -18,6 +19,56 @@ import { cn } from '@/lib/utils'
 
 const INLINE = /(\*\*[^*]+\*\*|__[^_]+__|\*[^*\n]+\*|_[^_\n]+_|`[^`]+`|~~[^~]+~~|\[[^\]]+\]\([^)]+\))/g
 
+/**
+ * Severity vocabulary the models use. Only matched inside a bold run, which is
+ * how the models actually mark a tier ("a **Critical** overall risk score"), so
+ * an ordinary "high" in prose is never repainted.
+ */
+const SEVERITY_TIER = {
+  critical: 'critical',
+  severe: 'critical',
+  high: 'high',
+  moderate: 'moderate',
+  medium: 'moderate',
+  low: 'low',
+  mild: 'low',
+  normal: 'low',
+}
+
+function severityOf(text) {
+  const key = String(text)
+    .trim()
+    .toLowerCase()
+    .replace(/\s*(risk|severity)$/, '')
+    .replace(/[^a-z]/g, '')
+  return SEVERITY_TIER[key]
+}
+
+// Percentages and lab-style measurements read as data, so they get tabular
+// figures and full contrast instead of disappearing into muted body text.
+//
+// Written as regex literals on purpose: building these with new RegExp and a
+// template literal silently drops the backslashes, because \d is not a valid
+// string escape.
+const MEASUREMENT = /(\d+(?:\.\d+)?\s?(?:%|mg\/dL|mL\/min(?:\/1\.73m2)?|U\/L|g\/dL|mmHg|bpm|mg|kg))/g
+// Separate, non-global copy: .test() on a /g/ regex is stateful via lastIndex
+// and would alternate true and false across calls.
+const IS_MEASUREMENT = /^\d+(?:\.\d+)?\s?(?:%|mg\/dL|mL\/min(?:\/1\.73m2)?|U\/L|g\/dL|mmHg|bpm|mg|kg)$/
+
+function decorate(text, keyPrefix) {
+  const parts = String(text).split(MEASUREMENT).filter((part) => part !== '')
+  if (parts.length === 1) return text
+  return parts.map((part, i) =>
+    IS_MEASUREMENT.test(part) ? (
+      <span key={`${keyPrefix}-m${i}`} className="font-medium tabular-nums text-foreground">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  )
+}
+
 /** Turn inline markdown into React nodes. */
 function parseInline(text, keyPrefix = 'i') {
   if (!text) return null
@@ -27,9 +78,24 @@ function parseInline(text, keyPrefix = 'i') {
     const key = `${keyPrefix}-${i}`
 
     if (/^\*\*[^*]+\*\*$/.test(part) || /^__[^_]+__$/.test(part)) {
+      const inner = part.slice(2, -2)
+      const tier = severityOf(inner)
+      if (tier) {
+        return (
+          <strong
+            key={key}
+            className={cn(
+              'rounded px-1.5 py-0.5 text-[0.9em] font-semibold',
+              riskClasses(tier).chip,
+            )}
+          >
+            {inner}
+          </strong>
+        )
+      }
       return (
         <strong key={key} className="font-semibold text-foreground">
-          {part.slice(2, -2)}
+          {decorate(inner, key)}
         </strong>
       )
     }
@@ -77,15 +143,17 @@ function parseInline(text, keyPrefix = 'i') {
       )
     }
 
-    return <span key={key}>{part}</span>
+    return <span key={key}>{decorate(part, key)}</span>
   })
 }
 
+// Top-level headings carry an accent bar so the sections of a long narrative are
+// scannable; deeper levels step down to plain weight.
 const HEADING_CLASS = {
-  1: 'mt-6 text-lg font-bold tracking-tight first:mt-0',
-  2: 'mt-6 text-base font-bold tracking-tight first:mt-0',
-  3: 'mt-5 text-sm font-semibold tracking-tight first:mt-0',
-  4: 'mt-4 text-sm font-semibold text-muted-foreground first:mt-0',
+  1: 'mt-7 border-l-[3px] border-primary pl-3 text-base font-bold tracking-tight text-foreground first:mt-0',
+  2: 'mt-7 border-l-[3px] border-primary pl-3 text-base font-bold tracking-tight text-foreground first:mt-0',
+  3: 'mt-5 text-sm font-semibold tracking-tight text-primary first:mt-0',
+  4: 'mt-4 text-sm font-semibold text-foreground first:mt-0',
   5: 'mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground first:mt-0',
   6: 'mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground first:mt-0',
 }
@@ -209,7 +277,7 @@ export function Markdown({ children, className }) {
       blocks.push(
         <blockquote
           key={key++}
-          className="my-4 border-l-2 border-primary/40 bg-muted/30 py-2 pl-4 text-muted-foreground"
+          className="my-4 rounded-r-lg border-l-[3px] border-warning bg-warning/5 py-2.5 pl-4 pr-3 text-foreground"
         >
           {parseInline(body.join(' '), `bq${key}`)}
         </blockquote>,
@@ -246,7 +314,7 @@ export function Markdown({ children, className }) {
           className={cn(
             'my-3 space-y-1.5 pl-5',
             ordered ? 'list-decimal' : 'list-disc',
-            'marker:text-muted-foreground',
+            'marker:text-primary/70',
           )}
         >
           {items.map((item, index) => (
