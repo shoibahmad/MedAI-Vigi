@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Download, FileText, Loader2, Sparkles } from 'lucide-react'
+import { Cpu, Download, FileText, Loader2, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { PageBody, PageHeader } from '@/components/layout/AppShell'
@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { RiskMeter } from '@/components/clinical/RiskMeter'
 import { AdrProbabilityBars } from '@/components/clinical/AdrProbabilityBars'
 import { PharmacogenomicsPanel } from '@/components/clinical/PharmacogenomicsPanel'
+import { AnalysisOverlay } from '@/components/clinical/AnalysisOverlay'
 import { useAssessment } from '@/context/AssessmentContext'
 import {
   useDetailedAnalysis,
@@ -38,6 +39,47 @@ const PRIORITY_TONE = {
   High: 'bg-risk-high-bg text-risk-high border-risk-high-border',
   Medium: 'bg-risk-moderate-bg text-risk-moderate border-risk-moderate-border',
   Low: 'bg-risk-low-bg text-risk-low border-risk-low-border',
+}
+
+/**
+ * Header for one side of the comparison. `source` distinguishes the
+ * deterministic model output from the generated narrative, and `generated`
+ * shows when Gemini fell back to the rule-based path.
+ */
+function ColumnHeader({ icon: Icon, title, source, generated }) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+      <div className="flex items-center gap-2.5">
+        <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
+          <Icon className="size-4" />
+        </span>
+        <div>
+          <h3 className="text-sm font-semibold leading-tight">{title}</h3>
+          <p className="text-xs text-muted-foreground">{source}</p>
+        </div>
+      </div>
+      {generated !== undefined ? (
+        <span
+          className={cn(
+            'rounded-full border px-2 py-0.5 text-xs font-medium',
+            generated
+              ? 'border-primary/30 bg-accent text-accent-foreground'
+              : 'bg-muted text-muted-foreground',
+          )}
+        >
+          {generated ? 'AI generated' : 'Rule-based fallback'}
+        </span>
+      ) : null}
+    </div>
+  )
+}
+
+function SubHeading({ children }) {
+  return (
+    <h4 className="mt-6 text-xs font-semibold uppercase tracking-wide text-muted-foreground first:mt-0">
+      {children}
+    </h4>
+  )
 }
 
 function Section({ title, children }) {
@@ -142,6 +184,10 @@ export default function Report() {
   const strategies = mitigation.data?.mitigation_strategies || []
   const organBreakdown = organs.data?.organ_system_breakdown || null
   const pending = generate.isPending || mitigation.isPending || organs.isPending
+  const hasAiOutput = Boolean(report) || strategies.length > 0 || Boolean(organBreakdown)
+  // Both AI endpoints report whether Gemini answered or the rule-based path ran.
+  const aiGenerated =
+    mitigation.data?.ai_generated === true || organs.data?.ai_generated === true
 
   const handleExport = async () => {
     setExporting(true)
@@ -188,6 +234,8 @@ export default function Report() {
 
   return (
     <>
+      <AnalysisOverlay open={pending} />
+
       <PageHeader
         title="Medical Report"
         description="Adverse drug reaction risk assessment report, ready for the patient record."
@@ -328,128 +376,184 @@ export default function Report() {
             )}
           </Section>
 
-          <Section title="ADR Risk Assessment">
-            <RiskMeter prediction={prediction} className="border-0 p-0" />
-          </Section>
+          {/*
+            Model output and Gemini output sit side by side so the two can be
+            compared directly: the left column is deterministic (classifier plus
+            pharmacogenomic rule engines), the right is generated. They stack on
+            narrow screens and in print, where two columns would be unreadable.
+          */}
+          <section className="border-t px-6 py-5">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-primary">Analysis</h2>
 
-          {prediction.top_specific_adr_risks || prediction.all_class_probabilities ? (
-            <Section title="Specific ADR Type Predictions">
-              <AdrProbabilityBars
-                probabilities={
-                  prediction.top_specific_adr_risks || prediction.all_class_probabilities
-                }
-              />
-            </Section>
-          ) : null}
+            <div className="mt-4 grid gap-x-8 gap-y-10 lg:grid-cols-2 print:grid-cols-1">
+              {/* ------------------------------------------------ Model */}
+              <div className="min-w-0 lg:border-r lg:pr-8 print:border-r-0 print:pr-0">
+                <ColumnHeader
+                  icon={Cpu}
+                  title="Model analysis"
+                  source="Gradient-boosted classifier and rule engines"
+                />
 
-          <Section title="AI-Powered Clinical Analysis">
-            {generate.isPending ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-11/12" />
-                <Skeleton className="h-4 w-4/5" />
-              </div>
-            ) : report ? (
-              <NarrativeBlock text={report} />
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No narrative generated yet. Use the Generate narrative action above.
-              </p>
-            )}
-          </Section>
+                <div className="mt-5">
+                  <RiskMeter prediction={prediction} className="border-0 p-0" />
+                </div>
 
-          {prediction.pharmacogenomics ? (
-            <Section title="Pharmacogenomic Profile">
-              <PharmacogenomicsPanel
-                pharmacogenomics={prediction.pharmacogenomics}
-                className="border-0 p-0"
-              />
-            </Section>
-          ) : null}
-
-          {Array.isArray(prediction.major_contributing_factors) &&
-          prediction.major_contributing_factors.length > 0 ? (
-            <Section title="Major Contributing Factors">
-              <ul className="space-y-3 text-sm">
-                {prediction.major_contributing_factors.map((factor, index) => (
-                  <li key={index}>
-                    <span className="font-semibold">{factor.factor}</span>
-                    {factor.value ? (
-                      <span className="ml-2 tabular-nums text-muted-foreground">
-                        {factor.value}
-                      </span>
-                    ) : null}
-                    {factor.description ? (
-                      <p className="text-muted-foreground">{factor.description}</p>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          ) : null}
-
-          {organBreakdown ? (
-            <Section title="Organ System Analysis">
-              <div className="grid gap-4 sm:grid-cols-2">
-                {Object.entries(organBreakdown).map(([system, data]) => {
-                  if (!data || typeof data !== 'object') return null
-                  const score = Number(data.risk_score) || 0
-                  const tone = riskClasses(riskTierFromScore(score).key)
-                  return (
-                    <div key={system} className="rounded-lg border p-4">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <h3 className="text-sm font-semibold capitalize">
-                          {system.replace(/_/g, ' ')}
-                        </h3>
-                        <span
-                          className={cn(
-                            'rounded-full border px-2 py-0.5 text-xs font-semibold',
-                            tone.chip,
-                          )}
-                        >
-                          {data.status} - {score}
-                        </span>
-                      </div>
-                      {data.findings ? (
-                        <p className="mt-2 text-sm text-muted-foreground">{data.findings}</p>
-                      ) : null}
-                      {data.monitoring ? (
-                        <p className="mt-1.5 text-xs text-muted-foreground">
-                          <span className="font-medium text-foreground">Monitoring: </span>
-                          {data.monitoring}
-                        </p>
-                      ) : null}
+                {prediction.top_specific_adr_risks || prediction.all_class_probabilities ? (
+                  <>
+                    <SubHeading>Predicted reaction classes</SubHeading>
+                    <div className="mt-3">
+                      <AdrProbabilityBars
+                        probabilities={
+                          prediction.top_specific_adr_risks || prediction.all_class_probabilities
+                        }
+                      />
                     </div>
-                  )
-                })}
-              </div>
-            </Section>
-          ) : null}
+                  </>
+                ) : null}
 
-          {strategies.length > 0 ? (
-            <Section title="Clinical Recommendations">
-              <ul className="space-y-3">
-                {strategies.map((item, index) => (
-                  <li key={index} className="flex gap-3">
-                    <span
-                      className={cn(
-                        'mt-0.5 shrink-0 rounded-full border px-2 py-0.5 text-xs font-semibold',
-                        PRIORITY_TONE[item.priority] || 'bg-muted',
-                      )}
-                    >
-                      {item.priority}
-                    </span>
-                    <span className="text-sm">
-                      <span className="font-semibold">{item.action}</span>
-                      {item.rationale ? (
-                        <span className="block text-muted-foreground">{item.rationale}</span>
-                      ) : null}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          ) : null}
+                {Array.isArray(prediction.major_contributing_factors) &&
+                prediction.major_contributing_factors.length > 0 ? (
+                  <>
+                    <SubHeading>Major contributing factors</SubHeading>
+                    <ul className="mt-3 space-y-3 text-sm">
+                      {prediction.major_contributing_factors.map((factor, index) => (
+                        <li key={index}>
+                          <div className="flex flex-wrap items-baseline gap-x-2">
+                            <span className="font-semibold">{factor.factor}</span>
+                            {factor.value ? (
+                              <span className="text-xs tabular-nums text-muted-foreground">
+                                {factor.value}
+                              </span>
+                            ) : null}
+                          </div>
+                          {factor.description ? (
+                            <p className="text-muted-foreground">{factor.description}</p>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+
+                {prediction.pharmacogenomics ? (
+                  <>
+                    <SubHeading>Pharmacogenomic profile</SubHeading>
+                    <div className="mt-3">
+                      <PharmacogenomicsPanel
+                        pharmacogenomics={prediction.pharmacogenomics}
+                        className="border-0 p-0"
+                      />
+                    </div>
+                  </>
+                ) : null}
+              </div>
+
+              {/* ----------------------------------------------- Gemini */}
+              <div className="min-w-0">
+                <ColumnHeader
+                  icon={Sparkles}
+                  title="Gemini analysis"
+                  source="Generated from the model output and clinical values"
+                  generated={hasAiOutput ? aiGenerated : undefined}
+                />
+
+                {!hasAiOutput && !pending ? (
+                  <div className="mt-5 rounded-lg border border-dashed p-6 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      No AI analysis yet.
+                    </p>
+                    <Button onClick={handleGenerate} size="sm" className="mt-3">
+                      <Sparkles className="size-4" />
+                      Generate analysis
+                    </Button>
+                  </div>
+                ) : null}
+
+                {pending ? (
+                  <div className="mt-5 space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-11/12" />
+                    <Skeleton className="h-4 w-4/5" />
+                    <Skeleton className="h-4 w-10/12" />
+                  </div>
+                ) : null}
+
+                {report ? (
+                  <>
+                    <SubHeading>Clinical narrative</SubHeading>
+                    <div className="mt-3">
+                      <NarrativeBlock text={report} />
+                    </div>
+                  </>
+                ) : null}
+
+                {organBreakdown ? (
+                  <>
+                    <SubHeading>Organ system analysis</SubHeading>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                      {Object.entries(organBreakdown).map(([system, data]) => {
+                        if (!data || typeof data !== 'object') return null
+                        const score = Number(data.risk_score) || 0
+                        const tone = riskClasses(riskTierFromScore(score).key)
+                        return (
+                          <div key={system} className="rounded-lg border p-4">
+                            <div className="flex flex-wrap items-baseline justify-between gap-2">
+                              <h5 className="text-sm font-semibold capitalize">
+                                {system.replace(/_/g, ' ')}
+                              </h5>
+                              <span
+                                className={cn(
+                                  'rounded-full border px-2 py-0.5 text-xs font-semibold',
+                                  tone.chip,
+                                )}
+                              >
+                                {data.status} - {score}
+                              </span>
+                            </div>
+                            {data.findings ? (
+                              <p className="mt-2 text-sm text-muted-foreground">{data.findings}</p>
+                            ) : null}
+                            {data.monitoring ? (
+                              <p className="mt-1.5 text-xs text-muted-foreground">
+                                <span className="font-medium text-foreground">Monitoring: </span>
+                                {data.monitoring}
+                              </p>
+                            ) : null}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </>
+                ) : null}
+
+                {strategies.length > 0 ? (
+                  <>
+                    <SubHeading>Clinical recommendations</SubHeading>
+                    <ul className="mt-3 space-y-3">
+                      {strategies.map((item, index) => (
+                        <li key={index} className="flex gap-3">
+                          <span
+                            className={cn(
+                              'mt-0.5 shrink-0 rounded-full border px-2 py-0.5 text-xs font-semibold',
+                              PRIORITY_TONE[item.priority] || 'bg-muted',
+                            )}
+                          >
+                            {item.priority}
+                          </span>
+                          <span className="text-sm">
+                            <span className="font-semibold">{item.action}</span>
+                            {item.rationale ? (
+                              <span className="block text-muted-foreground">{item.rationale}</span>
+                            ) : null}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          </section>
 
           <footer className="border-t bg-muted/30 px-6 py-4">
             <p className="text-xs leading-relaxed text-muted-foreground">

@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useAssessment } from '@/context/AssessmentContext'
 import { useDrugInteractions } from '@/hooks/useApi'
 import { MEDICATION_DATABASE, MEDICATION_NAMES } from '@/lib/dosing'
+import { AnalysisOverlay } from '@/components/clinical/AnalysisOverlay'
 import { cn } from '@/lib/utils'
 
 const SEVERITY_STYLES = {
@@ -63,6 +64,17 @@ export default function DrugInteractions() {
 
   return (
     <>
+      <AnalysisOverlay
+        open={analyse.isPending}
+        title="Analysing interactions"
+        steps={[
+          'Resolving the medication list...',
+          'Checking pairwise interactions...',
+          'Classifying severity...',
+          'Drafting management guidance...',
+        ]}
+      />
+
       <PageHeader
         title="Drug Interaction Checker"
         description="Multi-drug conflict analysis with severity classification and alternative suggestions."

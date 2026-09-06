@@ -22,6 +22,7 @@ import { PatientContextBar } from '@/components/clinical/PatientContextBar'
 import { RiskMeter } from '@/components/clinical/RiskMeter'
 import { AdrProbabilityBars } from '@/components/clinical/AdrProbabilityBars'
 import { PharmacogenomicsPanel } from '@/components/clinical/PharmacogenomicsPanel'
+import { AnalysisOverlay } from '@/components/clinical/AnalysisOverlay'
 import { useAssessment } from '@/context/AssessmentContext'
 import { usePredict, useSampleData } from '@/hooks/useApi'
 import { patientSchema, ASSESSMENT_SECTIONS } from '@/lib/schemas'
@@ -186,6 +187,18 @@ export default function Assessment() {
 
   return (
     <>
+      <AnalysisOverlay
+        open={predict.isPending}
+        title="Predicting ADR risk"
+        steps={[
+          'Validating clinical values...',
+          'Building the feature vector...',
+          'Running the classifier...',
+          'Scoring pharmacogenomic profile...',
+        ]}
+        note="The model is scoring seven reaction classes."
+      />
+
       <PageHeader
         title="Clinical Assessment"
         description="Complete the sections in any order. Values are validated against the same bounds the model enforces."
