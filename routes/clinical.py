@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from schemas import AssessmentSaveSchema, CounsellingSubmitSchema, LabInterpretationRequestSchema
 from services.clinical_service import ClinicalService
-from utils.base_record_store import BaseRecordStore
+from utils.base_record_store import BaseRecordStore, DuplicateRecordError
 
 clinical_bp = Blueprint("clinical", __name__)
 clinical_store = BaseRecordStore("ClinicalAssessments")
@@ -114,12 +114,26 @@ def save_assessment() -> Tuple[Response, int]:
     except ValidationError as e:
         return jsonify({"status": "validation_error", "errors": e.errors()}), 422
 
-    record = clinical_store.create_record(
-        record_id=schema.patient_id,
-        data={"patient_data": schema.patient_data, "prediction": schema.prediction},
-    )
+    payload = {"patient_data": schema.patient_data, "prediction": schema.prediction}
+
+    # Re-assessing the same patient is routine, so a repeat save updates the
+    # existing record rather than failing. Previously the DuplicateRecordError
+    # escaped and the endpoint returned a 500 on every second save.
+    try:
+        record = clinical_store.create_record(record_id=schema.patient_id, data=payload)
+        created = True
+    except DuplicateRecordError:
+        record = clinical_store.update_record(record_id=schema.patient_id, data=payload)
+        created = False
+
     return jsonify(
-        {"status": "success", "record_id": schema.patient_id, "checksum": record["checksum"]}
+        {
+            "status": "success",
+            "record_id": schema.patient_id,
+            "checksum": record["checksum"],
+            "created": created,
+            "version": record.get("version", 1),
+        }
     ), 200
 
 
