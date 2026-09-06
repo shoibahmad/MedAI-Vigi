@@ -2,7 +2,7 @@
 
 ## ✅ System Status
 
-**Model**: Gemini 2.5 Flash  
+**Model**: nvidia/nemotron-3-ultra-550b-a55b (NVIDIA NIM)  
 **API Status**: ✅ Verified Working  
 **Configuration**: Environment Variables (.env)
 
@@ -30,8 +30,9 @@ python app.py
 
 API keys are stored in `.env` file:
 ```
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_API_KEY_DRUG_INTERACTIONS=your_gemini_api_key_here
+NVIDIA_API_KEY=your_nvidia_api_key_here
+NVIDIA_MODEL_NAME=nvidia/nemotron-3-ultra-550b-a55b
+NVIDIA_FALLBACK_MODEL=nvidia/nemotron-3-super-120b-a12b
 ```
 
 Get your API keys from: https://aistudio.google.com/app/apikey
@@ -91,8 +92,8 @@ If you see "API key expired":
 3. Run `python test_api_key.py`
 
 ### Model Issues
-If Gemini 2.5 Flash fails:
-- Application automatically falls back to Gemini 1.5 models
+If the primary model is overloaded:
+- The service automatically retries with NVIDIA_FALLBACK_MODEL, then rule-based output
 - Rule-based analysis used if all AI models fail
 
 ### Port Issues
@@ -116,7 +117,7 @@ requirements.txt         # Python dependencies
 
 ### Key Dependencies
 - Flask (web framework)
-- google-generativeai (Gemini API)
+- openai (NVIDIA NIM OpenAI-compatible client)
 - joblib (model loading)
 - pandas, numpy (data processing)
 - python-dotenv (environment variables)
@@ -126,11 +127,11 @@ requirements.txt         # Python dependencies
 1. ✅ API verified - Ready to use!
 2. Start the application: `python app.py`
 3. Test all features through the web interface
-4. Review `GEMINI_2.5_FLASH_CONFIG.md` for detailed configuration
+4. Review `.env.example` for detailed configuration
 
 ## 📚 Documentation
 
-- **Configuration Details**: `GEMINI_2.5_FLASH_CONFIG.md`
+- **Configuration Details**: `.env.example`
 - **Model Improvements**: `MODEL_IMPROVEMENTS.md`
 - **Project Overview**: `PROJECT_OVERVIEW.md`
 - **Toast Notifications**: `TOAST_NOTIFICATIONS.md`
@@ -145,5 +146,5 @@ If you encounter issues:
 
 ---
 **Last Updated**: November 24, 2025  
-**Model**: Gemini 2.5 Flash  
+**Model**: nvidia/nemotron-3-ultra-550b-a55b (NVIDIA NIM)  
 **Status**: ✅ Production Ready

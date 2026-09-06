@@ -15,7 +15,7 @@ export function usePredict() {
   })
 }
 
-/** POST /generate_report -> routes/report.py:16 (Gemini, with rule-based fallback) */
+/** POST /generate_report -> routes/report.py:16 (LLM narrative, with rule-based fallback) */
 export function useGenerateReport() {
   return useMutation({
     mutationKey: ['generate_report'],

@@ -14,7 +14,7 @@ def test_metrics_json_endpoint(client: FlaskClient) -> None:
     data = response.get_json()
     assert "app_uptime_seconds" in data
     assert "ml_model_loaded" in data
-    assert "gemini_service_active" in data
+    assert "ai_service_active" in data
     assert data["ml_model_loaded"] in (0, 1)
 
 

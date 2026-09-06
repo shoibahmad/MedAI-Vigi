@@ -22,10 +22,16 @@ class Config:
     MODEL_PATH = os.environ.get("MODEL_PATH", "models/adr_model.pkl")
     PREPROCESSOR_PATH = os.environ.get("PREPROCESSOR_PATH", "models/adr_preprocessor.pkl")
 
-    # Google GenAI Settings
-    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-    GEMINI_API_KEY_DRUG_INTERACTIONS = os.environ.get("GEMINI_API_KEY_DRUG_INTERACTIONS", "")
-    GEMINI_MODEL_NAME = os.environ.get("GEMINI_MODEL_NAME", "gemini-2.5-flash")
+    # NVIDIA NIM settings (OpenAI-compatible endpoint)
+    NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
+    NVIDIA_BASE_URL = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1")
+    NVIDIA_MODEL_NAME = os.environ.get(
+        "NVIDIA_MODEL_NAME", "nvidia/nemotron-3-ultra-550b-a55b"
+    )
+    # Used when the primary model errors or is overloaded. Set to "" to disable.
+    NVIDIA_FALLBACK_MODEL = os.environ.get(
+        "NVIDIA_FALLBACK_MODEL", "nvidia/nemotron-3-super-120b-a12b"
+    )
 
     # Logging & Monitoring
     LOG_LEVEL = logging.INFO
@@ -49,8 +55,8 @@ class TestingConfig(Config):
     DEBUG = True
     ENV_NAME = "testing"
     LOG_LEVEL = logging.WARNING
-    GEMINI_API_KEY = ""
-    GEMINI_API_KEY_DRUG_INTERACTIONS = ""
+    NVIDIA_API_KEY = ""
+    NVIDIA_FALLBACK_MODEL = ""
 
 
 class ProductionConfig(Config):

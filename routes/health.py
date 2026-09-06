@@ -12,7 +12,7 @@ from typing import Any, Dict, Tuple
 
 from flask import Blueprint, Response, current_app, jsonify, request
 
-from services.gemini_service import GeminiService
+from services.ai_service import AIService
 from services.ml_service import MLService
 
 logger = logging.getLogger(__name__)
@@ -26,10 +26,10 @@ START_TIME = time.time()
 def health_check() -> Tuple[Response, int]:
     """Comprehensive health check probe for load balancers and orchestrators"""
     ml_service = MLService.get_instance()
-    gemini_service = GeminiService.get_instance()
+    ai_service = AIService.get_instance()
 
     ml_ready = ml_service.is_ready()
-    gemini_available = gemini_service.is_available()
+    ai_available = ai_service.is_available()
 
     health_status: Dict[str, Any] = {
         "status": "ok" if ml_ready else "degraded",
@@ -41,9 +41,9 @@ def health_check() -> Tuple[Response, int]:
                 "loaded": ml_ready,
                 "status": "operational" if ml_ready else "unavailable",
             },
-            "gemini_ai": {
-                "available": gemini_available,
-                "status": "connected" if gemini_available else "offline_fallback_active",
+            "ai_service": {
+                "available": ai_available,
+                "status": "connected" if ai_available else "offline_fallback_active",
             },
             "structured_logging": {"active": True, "framework": "pythonjsonlogger"},
         },
@@ -76,7 +76,7 @@ def metrics() -> Response:
     ml_service = MLService.get_instance()
     uptime = round(time.time() - START_TIME, 2)
     model_loaded = 1 if ml_service.is_ready() else 0
-    gemini_active = 1 if GeminiService.get_instance().is_available() else 0
+    ai_active = 1 if AIService.get_instance().is_available() else 0
 
     accept_header = request.headers.get("Accept", "")
 
@@ -89,9 +89,9 @@ def metrics() -> Response:
             "# HELP adr_ml_model_loaded Flag indicating if ML model pipeline is active\n"
             "# TYPE adr_ml_model_loaded gauge\n"
             f"adr_ml_model_loaded {model_loaded}\n"
-            "# HELP adr_gemini_service_active Flag indicating if GenAI service is available\n"
-            "# TYPE adr_gemini_service_active gauge\n"
-            f"adr_gemini_service_active {gemini_active}\n"
+            "# HELP adr_ai_service_active Flag indicating if GenAI service is available\n"
+            "# TYPE adr_ai_service_active gauge\n"
+            f"adr_ai_service_active {ai_active}\n"
             "# HELP adr_predictions_total Total adverse drug reaction inference requests\n"
             "# TYPE adr_predictions_total counter\n"
             "adr_predictions_total 0\n"
@@ -103,7 +103,7 @@ def metrics() -> Response:
     metrics_data = {
         "app_uptime_seconds": uptime,
         "ml_model_loaded": model_loaded,
-        "gemini_service_active": gemini_active,
+        "ai_service_active": ai_active,
         "predictions_total": 0,
         "timestamp": datetime.now().isoformat(),
     }
@@ -114,7 +114,7 @@ def metrics() -> Response:
 def system_status() -> Tuple[Response, int]:
     """Detailed runtime and environment diagnostics"""
     ml_service = MLService.get_instance()
-    gemini_service = GeminiService.get_instance()
+    ai_service = AIService.get_instance()
 
     status_data: Dict[str, Any] = {
         "application": {
@@ -136,9 +136,9 @@ def system_status() -> Tuple[Response, int]:
             ),
         },
         "genai_service": {
-            "active": gemini_service.is_available(),
-            "model": gemini_service.model_name
-            if gemini_service.is_available()
+            "active": ai_service.is_available(),
+            "model": ai_service.model_name
+            if ai_service.is_available()
             else "rule-based-fallback",
         },
     }

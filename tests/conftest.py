@@ -31,8 +31,8 @@ def client(app: Flask) -> Generator[FlaskClient, None, None]:
 @pytest.fixture(autouse=True)
 def mock_offline_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     """Auto-use fixture ensuring all tests run completely offline in hermetic isolation without live keys or external calls"""
-    monkeypatch.setenv("GEMINI_API_KEY", "")
-    monkeypatch.setenv("GEMINI_API_KEY_DRUG_INTERACTIONS", "")
+    monkeypatch.setenv("NVIDIA_API_KEY", "")
+    monkeypatch.setenv("NVIDIA_FALLBACK_MODEL", "")
     monkeypatch.setenv("SENTRY_DSN", "")
     try:
         import sentry_sdk

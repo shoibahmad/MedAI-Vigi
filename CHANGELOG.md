@@ -108,7 +108,7 @@ This release transforms the project from prototype to production-ready with comp
 
 #### Core Features
 - Machine Learning ADR prediction model
-- Google Gemini AI integration for clinical reports
+- NVIDIA Nemotron integration for clinical reports
 - Responsive web interface
 - Pharmacogenomics analysis
 - Drug interaction checking

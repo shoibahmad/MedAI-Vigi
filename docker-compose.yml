@@ -12,8 +12,8 @@ services:
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - GEMINI_API_KEY_DRUG_INTERACTIONS=${GEMINI_API_KEY_DRUG_INTERACTIONS}
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY}
+      - NVIDIA_FALLBACK_MODEL=${NVIDIA_FALLBACK_MODEL}
     env_file:
       - .env
     volumes:
@@ -47,8 +47,8 @@ services:
       - FLASK_APP=app.py
       - FLASK_ENV=development
       - FLASK_DEBUG=1
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - GEMINI_API_KEY_DRUG_INTERACTIONS=${GEMINI_API_KEY_DRUG_INTERACTIONS}
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY}
+      - NVIDIA_FALLBACK_MODEL=${NVIDIA_FALLBACK_MODEL}
     env_file:
       - .env
     volumes:

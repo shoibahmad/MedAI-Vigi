@@ -30,7 +30,7 @@ def test_security_no_credentials_in_health(client: FlaskClient) -> None:
     json_str = str(data)
 
     assert "AIza" not in json_str
-    assert "GEMINI_API_KEY" not in json_str
+    assert "NVIDIA_API_KEY" not in json_str
 
 
 def test_invalid_method_handling(client: FlaskClient) -> None:

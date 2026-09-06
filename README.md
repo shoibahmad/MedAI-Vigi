@@ -25,7 +25,7 @@ make install
 
 # 3. Set up environment (create .env with your API keys)
 cp .env.example .env
-# Edit .env and add GEMINI_API_KEY
+# Edit .env and add NVIDIA_API_KEY
 
 # 4. Build model (first time only)
 make build
@@ -50,7 +50,7 @@ make run
 
 - **Machine Learning Prediction**: Advanced ML model for multi-class ADR risk assessment
 - **Clinical Decision Support**: Evidence-based risk stratification (Low/Medium/High)
-- **AI-Powered Reports**: Comprehensive clinical reports generated using Google Gemini AI
+- **AI-Powered Reports**: Comprehensive clinical reports generated using NVIDIA Nemotron
 - **Pharmacogenomics**: CYP enzyme, transporter, and HLA analysis for personalized dosing
 - **Drug Interactions**: Real-time interaction checking with severity assessment
 - **Responsive Design**: Beautiful, medical-grade UI optimized for clinical workflows
@@ -67,7 +67,7 @@ make run
 - **Flask 3.0**: Python web framework
 - **Scikit-learn 1.3**: Machine learning model
 - **XGBoost 2.0**: Gradient boosting for predictions
-- **Google Gemini AI 0.3**: Clinical report generation
+- **NVIDIA Nemotron (NIM)**: Clinical report generation via the OpenAI-compatible endpoint
 - **Pandas/NumPy**: Data processing
 
 ### Frontend
@@ -137,7 +137,7 @@ docker-compose up -d
 
 # Or build manually
 docker build -t phenorx .
-docker run -p 5000:5000 -e GEMINI_API_KEY=your_key phenorx
+docker run -p 5000:5000 -e NVIDIA_API_KEY=your_key phenorx
 ```
 
 **Detailed Instructions:** See [INSTALLATION.md](INSTALLATION.md)
@@ -152,10 +152,10 @@ The test suite runs 100% offline without requiring external API keys or cloud de
 
 ```bash
 # Canonical offline verification (Linux / macOS)
-unset GEMINI_API_KEY && pytest -v
+unset NVIDIA_API_KEY && pytest -v
 
 # Windows PowerShell
-$env:GEMINI_API_KEY="" ; pytest -v
+$env:NVIDIA_API_KEY="" ; pytest -v
 
 # Run full multi-language test suite (Python + JavaScript)
 make test
@@ -280,7 +280,7 @@ PhenoRx/
 │
 ├── services/                    # Business logic
 │   ├── ml_service.py            #   model loading + inference (singleton)
-│   ├── gemini_service.py        #   AI narratives, with offline fallbacks
+│   ├── ai_service.py            #   AI narratives (NVIDIA NIM), with offline fallbacks
 │   ├── clinical_service.py      #   lab reference ranges + interpretation
 │   └── pharmacogenomics/        #   CYP / transporter / HLA rule engines
 │
@@ -411,8 +411,9 @@ Create `.env` file:
 
 ```env
 # API Keys (Required)
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_API_KEY_DRUG_INTERACTIONS=your_gemini_api_key_here
+NVIDIA_API_KEY=your_nvidia_api_key_here
+NVIDIA_MODEL_NAME=nvidia/nemotron-3-ultra-550b-a55b
+NVIDIA_FALLBACK_MODEL=nvidia/nemotron-3-super-120b-a12b
 
 # Flask Configuration
 FLASK_APP=app.py
@@ -426,7 +427,7 @@ SECRET_KEY=your_secret_key_here
 LOG_LEVEL=INFO
 ```
 
-Get Gemini API key: https://aistudio.google.com/app/apikey
+Get an NVIDIA API key: https://build.nvidia.com/
 
 ---
 
@@ -455,7 +456,7 @@ docker-compose up -d
 FLASK_ENV=production
 FLASK_DEBUG=0
 SECRET_KEY=<strong-random-secret>
-GEMINI_API_KEY=<production-key>
+NVIDIA_API_KEY=<production-key>
 LOG_LEVEL=WARNING
 ```
 
@@ -543,7 +544,7 @@ If you use this project in your research or education, please cite:
 
 ## 🌟 Acknowledgments
 
-- Google Gemini AI for natural language processing
+- NVIDIA Nemotron for natural language generation
 - Scikit-learn and XGBoost communities
 - Flask framework developers
 - All contributors and users

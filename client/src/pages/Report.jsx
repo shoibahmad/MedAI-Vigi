@@ -44,7 +44,7 @@ const PRIORITY_TONE = {
 /**
  * Header for one side of the comparison. `source` distinguishes the
  * deterministic model output from the generated narrative, and `generated`
- * shows when Gemini fell back to the rule-based path.
+ * shows when the model fell back to the rule-based path.
  */
 function ColumnHeader({ icon: Icon, title, source, generated }) {
   return (
@@ -106,7 +106,7 @@ function InfoGrid({ rows }) {
   )
 }
 
-/** Renders the Gemini markdown response without pulling in a markdown library. */
+/** Renders the model markdown response without pulling in a markdown library. */
 function NarrativeBlock({ text }) {
   const blocks = String(text).split(/\n{2,}/)
   return (
@@ -156,7 +156,7 @@ export default function Report() {
     clinician_name: clinicianName,
   }
 
-  // All three run against Gemini. They are independent, so fire them together
+  // All three run against the LLM. They are independent, so fire them together
   // rather than serially - each one blocks a Flask worker for several seconds.
   const handleGenerate = async () => {
     const [narrative, plan, breakdown] = await Promise.allSettled([
@@ -185,7 +185,7 @@ export default function Report() {
   const organBreakdown = organs.data?.organ_system_breakdown || null
   const pending = generate.isPending || mitigation.isPending || organs.isPending
   const hasAiOutput = Boolean(report) || strategies.length > 0 || Boolean(organBreakdown)
-  // Both AI endpoints report whether Gemini answered or the rule-based path ran.
+  // Both AI endpoints report whether the model answered or the rule-based path ran.
   const aiGenerated =
     mitigation.data?.ai_generated === true || organs.data?.ai_generated === true
 
@@ -377,7 +377,7 @@ export default function Report() {
           </Section>
 
           {/*
-            Model output and Gemini output sit side by side so the two can be
+            Model output and generated output sit side by side so the two can be
             compared directly: the left column is deterministic (classifier plus
             pharmacogenomic rule engines), the right is generated. They stack on
             narrow screens and in print, where two columns would be unreadable.
@@ -448,11 +448,11 @@ export default function Report() {
                 ) : null}
               </div>
 
-              {/* ----------------------------------------------- Gemini */}
+              {/* -------------------------------------------------- LLM */}
               <div className="min-w-0">
                 <ColumnHeader
                   icon={Sparkles}
-                  title="Gemini analysis"
+                  title="NVIDIA Nemotron analysis"
                   source="Generated from the model output and clinical values"
                   generated={hasAiOutput ? aiGenerated : undefined}
                 />

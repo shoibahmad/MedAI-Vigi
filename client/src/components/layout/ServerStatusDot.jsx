@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
  * cause. Showing it up front turns a mystery into a glance.
  *
  * Response shape from routes/health.py:
- *   { status: "ok", components: { ml_model: { loaded, status }, gemini_ai: {...} } }
+ *   { status: "ok", components: { ml_model: { loaded, status }, ai_service: {...} } }
  */
 function describe({ isPending, isError, data }) {
   if (isPending) {
@@ -22,10 +22,10 @@ function describe({ isPending, isError, data }) {
 
   const model = data?.components?.ml_model
   if (model?.loaded) {
-    const gemini = data?.components?.gemini_ai
+    const ai = data?.components?.ai_service
     return {
       tone: 'bg-success',
-      label: gemini?.available
+      label: ai?.available
         ? 'API healthy - prediction model loaded, AI narratives available'
         : 'API healthy - prediction model loaded. AI narratives run in offline fallback.',
     }

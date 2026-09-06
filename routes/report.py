@@ -14,7 +14,7 @@ from schemas import (
     MedicationAnalysisRequestSchema,
     ReportRequestSchema,
 )
-from services.gemini_service import GeminiService
+from services.ai_service import AIService
 
 report_bp = Blueprint("report", __name__)
 
@@ -30,8 +30,8 @@ def generate_report() -> Tuple[Response, int]:
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
-    gemini_service = GeminiService.get_instance()
-    report_dict = gemini_service.generate_clinical_report(
+    ai_service = AIService.get_instance()
+    report_dict = ai_service.generate_clinical_report(
         patient_data=schema.patient_data,
         prediction_result=schema.prediction_result,
         patient_name=schema.patient_name,
@@ -47,15 +47,15 @@ def generate_detailed_analysis() -> Tuple[Response, int]:
     Organ-system risk breakdown.
 
     Previously a hardcoded lookup (hematologic risk was always 30). Now generated
-    by Gemini from the actual patient values, with the original rule-based
+    by the LLM from the actual patient values, with the original rule-based
     scoring retained as the offline fallback.
     """
     raw_data = request.get_json() or {}
     patient_data = raw_data.get("patient_data", {})
     prediction_result = raw_data.get("prediction_result", {})
 
-    gemini_service = GeminiService.get_instance()
-    result = gemini_service.generate_detailed_analysis(
+    ai_service = AIService.get_instance()
+    result = ai_service.generate_detailed_analysis(
         patient_data=patient_data, prediction_result=prediction_result
     )
 
@@ -71,8 +71,8 @@ def analyze_drug_interactions_ai() -> Tuple[Response, int]:
     except ValidationError as e:
         return jsonify({"status": "validation_error", "errors": e.errors()}), 422
 
-    gemini_service = GeminiService.get_instance()
-    result = gemini_service.analyze_drug_interactions(
+    ai_service = AIService.get_instance()
+    result = ai_service.analyze_drug_interactions(
         drugs=schema.drugs, patient_data=schema.patient_data
     )
     return jsonify(result), 200
@@ -87,8 +87,8 @@ def api_chat() -> Tuple[Response, int]:
     except ValidationError as e:
         return jsonify({"status": "validation_error", "errors": e.errors()}), 422
 
-    gemini_service = GeminiService.get_instance()
-    reply = gemini_service.chat_response(message=schema.message, context=schema.context)
+    ai_service = AIService.get_instance()
+    reply = ai_service.chat_response(message=schema.message, context=schema.context)
     return jsonify({"status": "success", "response": reply}), 200
 
 
@@ -105,8 +105,8 @@ def get_ai_drug_insights() -> Tuple[Response, int]:
     except ValidationError as e:
         return jsonify({"status": "validation_error", "errors": e.errors()}), 422
 
-    gemini_service = GeminiService.get_instance()
-    result = gemini_service.generate_drug_insights(
+    ai_service = AIService.get_instance()
+    result = ai_service.generate_drug_insights(
         medications=schema.medications,
         patient_age=schema.patient_age,
         comorbidities=schema.comorbidities,
@@ -126,8 +126,8 @@ def generate_medication_analysis() -> Tuple[Response, int]:
     except ValidationError as e:
         return jsonify({"status": "validation_error", "errors": e.errors()}), 422
 
-    gemini_service = GeminiService.get_instance()
-    result = gemini_service.generate_medication_analysis(
+    ai_service = AIService.get_instance()
+    result = ai_service.generate_medication_analysis(
         patient_data=schema.patient_data,
         prediction_result=schema.prediction_result,
         patient_name=schema.patient_name,

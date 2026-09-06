@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**PhenoRx** (Medication AI-Vigilance) is an advanced AI-powered clinical decision support system that predicts Adverse Drug Reaction (ADR) risks in patients. It combines machine learning with Google Gemini AI to provide comprehensive risk assessments, personalized medication dosing recommendations, and professional medical reports.
+**PhenoRx** (Medication AI-Vigilance) is an advanced AI-powered clinical decision support system that predicts Adverse Drug Reaction (ADR) risks in patients. It combines machine learning with NVIDIA Nemotron to provide comprehensive risk assessments, personalized medication dosing recommendations, and professional medical reports.
 
 ---
 
@@ -17,7 +17,7 @@
 ### Backend
 - Flask (Python web framework)
 - Scikit-learn & XGBoost (Machine Learning)
-- Google Gemini API (AI Analysis)
+- NVIDIA Nemotron API (AI Analysis)
 - Pandas & NumPy (Data Processing)
 
 ### Frontend
@@ -47,7 +47,7 @@
 - Confidence scoring
 
 ### 3. AI-Powered Analysis
-- Clinical interpretation via Gemini AI
+- Clinical interpretation via NVIDIA Nemotron
 - Personalized recommendations
 - Drug interaction analysis
 - Monitoring protocols
@@ -119,7 +119,7 @@ PhenoRx/
 
 ```
 Patient Details → Clinical Assessment → ML Prediction → 
-Gemini AI Analysis → Results Display → Medical Report → PDF/Print
+LLM Analysis → Results Display → Medical Report → PDF/Print
 ```
 
 ---
@@ -150,7 +150,7 @@ Gemini AI Analysis → Results Display → Medical Report → PDF/Print
 
 ### 3. Medical Report Enhancements
 - Multiple data sources (sessionStorage, localStorage, URL)
-- Enhanced Gemini analysis display
+- Enhanced LLM analysis display
 - Risk-based recommendations
 - Comprehensive monitoring plans
 - Interactive ADR type cards

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 /**
  * Full-screen blocking overlay for long-running analyses.
  *
- * The Gemini calls take tens of seconds, so this does three things a plain
+ * The model calls take tens of seconds, so this does three things a plain
  * button spinner does not: it centres the feedback in the viewport, it cycles
  * through the phases so the wait reads as progress rather than a hang, and it
  * locks body scroll so the page cannot be moved while work is in flight.
