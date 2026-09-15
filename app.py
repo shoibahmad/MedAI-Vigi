@@ -35,8 +35,25 @@ def create_app(config_class: Any = None) -> Flask:
     else:
         app.config.from_object(config_class)
 
-    # Enable Cross-Origin Resource Sharing
-    CORS(app)
+    # Cross-Origin Resource Sharing.
+    #
+    # In production the SPA is served by this same service, so requests are
+    # same-origin and no CORS headers are needed at all. A wide-open CORS(app)
+    # would let any site call this API from a user's browser, which is not
+    # something a clinical endpoint should offer.
+    #
+    # Development still needs it, because Vite serves the UI on :5173 while Flask
+    # runs on :5000. CORS_ORIGINS allows an explicit comma-separated list for the
+    # rare case where the frontend really is deployed separately.
+    configured_origins = [
+        origin.strip()
+        for origin in os.environ.get("CORS_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
+    if configured_origins:
+        CORS(app, origins=configured_origins)
+    elif app.config.get("DEBUG"):
+        CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
     # Initialize structured JSON logging & error tracking
     setup_structured_logging(app, log_level=app.config.get("LOG_LEVEL", logging.INFO))

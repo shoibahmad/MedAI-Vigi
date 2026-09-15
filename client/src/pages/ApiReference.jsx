@@ -18,6 +18,10 @@ function Code({ children }) {
 }
 
 export default function ApiReference() {
+  // The API shares this service's origin, so show the real host rather than a
+  // hardcoded localhost that is wrong everywhere except a dev machine.
+  const origin = typeof window === 'undefined' ? 'http://localhost:5000' : window.location.origin
+
   return (
     <>
       <PageHeader
@@ -29,10 +33,10 @@ export default function ApiReference() {
       <PageBody className="max-w-4xl space-y-10">
         <section>
           <h2 className="text-lg font-semibold tracking-tight">Base URL</h2>
-          <Code>http://localhost:5000</Code>
+          <Code>{origin}</Code>
           <p className="mt-2 text-sm text-muted-foreground">
-            Replace with your deployed host. The frontend calls the API on the same origin, so no
-            base URL is configured in the client.
+            This is the origin serving this page. The API and the frontend are one service, so the
+            client calls the API on the same origin and configures no base URL.
           </p>
         </section>
 

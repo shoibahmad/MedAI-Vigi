@@ -22,6 +22,25 @@ API and the built React SPA from the same origin.
 
 The service is healthy when `/health` returns 200 with `ml_model.loaded = true`.
 
+## One service, one origin
+
+There is a single Render service. The Dockerfile builds the SPA in a Node stage
+and copies `client/dist` into the Python stage, and `routes/views.py` serves it:
+
+| Request | Served by |
+|---|---|
+| `GET /`, `/assessment`, `/report`, ... | the SPA shell, from `client/dist` |
+| `GET /assets/*` | the hashed Vite bundles |
+| `GET /health`, `POST /predict`, `/api/*` | the Flask API |
+
+The frontend configures no API host. `client/src/lib/api.js` sets
+`baseURL: '/'`, so every call is same-origin and nothing needs rebuilding when
+the service URL changes. There are no `VITE_*` values baked into the bundle.
+
+Because it is same-origin, CORS is off by default. Development still gets it,
+for the Vite server on :5173, and `CORS_ORIGINS` accepts an explicit
+comma-separated list if you ever do split the frontend out.
+
 ## Why Docker rather than the native Python runtime
 
 The frontend is a Vite build, and Render's Python image does not provide Node, so
