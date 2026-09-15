@@ -60,6 +60,9 @@ def health_check() -> Tuple[Response, int]:
                 "fallback_model": ai_service.fallback_model or None,
                 "last_success_at": ai_service.last_success_at,
                 "last_error": ai_service.last_error,
+                # Shape only, never the key itself. Lets a 401 caused by a
+                # truncated or quoted paste be told apart from a rejected key.
+                "key": ai_service.key_fingerprint(),
             },
             "structured_logging": {"active": True, "framework": "pythonjsonlogger"},
         },

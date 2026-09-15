@@ -17,6 +17,7 @@ Two layers of resilience, because the hosted models are not always available:
 
 import json
 import logging
+import hashlib
 import os
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -52,7 +53,14 @@ class AIService:
         fallback_model: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> None:
-        self.api_key = api_key if api_key is not None else os.getenv("NVIDIA_API_KEY", "")
+        raw_key = api_key if api_key is not None else os.getenv("NVIDIA_API_KEY", "")
+        # Dashboard and .env values routinely arrive with a trailing newline or
+        # wrapped in quotes, and either produces an Authorization header the API
+        # rejects with a 401 that is indistinguishable from a genuinely bad key.
+        # Normalise rather than fail, and remember that we had to - key_sanitized
+        # in /health is the only way to see this from outside.
+        self.api_key = raw_key.strip().strip('"').strip("'")
+        self.key_sanitized = bool(raw_key) and self.api_key != raw_key
         self.model_name = model_name or os.getenv("NVIDIA_MODEL_NAME", DEFAULT_MODEL)
         self.base_url = base_url or os.getenv("NVIDIA_BASE_URL", DEFAULT_BASE_URL)
         # Set NVIDIA_FALLBACK_MODEL="" to disable the secondary model entirely.
@@ -92,6 +100,26 @@ class AIService:
         if cls._instance is None:
             cls._instance = cls(api_key=api_key, model_name=model_name)
         return cls._instance
+
+    def key_fingerprint(self) -> dict:
+        """
+        Shape of the configured key, carrying nothing secret.
+
+        Exists because "I pasted the correct key and still get 401" is otherwise
+        undiagnosable from outside the host: length and prefix are enough to tell
+        a truncated paste, a wrong-variable paste, or a quoted value apart from a
+        key the API genuinely rejects, and sha8 lets two deployments be compared
+        without either key being revealed.
+        """
+        if not self.api_key:
+            return {"present": False}
+        return {
+            "present": True,
+            "length": len(self.api_key),
+            "prefix_ok": self.api_key.startswith("nvapi-"),
+            "sanitized": self.key_sanitized,
+            "sha8": hashlib.sha256(self.api_key.encode()).hexdigest()[:8],
+        }
 
     def _warn_on_malformed_model_ids(self) -> None:
         """
