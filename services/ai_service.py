@@ -121,6 +121,25 @@ class AIService:
             "sha8": hashlib.sha256(self.api_key.encode()).hexdigest()[:8],
         }
 
+    def _warn_on_malformed_key(self) -> None:
+        """
+        Catch a key that cannot possibly be valid before it costs a round trip.
+
+        NIM keys are "nvapi-" followed by a long opaque body. A key that has lost
+        its hyphens - which happens when the value is retyped, or pasted through
+        something that rewrites dashes - still looks plausible in a masked
+        dashboard field, and the API rejects it with a 401 identical to the one a
+        revoked key produces. Saying so at startup turns an afternoon of guessing
+        into one line in the log.
+        """
+        if not self.api_key.startswith("nvapi-"):
+            logger.warning(
+                "NVIDIA_API_KEY does not start with 'nvapi-' (length %d). It will "
+                "be rejected with 401. A common cause is hyphens being stripped "
+                "from the value in transit; check it against the key as issued.",
+                len(self.api_key),
+            )
+
     def _warn_on_malformed_model_ids(self) -> None:
         """
         Catch model ids that are missing their vendor prefix.
@@ -166,6 +185,7 @@ class AIService:
                 # fallback model is tried, and the fallback IS the retry here.
                 max_retries=0,
             )
+            self._warn_on_malformed_key()
             self._warn_on_malformed_model_ids()
             logger.info("NVIDIA NIM client initialized (model=%s).", self.model_name)
         except Exception as e:
