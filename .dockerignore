@@ -1,74 +1,64 @@
-# Python
+# Keep the build context small and secrets out of the image.
+# models/ and client/ are deliberately NOT excluded: the model is copied into the
+# runtime stage, and client/ is the frontend build stage's input.
+
+# Secrets - must never reach the image
+.env
+.env.*
+!.env.example
+kaggle.json
+*.pem
+*.key
+
+# Local virtualenvs and caches
+myenv/
+venv/
+.venv/
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
-venv/
-ENV/
-env/
-myenv/
-.venv/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Testing
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
+coverage.xml
 htmlcov/
-.tox/
-.hypothesis/
 
-# Git
+# Node - reinstalled from the lockfile inside the frontend stage
+client/node_modules/
+client/dist/
+node_modules/
+
+# Version control and CI
 .git/
+.github/
 .gitignore
 .gitattributes
 
-# Documentation
-*.md
+# Not needed at runtime
+tests/
+scripts/
 docs/
+legacy/
+reports/
+mlruns/
+notebooks/
+data/
+*.md
+!README.md
+Makefile
+pytest.ini
+dvc.yaml
+docker-compose.yml
+Procfile
+render.yaml
+.pre-commit-config.yaml
+.flake8
+.devcontainer/
+.vscode/
+package.json
+package-lock.json
 
-# CI/CD
-.github/
-
-# Local files
-.env.local
-.env.*.local
-*.log
-logs/
-
-# Model files (optional - uncomment if models are too large)
-# models/
-# *.pkl
-
-# Data files (optional)
-# *.csv
-# *.json
-
-# Temporary files
-*.tmp
-*.temp
-.cache/
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+*.swp

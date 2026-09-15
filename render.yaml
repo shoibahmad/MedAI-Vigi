@@ -1,16 +1,53 @@
+# Render blueprint for PhenoRx.
+#
+# Docker rather than the native Python runtime: the frontend is a Vite build and
+# Render's Python image does not provide Node. The Dockerfile builds the SPA in a
+# Node stage and serves it from the Python stage, so one service runs both.
+
 services:
   - type: web
     name: phenorx
-    env: python
-    buildCommand: chmod +x scripts/build.sh && ./scripts/build.sh
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --worker-class gthread --timeout 180
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.0
+      # --- Secrets: set these in the Render dashboard, never in this file ---
       - key: NVIDIA_API_KEY
-        sync: false  # Set this in Render dashboard as a secret environment variable
+        sync: false
+
+      # Generated once by Render and kept across deploys.
+      - key: SECRET_KEY
+        generateValue: true
+
+      # --- Model selection ---
+      # The 550B endpoint is frequently capacity-limited and returns "Service
+      # temporarily overloaded". It stays the primary, and the service falls
+      # through to the secondary model, then to deterministic output.
+      # Set NVIDIA_MODEL_NAME to the 120B value to skip the failover delay.
+      - key: NVIDIA_BASE_URL
+        value: https://integrate.api.nvidia.com/v1
+      - key: NVIDIA_MODEL_NAME
+        value: nvidia/nemotron-3-ultra-550b-a55b
+      - key: NVIDIA_FALLBACK_MODEL
+        value: nvidia/nemotron-3-super-120b-a12b
+
+      # Short leash on the primary so an overloaded endpoint fails over quickly;
+      # a generous budget on the final attempt, which must generate a full
+      # narrative. Both are below the gunicorn --timeout of 180.
+      - key: NVIDIA_TIMEOUT
+        value: "30"
+      - key: NVIDIA_LONG_TIMEOUT
+        value: "120"
+      - key: NVIDIA_ENABLE_THINKING
+        value: "false"
+
+      # --- Application ---
       - key: FLASK_ENV
         value: production
       - key: PRODUCTION
         value: "true"
-    healthCheckPath: /health
+      - key: LOG_LEVEL
+        value: INFO

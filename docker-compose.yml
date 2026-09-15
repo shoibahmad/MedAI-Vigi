@@ -56,7 +56,9 @@ services:
       - /app/__pycache__
       - /app/myenv
       - /app/.venv
-    command: ["python", "app.py"]
+    # The image has no dev server; run the same entrypoint as production.
+    command: ["gunicorn", "app:app", "--bind", "0.0.0.0:5000", "--workers", "1",
+              "--threads", "4", "--worker-class", "gthread", "--timeout", "180"]
     networks:
       - phenorx-network
     profiles:
