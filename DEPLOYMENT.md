@@ -107,6 +107,8 @@ Declared in `render.yaml`, override only if you need to:
 | `NVIDIA_FALLBACK_MODEL` | `nvidia/nemotron-3-ultra-550b-a55b` | Tried when the primary errors. Empty disables it. |
 | `NVIDIA_TIMEOUT` | `30` | Per-attempt budget for every model except the last |
 | `NVIDIA_LONG_TIMEOUT` | `120` | Budget for the final attempt, which generates a full narrative |
+| `NVIDIA_TOTAL_BUDGET` | `140` | Ceiling across all models and retries combined. Must stay under the gunicorn `--timeout` of 180. |
+| `NVIDIA_OVERLOAD_BACKOFF` | `1.5` | Pause before retrying a model that reported itself overloaded |
 | `NVIDIA_ENABLE_THINKING` | `false` | Reasoning stream; unwanted in clinical output and costs latency |
 | `SECRET_KEY` | generated | Flask secret |
 | `LOG_LEVEL` | `INFO` | |

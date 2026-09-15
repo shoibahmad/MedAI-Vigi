@@ -130,7 +130,7 @@ def test_thinking_is_disabled_by_default() -> None:
 
 def test_falls_back_to_secondary_model_when_primary_fails() -> None:
     service = make_service(
-        [RuntimeError("Service temporarily overloaded"), "Narrative from the backup model."],
+        [RuntimeError("400 Bad Request"), "Narrative from the backup model."],
         model_name="primary-model",
         fallback_model="secondary-model",
     )
@@ -251,9 +251,9 @@ def test_every_narrative_method_degrades_without_a_key(method: str, args: tuple)
 
 
 def test_last_attempt_gets_the_longer_timeout() -> None:
-    """An overloaded primary should fail fast; the final attempt gets room to generate."""
+    """A failed primary should fail fast; the final attempt gets room to generate."""
     service = make_service(
-        [RuntimeError("overloaded"), "Narrative."],
+        [RuntimeError("400 Bad Request"), "Narrative."],
         model_name="primary",
         fallback_model="secondary",
     )
@@ -270,3 +270,85 @@ def test_single_model_still_gets_the_long_timeout() -> None:
     service.generate_clinical_report(PATIENT, PREDICTION)
 
     assert service._stub.timeouts_used == [120.0]  # type: ignore[attr-defined]
+
+
+# ------------------------------------------------- overload retry & budget
+
+
+class _Overloaded(Exception):
+    """Mirrors what NIM raises for a 503, which carries a status_code."""
+
+    def __init__(self, message: str = "Service temporarily overloaded") -> None:
+        super().__init__(message)
+        self.status_code = 503
+
+
+def test_overloaded_model_is_retried_before_moving_on() -> None:
+    """
+    A 503 comes back in well under a second, so retrying the same model is nearly
+    free - and far cheaper than spending the fallback's much longer budget.
+    """
+    service = make_service(
+        [_Overloaded(), "Narrative."], model_name="primary", fallback_model="secondary"
+    )
+    service.generate_clinical_report(PATIENT, PREDICTION)
+
+    assert service._stub.models_called == ["primary", "primary"]  # type: ignore[attr-defined]
+
+
+def test_overload_retry_is_not_unlimited() -> None:
+    """Two strikes and the next model gets its turn; a busy endpoint tends to stay busy."""
+    service = make_service(
+        [_Overloaded(), _Overloaded(), "Narrative."],
+        model_name="primary",
+        fallback_model="secondary",
+    )
+    service.generate_clinical_report(PATIENT, PREDICTION)
+
+    assert service._stub.models_called == ["primary", "primary", "secondary"]  # type: ignore[attr-defined]
+
+
+def test_timeout_is_not_retried() -> None:
+    """A timeout means the model genuinely is not answering; retrying just burns the budget."""
+    service = make_service(
+        [RuntimeError("Request timed out."), "Narrative."],
+        model_name="primary",
+        fallback_model="secondary",
+    )
+    service.generate_clinical_report(PATIENT, PREDICTION)
+
+    assert service._stub.models_called == ["primary", "secondary"]  # type: ignore[attr-defined]
+
+
+def test_total_budget_stops_further_attempts() -> None:
+    """
+    Per-model timeouts stack: 30s primary plus 120s fallback is 150s against a
+    180s worker timeout. The overall budget has to cut in before the worker dies.
+    """
+    import time
+
+    class SlowCompletions(StubCompletions):
+        def create(self, model: str, **kwargs: Any) -> Any:
+            self.models_called.append(model)
+            time.sleep(2.2)
+            raise RuntimeError("Request timed out.")
+
+    service = AIService(api_key="fake-test-key", model_name="primary", fallback_model="secondary")
+    stub = SlowCompletions([])
+    service.client = StubClient(stub)
+    service.total_budget = 2.0
+    result = service.generate_clinical_report(PATIENT, PREDICTION)
+
+    assert stub.models_called == ["primary"], "the fallback must not start past the budget"
+    assert result["ai_generated"] is False
+
+
+def test_attempt_timeout_never_exceeds_remaining_budget() -> None:
+    """The last attempt must not be handed more time than the budget has left."""
+    service = make_service(["Narrative."], model_name="only", fallback_model="")
+    service.long_timeout = 120.0
+    service.total_budget = 45.0
+    service.generate_clinical_report(PATIENT, PREDICTION)
+
+    used = service._stub.timeouts_used[0]  # type: ignore[attr-defined]
+    assert used <= 45.0, f"attempt got {used}s against a 45s budget"

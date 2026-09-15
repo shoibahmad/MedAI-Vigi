@@ -39,6 +39,11 @@ services:
       # Short leash on the primary so an overloaded endpoint fails over quickly;
       # a generous budget on the final attempt, which must generate a full
       # narrative. Both are below the gunicorn --timeout of 180.
+      # Ceiling across every model and retry. 30s primary + 120s fallback is
+      # 150s on its own, against a 180s worker timeout - too close to serve the
+      # deterministic fallback properly when both models are slow.
+      - key: NVIDIA_TOTAL_BUDGET
+        value: "140"
       - key: NVIDIA_TIMEOUT
         value: "30"
       - key: NVIDIA_LONG_TIMEOUT

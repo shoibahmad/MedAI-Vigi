@@ -19,6 +19,7 @@ import json
 import logging
 import hashlib
 import os
+import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -38,6 +39,21 @@ DEFAULT_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b"
 # The reasoning models emit a separate reasoning_content stream. It is not wanted
 # in clinical output, and it costs latency, so thinking is disabled by default.
 ENABLE_THINKING = os.getenv("NVIDIA_ENABLE_THINKING", "false").lower() == "true"
+
+
+# One retry of the same model when it reports itself overloaded. Two attempts
+# rather than more because a busy endpoint usually stays busy for longer than any
+# reasonable wait, and the next model is the better use of the time after that.
+OVERLOAD_ATTEMPTS = 2
+OVERLOAD_BACKOFF_SECONDS = float(os.getenv("NVIDIA_OVERLOAD_BACKOFF", "1.5"))
+
+
+def _is_overloaded(error: Exception) -> bool:
+    """True for a 503-style "try again shortly", which is worth one retry."""
+    if getattr(error, "status_code", None) == 503:
+        return True
+    text = str(error).lower()
+    return "503" in text or "overloaded" in text or "service unavailable" in text
 
 
 class AIService:
@@ -81,6 +97,12 @@ class AIService:
         # Budget for the final attempt. A 3000-token clinical narrative takes well
         # over the short timeout to generate even on a healthy model.
         self.long_timeout = float(os.getenv("NVIDIA_LONG_TIMEOUT", "120"))
+        # Ceiling across every model and retry combined. The per-model timeouts
+        # can otherwise stack - 30s primary plus 120s fallback is 150s, and the
+        # worker is killed at 180s, so a slow run came close to returning nothing
+        # at all. Staying under that leaves room to serve the deterministic
+        # fallback properly instead.
+        self.total_budget = float(os.getenv("NVIDIA_TOTAL_BUDGET", "140"))
         self.client: Optional[Any] = None
         self.last_model_used: Optional[str] = None
         # Call outcomes, surfaced by /health. is_available() only reports that a
@@ -240,6 +262,7 @@ class AIService:
 
         last_error: Optional[Exception] = None
         models = self._models_to_try()
+        started = time.monotonic()
         for position, model in enumerate(models):
             # Short leash on every model except the last: an overloaded endpoint
             # should fail fast so the next one is tried. The final model gets a
@@ -247,23 +270,46 @@ class AIService:
             # deterministic fallback, and a long narrative genuinely needs time
             # to generate even once the model is responding.
             is_last = position == len(models) - 1
-            per_request_timeout = self.long_timeout if is_last else self.timeout
-            try:
-                response = self.client.with_options(
-                    timeout=per_request_timeout
-                ).chat.completions.create(model=model, **kwargs)
-                content = (response.choices[0].message.content or "").strip()
-                if not content:
-                    raise ValueError("empty completion")
-                self.last_model_used = model
-                self.last_success_at = datetime.now().isoformat()
-                self.last_error = None
-                if model != self.model_name:
-                    logger.info("Primary model unavailable; answered with %s.", model)
-                return content
-            except Exception as e:
-                last_error = e
-                logger.warning("Model %s failed: %s", model, str(e)[:200])
+            base_timeout = self.long_timeout if is_last else self.timeout
+
+            # An overloaded endpoint answers in well under a second, so retrying
+            # the same model costs almost nothing and frequently succeeds -
+            # whereas moving on immediately spends the next model's whole budget.
+            # A timeout is different: it means the model really is not answering,
+            # so that is never retried.
+            for attempt in range(OVERLOAD_ATTEMPTS):
+                remaining = self.total_budget - (time.monotonic() - started)
+                if remaining <= 1.0:
+                    logger.warning(
+                        "Budget of %.0fs exhausted before trying %s; using the "
+                        "deterministic fallback rather than risking the worker timeout.",
+                        self.total_budget,
+                        model,
+                    )
+                    break
+                # Never let one attempt overrun what is left overall: the worst
+                # case here has to stay clear of the gunicorn --timeout.
+                per_request_timeout = min(base_timeout, remaining)
+                try:
+                    response = self.client.with_options(
+                        timeout=per_request_timeout
+                    ).chat.completions.create(model=model, **kwargs)
+                    content = (response.choices[0].message.content or "").strip()
+                    if not content:
+                        raise ValueError("empty completion")
+                    self.last_model_used = model
+                    self.last_success_at = datetime.now().isoformat()
+                    self.last_error = None
+                    if model != self.model_name:
+                        logger.info("Primary model unavailable; answered with %s.", model)
+                    return content
+                except Exception as e:
+                    last_error = e
+                    logger.warning("Model %s failed: %s", model, str(e)[:200])
+                    if attempt + 1 < OVERLOAD_ATTEMPTS and _is_overloaded(e):
+                        time.sleep(OVERLOAD_BACKOFF_SECONDS)
+                        continue
+                    break
 
         self.last_error = f"{type(last_error).__name__}: {str(last_error)[:200]}"
         logger.warning("All models failed; using deterministic fallback. Last error: %s", last_error)
