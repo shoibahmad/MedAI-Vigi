@@ -43,6 +43,9 @@ Thumbs.db
 
 # Environment variables
 .env
+# Editor and manual backups of the secret file (.env.bak, .env.save, .env.local...)
+.env.*
+!.env.example
 .env.local
 
 

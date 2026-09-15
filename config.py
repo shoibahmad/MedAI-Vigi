@@ -25,12 +25,14 @@ class Config:
     # NVIDIA NIM settings (OpenAI-compatible endpoint)
     NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
     NVIDIA_BASE_URL = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1")
+    # The 120B leads; the 550B endpoint is persistently capacity-limited. See
+    # services/ai_service.py for the measurements behind this ordering.
     NVIDIA_MODEL_NAME = os.environ.get(
-        "NVIDIA_MODEL_NAME", "nvidia/nemotron-3-ultra-550b-a55b"
+        "NVIDIA_MODEL_NAME", "nvidia/nemotron-3-super-120b-a12b"
     )
     # Used when the primary model errors or is overloaded. Set to "" to disable.
     NVIDIA_FALLBACK_MODEL = os.environ.get(
-        "NVIDIA_FALLBACK_MODEL", "nvidia/nemotron-3-super-120b-a12b"
+        "NVIDIA_FALLBACK_MODEL", "nvidia/nemotron-3-ultra-550b-a55b"
     )
 
     # Logging & Monitoring

@@ -26,8 +26,13 @@ from services.clinical_service import ClinicalService
 logger = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "https://integrate.api.nvidia.com/v1"
-DEFAULT_MODEL = "nvidia/nemotron-3-ultra-550b-a55b"
-DEFAULT_FALLBACK_MODEL = "nvidia/nemotron-3-super-120b-a12b"
+# The 120B leads. The 550B endpoint is persistently capacity-limited: across
+# repeated measurement it returned "Service temporarily overloaded" or timed out
+# on every attempt, never once producing a narrative, while costing NVIDIA_TIMEOUT
+# seconds before failing over. The 120B answers in roughly 7-11 seconds. The 550B
+# is kept as the fallback rather than dropped, for when it does have capacity.
+DEFAULT_MODEL = "nvidia/nemotron-3-super-120b-a12b"
+DEFAULT_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b"
 
 # The reasoning models emit a separate reasoning_content stream. It is not wanted
 # in clinical output, and it costs latency, so thinking is disabled by default.

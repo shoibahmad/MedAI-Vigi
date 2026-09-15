@@ -103,8 +103,8 @@ Declared in `render.yaml`, override only if you need to:
 | Key | Default | Purpose |
 |---|---|---|
 | `NVIDIA_BASE_URL` | `https://integrate.api.nvidia.com/v1` | NIM OpenAI-compatible endpoint |
-| `NVIDIA_MODEL_NAME` | `nvidia/nemotron-3-ultra-550b-a55b` | Primary model |
-| `NVIDIA_FALLBACK_MODEL` | `nvidia/nemotron-3-super-120b-a12b` | Tried when the primary errors. Empty disables it. |
+| `NVIDIA_MODEL_NAME` | `nvidia/nemotron-3-super-120b-a12b` | Primary model |
+| `NVIDIA_FALLBACK_MODEL` | `nvidia/nemotron-3-ultra-550b-a55b` | Tried when the primary errors. Empty disables it. |
 | `NVIDIA_TIMEOUT` | `30` | Per-attempt budget for every model except the last |
 | `NVIDIA_LONG_TIMEOUT` | `120` | Budget for the final attempt, which generates a full narrative |
 | `NVIDIA_ENABLE_THINKING` | `false` | Reasoning stream; unwanted in clinical output and costs latency |
@@ -113,14 +113,23 @@ Declared in `render.yaml`, override only if you need to:
 
 ### A note on model choice
 
-`nemotron-3-ultra-550b-a55b` is frequently capacity-limited and returns
-"Service temporarily overloaded". The service handles that by failing over to
-the secondary model, but the failover costs `NVIDIA_TIMEOUT` seconds on every
-call. If you would rather have the speed, set:
+The 120B leads deliberately. `nemotron-3-ultra-550b-a55b` is persistently
+capacity-limited: measured repeatedly against a valid key, it returned "Service
+temporarily overloaded" or timed out on **every** attempt without once producing
+a narrative, while costing `NVIDIA_TIMEOUT` seconds before failing over. The
+120B answers in roughly 7-11 seconds.
+
+The 550B remains the fallback rather than being dropped, for when it does have
+capacity. To try it as the primary again:
 
 ```
-NVIDIA_MODEL_NAME=nvidia/nemotron-3-super-120b-a12b
+NVIDIA_MODEL_NAME=nvidia/nemotron-3-ultra-550b-a55b
+NVIDIA_FALLBACK_MODEL=nvidia/nemotron-3-super-120b-a12b
 ```
+
+Both endpoints can return 503 at the same time, in which case the deterministic
+rule-based output is served and `ai_generated` is `false`. That is NVIDIA-side
+capacity, not a key problem.
 
 ## Resource sizing
 
@@ -160,7 +169,7 @@ populate once a call has been attempted:
 |---|---|---|
 | `offline_fallback_active` | No key reached the process. `configured: false`. | Set `NVIDIA_API_KEY` in the Render dashboard, then redeploy. A blueprint variable marked `sync: false` is prompted for, not set automatically. |
 | `configured_untested` | Key present, no call made yet. | Trigger an AI action and re-check. |
-| `error` | Key present but calls fail. `last_error` gives the reason. | A 403 means the key is rejected; regenerate it. A 429 means credits or rate limit. |
+| `error` | Key present but calls fail. `last_error` gives the reason. | **401 with a key you know is good: the process is stale.** The key is read once when `AIService` is constructed, so editing `.env` or the dashboard does nothing until Flask restarts. Restart, then retry. A 403 means the key is genuinely rejected; regenerate it. A 429 means credits or rate limit. A 503 is NVIDIA capacity - retry. |
 | `connected` | Working. `last_success_at` shows when. | - |
 
 The key never appears in this output, and it is never logged.
