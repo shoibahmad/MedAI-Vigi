@@ -150,6 +150,25 @@ curl -s $BASE/sample_data/high_risk | jq .name             # "Harold Wilson"
 `/live` and `/ready` are also available for probes; the container's own
 `HEALTHCHECK` uses `/live`.
 
+### Diagnosing "the API key is not working"
+
+`/health` reports the AI service under `components.ai_service`. Make one AI call
+first (loading the report, or `POST /api/chat`), then read it - the fields only
+populate once a call has been attempted:
+
+| `status` | Meaning | Fix |
+|---|---|---|
+| `offline_fallback_active` | No key reached the process. `configured: false`. | Set `NVIDIA_API_KEY` in the Render dashboard, then redeploy. A blueprint variable marked `sync: false` is prompted for, not set automatically. |
+| `configured_untested` | Key present, no call made yet. | Trigger an AI action and re-check. |
+| `error` | Key present but calls fail. `last_error` gives the reason. | A 403 means the key is rejected; regenerate it. A 429 means credits or rate limit. |
+| `connected` | Working. `last_success_at` shows when. | - |
+
+The key never appears in this output, and it is never logged.
+
+Note that `.env` is deliberately excluded from the image, so a key that works
+locally proves nothing about the deploy: on Render the value must come from the
+dashboard.
+
 ## Running the image locally
 
 ```bash

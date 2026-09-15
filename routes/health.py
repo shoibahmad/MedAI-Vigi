@@ -42,8 +42,24 @@ def health_check() -> Tuple[Response, int]:
                 "status": "operational" if ml_ready else "unavailable",
             },
             "ai_service": {
+                # "configured" means a key is present. It does NOT mean the key
+                # is accepted: that only shows once a call has been made, which
+                # is what last_error and last_success_at report.
+                "configured": ai_available,
                 "available": ai_available,
-                "status": "connected" if ai_available else "offline_fallback_active",
+                "status": (
+                    "offline_fallback_active"
+                    if not ai_available
+                    else "error"
+                    if ai_service.last_error
+                    else "connected"
+                    if ai_service.last_success_at
+                    else "configured_untested"
+                ),
+                "model": ai_service.model_name,
+                "fallback_model": ai_service.fallback_model or None,
+                "last_success_at": ai_service.last_success_at,
+                "last_error": ai_service.last_error,
             },
             "structured_logging": {"active": True, "framework": "pythonjsonlogger"},
         },

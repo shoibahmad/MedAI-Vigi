@@ -70,6 +70,11 @@ class AIService:
         self.long_timeout = float(os.getenv("NVIDIA_LONG_TIMEOUT", "120"))
         self.client: Optional[Any] = None
         self.last_model_used: Optional[str] = None
+        # Call outcomes, surfaced by /health. is_available() only reports that a
+        # client was constructed; it cannot tell whether the key is accepted, so
+        # an invalid key otherwise looks identical to a working one.
+        self.last_error: Optional[str] = None
+        self.last_success_at: Optional[str] = None
         self._initialize_client()
 
     @classmethod
@@ -173,6 +178,8 @@ class AIService:
                 if not content:
                     raise ValueError("empty completion")
                 self.last_model_used = model
+                self.last_success_at = datetime.now().isoformat()
+                self.last_error = None
                 if model != self.model_name:
                     logger.info("Primary model unavailable; answered with %s.", model)
                 return content
@@ -180,6 +187,7 @@ class AIService:
                 last_error = e
                 logger.warning("Model %s failed: %s", model, str(e)[:200])
 
+        self.last_error = f"{type(last_error).__name__}: {str(last_error)[:200]}"
         logger.warning("All models failed; using deterministic fallback. Last error: %s", last_error)
         return None
 
