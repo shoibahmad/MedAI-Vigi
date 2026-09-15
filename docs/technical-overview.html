@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PhenoRx — Technical Overview</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+
+  :root {
+    --ink:      #0f172a;
+    --body:     #1e293b;
+    --muted:    #64748b;
+    --faint:    #94a3b8;
+    --rule:     #e2e8f0;
+    --primary:  #0284c7;
+    --primary-d:#075985;
+    --wash:     #f0f9ff;
+    --paper:    #f8fafc;
+    --danger:   #b91c1c;
+    --danger-bg:#fef2f2;
+    --danger-br:#fecaca;
+    --warn:     #b45309;
+    --warn-bg:  #fffbeb;
+    --warn-br:  #fde68a;
+    --ok:       #047857;
+    --ok-bg:    #ecfdf5;
+    --ok-br:    #a7f3d0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.2pt;
+    line-height: 1.58;
+    color: var(--body);
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  h1, h2, h3, h4 { color: var(--ink); line-height: 1.25; margin: 0; }
+
+  /* ---------------------------------------------------------- title page */
+  .cover { height: 247mm; display: flex; flex-direction: column; page-break-after: always; }
+  .cover-top { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .mark {
+    width: 54px; height: 54px; border-radius: 13px; background: var(--primary);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 26px;
+  }
+  .mark svg { width: 30px; height: 30px; }
+  .cover h1 { font-size: 34pt; letter-spacing: -0.8pt; font-weight: 700; }
+  .cover .sub { font-size: 15pt; color: var(--primary-d); margin-top: 8px; font-weight: 500; }
+  .cover .desc {
+    font-size: 11pt; color: var(--muted); margin-top: 22px; max-width: 128mm; line-height: 1.65;
+  }
+  .cover-rule { height: 3px; background: var(--primary); width: 62px; margin: 30px 0; }
+  .cover-meta { font-size: 9pt; color: var(--muted); }
+  .cover-meta dl { display: grid; grid-template-columns: 34mm 1fr; gap: 5px 0; margin: 0; }
+  .cover-meta dt { color: var(--faint); }
+  .cover-meta dd { margin: 0; color: var(--body); }
+  .cover-warning {
+    border: 1.5px solid var(--danger-br); background: var(--danger-bg);
+    border-radius: 7px; padding: 13px 16px; font-size: 9pt; color: var(--danger);
+    line-height: 1.55;
+  }
+  .cover-warning strong { display: block; margin-bottom: 3px; font-size: 9.5pt; }
+
+  /* ------------------------------------------------------------ headings */
+  h2 {
+    font-size: 15.5pt; margin: 0 0 12px; padding-bottom: 7px;
+    border-bottom: 2px solid var(--primary); letter-spacing: -0.3pt;
+  }
+  h2 .num { color: var(--primary); margin-right: 9px; }
+  h3 { font-size: 11.5pt; margin: 19px 0 7px; color: var(--primary-d); }
+  h4 { font-size: 10.2pt; margin: 14px 0 5px; }
+  section { page-break-before: always; }
+  section.run-on { page-break-before: auto; }
+  p { margin: 0 0 9px; }
+  ul, ol { margin: 0 0 10px; padding-left: 19px; }
+  li { margin-bottom: 4px; }
+  li::marker { color: var(--primary); }
+  strong { color: var(--ink); }
+  code {
+    font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+    font-size: 8.8pt; background: var(--paper); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 0.5px 4px; color: var(--primary-d);
+  }
+
+  /* -------------------------------------------------------------- tables */
+  table { width: 100%; border-collapse: collapse; margin: 11px 0 14px; font-size: 9.2pt; }
+  caption {
+    caption-side: top; text-align: left; font-size: 8.6pt; color: var(--muted);
+    padding-bottom: 5px; font-style: italic;
+  }
+  th {
+    background: var(--paper); text-align: left; padding: 7px 9px;
+    border-bottom: 1.5px solid var(--rule); color: var(--ink); font-weight: 600;
+    font-size: 8.8pt; text-transform: uppercase; letter-spacing: 0.3pt;
+  }
+  td { padding: 6.5px 9px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  tbody tr:nth-child(even) { background: #fcfdfe; }
+  .num-col { text-align: right; font-variant-numeric: tabular-nums; }
+  table, tr, td, th { page-break-inside: avoid; }
+
+  /* ------------------------------------------------------------ callouts */
+  .box {
+    border-left: 3.5px solid var(--primary); background: var(--wash);
+    padding: 11px 15px; margin: 13px 0; border-radius: 0 5px 5px 0;
+    font-size: 9.4pt; page-break-inside: avoid;
+  }
+  .box .box-title {
+    font-weight: 700; color: var(--primary-d); margin-bottom: 4px; font-size: 9.6pt;
+  }
+  .box p:last-child, .box ul:last-child { margin-bottom: 0; }
+  .box.danger { border-left-color: var(--danger); background: var(--danger-bg); }
+  .box.danger .box-title { color: var(--danger); }
+  .box.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+  .box.warn .box-title { color: var(--warn); }
+  .box.ok { border-left-color: var(--ok); background: var(--ok-bg); }
+  .box.ok .box-title { color: var(--ok); }
+
+  /* ------------------------------------------------------------ toc */
+  .toc { font-size: 10pt; }
+  .toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+  .toc li {
+    counter-increment: toc; padding: 6.5px 0; border-bottom: 1px solid var(--rule);
+    display: flex; align-items: baseline;
+  }
+  .toc li::before {
+    content: counter(toc); color: var(--primary); font-weight: 700;
+    width: 20px; flex-shrink: 0;
+  }
+  .toc .t { color: var(--ink); font-weight: 600; }
+  .toc .d { color: var(--muted); font-size: 8.8pt; margin-left: 8px; }
+
+  /* ------------------------------------------------------------ misc */
+  .lead { font-size: 10.8pt; color: var(--muted); margin-bottom: 15px; line-height: 1.6; }
+  .stat-row { display: flex; gap: 9px; margin: 14px 0; page-break-inside: avoid; }
+  .stat {
+    flex: 1; border: 1px solid var(--rule); border-radius: 6px; padding: 11px 12px;
+    background: #fff;
+  }
+  .stat .v { font-size: 17pt; font-weight: 700; color: var(--primary-d); line-height: 1.1; }
+  .stat .v.bad { color: var(--danger); }
+  .stat .k {
+    font-size: 7.8pt; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.4pt; margin-top: 4px;
+  }
+  .stat .note { font-size: 8pt; color: var(--faint); margin-top: 3px; }
+  .pipeline { margin: 14px 0; page-break-inside: avoid; }
+  .stage {
+    border: 1px solid var(--rule); border-left: 3px solid var(--primary);
+    border-radius: 0 5px 5px 0; padding: 10px 13px; margin-bottom: 7px; background: #fff;
+  }
+  .stage .st { font-weight: 700; color: var(--ink); font-size: 9.8pt; }
+  .stage .sd { font-size: 8.9pt; color: var(--muted); margin-top: 2px; }
+  .stage .sx { font-size: 8.4pt; color: var(--faint); margin-top: 3px; font-family: Consolas, monospace; }
+  .footnote { font-size: 8.4pt; color: var(--faint); border-top: 1px solid var(--rule); padding-top: 7px; margin-top: 15px; }
+  .kv { display: grid; grid-template-columns: 52mm 1fr; gap: 4px 0; font-size: 9.3pt; margin: 10px 0; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════ COVER ══ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="mark">
+      <svg viewBox="0 0 60 60" fill="none" stroke="#fff" stroke-width="5"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M54 32H42l-9 21L23 11l-9 21H6"/>
+      </svg>
+    </div>
+    <h1>PhenoRx</h1>
+    <div class="sub">Pharmacogenomic Adverse Drug Reaction Risk Assessment</div>
+    <div class="cover-rule"></div>
+    <p class="desc">
+      A technical and methodological overview of a clinical decision support prototype that
+      combines a machine-learning classifier, pharmacogenomic rule engines, and a large
+      language model to estimate adverse drug reaction risk before a medicine is administered.
+    </p>
+    <p class="desc" style="margin-top:10px">
+      Written for medical students and clinicians with no machine-learning background. It
+      explains what the system does, how each component works, and — importantly — how well
+      it actually performs.
+    </p>
+  </div>
+
+  <div class="cover-warning">
+    <strong>This is a teaching and research prototype, not a clinical tool.</strong>
+    It is trained on synthetic data, has never been externally validated, and its measured
+    accuracy is below that of a trivial baseline. It must not be used to make decisions about
+    any real patient. Section 6 explains the evidence for this statement in full.
+  </div>
+
+  <div class="cover-meta" style="margin-top:18px">
+    <dl>
+      <dt>Document</dt><dd>Technical &amp; Methodological Overview</dd>
+      <dt>System version</dt><dd>2.1.0</dd>
+      <dt>Model artifact</dt><dd><code>models/adr_model.pkl</code> (17.9&nbsp;MB)</dd>
+      <dt>Audience</dt><dd>Medical students, clinical pharmacology trainees</dd>
+    </dl>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ TOC ══ -->
+<section class="run-on">
+  <h2>Contents</h2>
+  <div class="toc">
+    <ol>
+      <li><span class="t">The clinical problem</span><span class="d">Why ADR prediction matters</span></li>
+      <li><span class="t">What the system does</span><span class="d">The clinical workflow, page by page</span></li>
+      <li><span class="t">Architecture</span><span class="d">Three independent layers</span></li>
+      <li><span class="t">Layer 1 — The machine-learning model</span><span class="d">Algorithm, features, training</span></li>
+      <li><span class="t">Layer 2 — Pharmacogenomic rule engines</span><span class="d">CYP, transporters, HLA</span></li>
+      <li><span class="t">Model performance — the honest numbers</span><span class="d">What it scores, and why</span></li>
+      <li><span class="t">Layer 3 — The AI narrative</span><span class="d">Large language model integration</span></li>
+      <li><span class="t">Safety, limitations and governance</span><span class="d">What would be needed clinically</span></li>
+      <li><span class="t">Glossary</span><span class="d">Machine-learning terms in clinical language</span></li>
+    </ol>
+  </div>
+
+  <div class="box" style="margin-top:22px">
+    <div class="box-title">How to read this document</div>
+    <p>
+      Sections 1–3 describe the system and need no technical background. Sections 4–7 go into
+      the methods. <strong>Section 6 is the most important section</strong> — it reports the
+      measured performance, which is poor, and explains precisely why. If you read only one
+      part, read that one: it is the part that teaches you how to interrogate any clinical AI
+      tool you are shown in future.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 1. PROBLEM ══ -->
+<section>
+  <h2><span class="num">1</span>The clinical problem</h2>
+
+  <p class="lead">
+    An adverse drug reaction (ADR) is harm caused by a medicine given at a normal dose for a
+    normal indication. ADRs are a substantial cause of hospital admission and inpatient
+    morbidity, and a meaningful proportion are considered preventable.
+  </p>
+
+  <p>
+    The clinical difficulty is that risk is not uniform. Two patients given the same drug at
+    the same dose can have very different outcomes, because risk depends on the interaction of:
+  </p>
+
+  <ul>
+    <li><strong>Organ function</strong> — chiefly renal clearance (eGFR) and hepatic metabolism,
+        which determine how quickly a drug is eliminated.</li>
+    <li><strong>Genetics</strong> — inherited variation in metabolising enzymes and immune
+        receptors, which can multiply exposure or predispose to severe immune reactions.</li>
+    <li><strong>Co-medication</strong> — competing substrates, enzyme inhibition or induction,
+        and additive toxicity across a regimen.</li>
+    <li><strong>Comorbidity and physiology</strong> — age, body composition, cardiac disease,
+        electrolyte state.</li>
+  </ul>
+
+  <p>
+    A clinician integrates these mentally. The premise of this project is that the same
+    integration can be performed computationally, before the first dose, to flag patients who
+    warrant a different agent, a lower dose, or closer monitoring.
+  </p>
+
+  <div class="box warn">
+    <div class="box-title">The premise is reasonable; the execution here is a prototype</div>
+    <p>
+      The idea above is sound and is an active area of real research. This particular
+      implementation does not achieve it — see Section 6. The value of this document is in
+      showing how such a system is constructed and how to evaluate whether it works.
+    </p>
+  </div>
+
+  <h3>Why "phenotype" plus "Rx"</h3>
+  <p>
+    The name reflects the intended approach: combine the patient's observable clinical
+    phenotype (laboratory values, comorbidities, physiology) with their pharmacogenomic
+    phenotype (metaboliser status) to individualise the prescription.
+  </p>
+</section>
+
+<!-- ═════════════════════════════════════════════════════ 2. WORKFLOW ══ -->
+<section>
+  <h2><span class="num">2</span>What the system does</h2>
+
+  <p class="lead">
+    The application is a web tool organised around a single clinical assessment. A user works
+    through five screens in sequence.
+  </p>
+
+  <div class="pipeline">
+    <div class="stage">
+      <div class="st">1 &nbsp;·&nbsp; Patient details</div>
+      <div class="sd">Demographics: age, sex, ethnicity, height and weight. Body mass index is
+        calculated automatically, and age and sex select the laboratory reference intervals used
+        on every subsequent screen.</div>
+    </div>
+    <div class="stage">
+      <div class="st">2 &nbsp;·&nbsp; Clinical assessment</div>
+      <div class="sd">The main data-entry form: renal and hepatic panels, full blood count and
+        differential, vital signs, comorbidities, the drug regimen, and pharmacogenomic
+        results. Values are validated against the same numeric bounds the server enforces, so
+        an implausible entry is flagged as it is typed.</div>
+      <div class="sx">~60 fields, fillable in any order; a demo patient can populate all of them</div>
+    </div>
+    <div class="stage">
+      <div class="st">3 &nbsp;·&nbsp; Report</div>
+      <div class="sd">The model's numerical output and the AI-generated narrative are presented
+        side by side: overall risk percentage, risk tier, predicted reaction classes,
+        contributing factors, and pharmacogenomic profile. Exportable as PDF.</div>
+    </div>
+    <div class="stage">
+      <div class="st">4 &nbsp;·&nbsp; Interactions and dosing</div>
+      <div class="sd">Pairwise interaction checking across the regimen with severity
+        classification, plus renal-, hepatic- and CYP-adjusted dose suggestions with
+        monitoring intervals.</div>
+    </div>
+    <div class="stage">
+      <div class="st">5 &nbsp;·&nbsp; Counselling</div>
+      <div class="sd">A six-step structured medication education workflow, including teach-back
+        comprehension scoring and signed acknowledgement from both patient and counsellor.</div>
+    </div>
+  </div>
+
+  <h3>Risk tiers</h3>
+  <p>
+    The model returns a probability, which is mapped to one of four tiers. The thresholds are
+    fixed constants in the code, not learned from data:
+  </p>
+
+  <table>
+    <caption>Risk tier thresholds, from <code>services/ml_service.py</code></caption>
+    <thead>
+      <tr><th>Tier</th><th>Overall ADR risk</th><th>Intended interpretation</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Critical</strong></td><td class="num-col">≥ 75%</td><td>Consider an alternative agent; specialist input</td></tr>
+      <tr><td><strong>High</strong></td><td class="num-col">≥ 50%</td><td>Dose reduction and active monitoring</td></tr>
+      <tr><td><strong>Moderate</strong></td><td class="num-col">≥ 25%</td><td>Standard dosing with scheduled review</td></tr>
+      <tr><td><strong>Low</strong></td><td class="num-col">&lt; 25%</td><td>Routine care</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box">
+    <div class="box-title">A point worth noticing</div>
+    <p>
+      These cut-points are arbitrary round numbers. In a validated clinical tool, thresholds
+      would be derived from the data — chosen to achieve a target sensitivity or to optimise
+      net clinical benefit, then tested on a separate cohort. Fixed round numbers are a
+      reasonable placeholder in a prototype, but they are an assumption, not a finding.
+    </p>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════ 3. ARCHITECTURE ══ -->
+<section>
+  <h2><span class="num">3</span>Architecture</h2>
+
+  <p class="lead">
+    Three independent layers contribute to the output. They are worth separating clearly,
+    because they have very different reliability characteristics.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:26%">Layer</th><th style="width:37%">What it is</th><th>How it can fail</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. ML classifier</strong></td>
+        <td>A gradient-boosting model trained on 10,000 synthetic patient records</td>
+        <td>Silently wrong. Produces a confident-looking number regardless of whether it is
+            correct. <strong>This is the weakest layer</strong> — see Section 6.</td>
+      </tr>
+      <tr>
+        <td><strong>2. PGx rule engines</strong></td>
+        <td>Deterministic rules encoding published gene–drug relationships</td>
+        <td>Transparent. Rules are explicit and auditable; failure means a rule is missing or
+            out of date, which is inspectable.</td>
+      </tr>
+      <tr>
+        <td><strong>3. LLM narrative</strong></td>
+        <td>A large language model that writes the clinical prose</td>
+        <td>Fluent but unreliable. Can produce plausible, well-written statements that are
+            incorrect. Degrades to fixed rule-based text when unavailable.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Technology stack</h3>
+  <dl class="kv">
+    <dt>Backend</dt><dd>Python 3.13, Flask (application factory with blueprints)</dd>
+    <dt>Machine learning</dt><dd>scikit-learn — <code>HistGradientBoostingClassifier</code></dd>
+    <dt>Frontend</dt><dd>React 19 with Vite, Tailwind CSS, single-page application</dd>
+    <dt>Language model</dt><dd>NVIDIA NIM (Nemotron), OpenAI-compatible API</dd>
+    <dt>Serving</dt><dd>Gunicorn, one worker with four threads, containerised</dd>
+    <dt>Persistence</dt><dd>In-memory only — no database</dd>
+  </dl>
+
+  <div class="box">
+    <div class="box-title">Why the three layers are kept separate</div>
+    <p>
+      Separation means a failure in one layer does not silently corrupt the others. If the
+      language model is unreachable, the system still returns the model's number and the
+      pharmacogenomic findings, with deterministic text in place of the narrative. The
+      converse also holds: a fluent AI narrative does not make the underlying risk number
+      any more trustworthy.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 4. ML MODEL ══ -->
+<section>
+  <h2><span class="num">4</span>Layer 1 — The machine-learning model</h2>
+
+  <h3>The algorithm</h3>
+  <p>
+    The model is a <strong>histogram-based gradient boosting classifier</strong>
+    (<code>HistGradientBoostingClassifier</code> from scikit-learn). In clinical terms, it can
+    be understood as follows.
+  </p>
+
+  <p>
+    A single <em>decision tree</em> is a flowchart of yes/no questions — "is eGFR below 30?",
+    "is the patient over 70?" — ending in a prediction. One tree alone is crude.
+    <em>Gradient boosting</em> builds hundreds of trees in sequence, where each new tree is
+    trained specifically on the cases the existing trees got wrong. The final prediction is
+    the accumulated vote of all the trees.
+  </p>
+
+  <p>
+    This family of model is a sensible default for tabular clinical data: it handles mixed
+    numeric and categorical variables, tolerates missing values natively, and captures
+    interactions between variables without being told to look for them.
+  </p>
+
+  <table>
+    <caption>Training hyperparameters, from <code>config/ml_config.yaml</code> defaults</caption>
+    <thead><tr><th>Parameter</th><th style="width:22%">Value</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>max_iter</code></td><td class="num-col">400</td><td>Maximum number of boosting trees</td></tr>
+      <tr><td><code>max_depth</code></td><td class="num-col">18</td><td>Maximum questions deep any one tree may go</td></tr>
+      <tr><td><code>learning_rate</code></td><td class="num-col">0.07</td><td>How much each tree is allowed to correct its predecessors</td></tr>
+      <tr><td><code>l2_regularization</code></td><td class="num-col">0.3</td><td>Penalty discouraging over-confident fitting</td></tr>
+      <tr><td><code>random_state</code></td><td class="num-col">42</td><td>Fixed seed, so training is reproducible</td></tr>
+      <tr><td>train/test split</td><td class="num-col">80 / 20</td><td>A fifth of data held back to test on</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Input features</h3>
+  <p>The model consumes <strong>29 variables</strong> per patient:</p>
+
+  <table>
+    <thead><tr><th style="width:27%">Domain</th><th>Variables</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Demographics</strong></td><td>age, sex, ethnicity, weight, height, BMI</td></tr>
+      <tr><td><strong>Renal</strong></td><td>creatinine, eGFR</td></tr>
+      <tr><td><strong>Hepatic</strong></td><td>AST/ALT, bilirubin, albumin</td></tr>
+      <tr><td><strong>Haematology</strong></td><td>haemoglobin, white cell count, platelet count</td></tr>
+      <tr><td><strong>Vital signs</strong></td><td>systolic and diastolic blood pressure, heart rate, temperature</td></tr>
+      <tr><td><strong>Comorbidity</strong></td><td>diabetes, liver disease, chronic kidney disease, cardiac disease, hypertension</td></tr>
+      <tr><td><strong>Drug exposure</strong></td><td>index drug dose, concomitant drug count, polypharmacy flag, days since start</td></tr>
+      <tr><td><strong>Pharmacogenomic</strong></td><td>CYP2C9 and CYP2D6 metaboliser status</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box warn">
+    <div class="box-title">Note the mismatch between form and model</div>
+    <p>
+      The assessment form collects roughly 60 fields, including an extensive pharmacogenomic
+      panel (six CYP enzymes, three transporters, three HLA alleles). The model itself uses
+      only the 29 variables above, of which just <strong>two</strong> are pharmacogenomic.
+      The remaining PGx data is used by the rule engines in Layer 2, not by the model. This is
+      worth knowing: entering a full genomic panel does not make the risk <em>number</em> more
+      informed than entering CYP2C9 and CYP2D6 alone.
+    </p>
+  </div>
+
+  <h3>Training data</h3>
+  <dl class="kv">
+    <dt>Records</dt><dd>10,000</dd>
+    <dt>Origin</dt><dd><strong>Synthetic</strong> — generated by <code>scripts/data_generator.py</code></dd>
+    <dt>Outcome classes</dt><dd>10 distinct ADR types, including "No ADR"</dd>
+    <dt>Split</dt><dd>8,000 training / 2,000 held-out test</dd>
+  </dl>
+
+  <div class="box danger">
+    <div class="box-title">The data is synthetic, and this is the root limitation</div>
+    <p>
+      No real patient contributed to this model. The records were produced by a script that
+      encodes assumptions about how clinical variables relate to adverse outcomes. A model
+      trained this way can only learn the rules its generator already contained — it cannot
+      discover anything about real physiology, and good performance on such data would
+      demonstrate nothing about real-world accuracy.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ 5. PGX ══ -->
+<section>
+  <h2><span class="num">5</span>Layer 2 — Pharmacogenomic rule engines</h2>
+
+  <p class="lead">
+    Separate from the model, four deterministic engines encode published gene–drug
+    relationships. These are ordinary conditional logic, not learned from data, which makes
+    them transparent and auditable.
+  </p>
+
+  <table>
+    <thead><tr><th style="width:27%">Engine</th><th>Scope</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>CYP engine</strong></td>
+        <td>Cytochrome P450 metaboliser phenotypes. Poor metabolisers accumulate an active
+            drug; ultra-rapid metabolisers may fail to respond, or over-produce an active
+            metabolite from a prodrug.</td>
+      </tr>
+      <tr>
+        <td><strong>Transporter engine</strong></td>
+        <td>Membrane transporter variants affecting drug distribution and hepatic uptake —
+            the mechanism underlying, for example, statin-associated muscle symptoms.</td>
+      </tr>
+      <tr>
+        <td><strong>HLA engine</strong></td>
+        <td>Human leukocyte antigen alleles associated with severe immune-mediated
+            hypersensitivity, the class of reaction where pre-prescription genotyping has the
+            clearest established clinical value.</td>
+      </tr>
+      <tr>
+        <td><strong>Non-CYP engine</strong></td>
+        <td>Other metabolising enzymes outside the P450 system.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Why this layer is more trustworthy than the model</h3>
+  <p>
+    A rule stating a relationship between a genotype and a drug can be traced to a published
+    source, reviewed by a pharmacologist, and corrected when guidance changes. Its behaviour
+    is identical every time and can be reasoned about without running it. The machine-learning
+    model has none of these properties: it is a numerical function fitted to data, and its
+    reasoning cannot be inspected directly.
+  </p>
+
+  <div class="box ok">
+    <div class="box-title">The generalisable lesson</div>
+    <p>
+      When you encounter a clinical AI product, ask which parts are learned and which are
+      encoded rules. Rules can be checked against guidelines. Learned components can only be
+      trusted to the extent that they have been validated on data resembling your patients.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ 6. PERFORMANCE ══ -->
+<section>
+  <h2><span class="num">6</span>Model performance — the honest numbers</h2>
+
+  <p class="lead">
+    This section reports what the model actually scores. The results are poor. They are
+    presented in full because a clinical decision support tool that overstates its accuracy is
+    more dangerous than one that has none.
+  </p>
+
+  <h3>6.1 &nbsp;Measured accuracy</h3>
+  <p>
+    The repository contains two stored performance reports, and the shipped model can be
+    re-evaluated directly. <strong>All three disagree:</strong>
+  </p>
+
+  <table>
+    <caption>Reported accuracy of the ADR classifier, by source</caption>
+    <thead>
+      <tr><th>Source</th><th class="num-col" style="width:16%">Accuracy</th>
+          <th class="num-col" style="width:16%">Weighted F1</th><th style="width:20%">Test set</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>reports/experiment_metrics.json</code><br>
+            <span style="color:var(--muted);font-size:8.5pt">Training-run holdout</span></td>
+        <td class="num-col">45.0%</td><td class="num-col">0.407</td><td class="num-col">200</td>
+      </tr>
+      <tr>
+        <td><code>reports/model_evaluation_report.md</code><br>
+            <span style="color:var(--muted);font-size:8.5pt">Stored evaluation</span></td>
+        <td class="num-col">11.0%</td><td class="num-col">0.126</td><td class="num-col">200</td>
+      </tr>
+      <tr style="background:var(--danger-bg)">
+        <td><strong>Shipped model, re-evaluated</strong><br>
+            <span style="color:var(--muted);font-size:8.5pt">Against <code>data/clinical_data.csv</code></span></td>
+        <td class="num-col"><strong>15.5%</strong></td><td class="num-col"><strong>0.183</strong></td>
+        <td class="num-col">200</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>6.2 &nbsp;The number that matters most</h3>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="v bad">15.5%</div>
+      <div class="k">Model accuracy</div>
+      <div class="note">Shipped artifact, measured</div>
+    </div>
+    <div class="stat">
+      <div class="v">89.5%</div>
+      <div class="k">Baseline accuracy</div>
+      <div class="note">Always answer "No ADR"</div>
+    </div>
+    <div class="stat">
+      <div class="v bad">−74 pts</div>
+      <div class="k">Model vs baseline</div>
+      <div class="note">Worse than guessing</div>
+    </div>
+  </div>
+
+  <p>
+    An accuracy figure is meaningless without the baseline it must beat. In the training data,
+    <strong>8,951 of 10,000 records (89.5%) are labelled "No ADR"</strong>. A trivial rule that
+    ignores every input and always answers "No ADR" would therefore be right 89.5% of the time.
+  </p>
+
+  <p>
+    The model scores far below that. <strong>It is substantially worse than the simplest
+    possible guess.</strong>
+  </p>
+
+  <div class="box danger">
+    <div class="box-title">This is the single most important fact in this document</div>
+    <p>
+      A model performing below its majority-class baseline has learned nothing useful about
+      the outcome. Any risk score it produces should be treated as uninformative. This is also
+      why accuracy alone is a poor metric for rare outcomes — a point that generalises to every
+      diagnostic study you will read.
+    </p>
+  </div>
+
+  <h3>6.3 &nbsp;Why the numbers are so poor</h3>
+  <p>Three separate, identifiable causes:</p>
+
+  <h4>Cause 1 — Severe class imbalance</h4>
+  <p>
+    The outcome distribution is extremely skewed: the commonest class has 8,951 examples, the
+    rarest has 46. Gradient boosting minimises overall error, so with this distribution the
+    lowest-error strategy is to predict the majority class and largely ignore the rest.
+    Mitigations exist — class weighting, resampling, or optimising a metric other than
+    accuracy — and none has been applied here.
+  </p>
+
+  <h4>Cause 2 — The evaluation is measuring an impossible task</h4>
+  <p>
+    The model is trained on <strong>10</strong> outcome classes but evaluated against a file
+    containing <strong>18</strong>, of which only 4 overlap. <strong>14 of the classes in the
+    test set are ones the model was never trained to predict</strong> and therefore cannot
+    possibly output.
+  </p>
+
+  <table>
+    <caption>Label space mismatch between training and evaluation</caption>
+    <thead><tr><th>Dataset</th><th style="width:18%">Classes</th><th>Target column</th></tr></thead>
+    <tbody>
+      <tr><td>Training (<code>adr_training_data.csv</code>)</td><td class="num-col">10</td><td><code>adr_type</code></td></tr>
+      <tr><td>Evaluation (<code>clinical_data.csv</code>)</td><td class="num-col">18</td><td><code>adr_risk_label</code></td></tr>
+      <tr style="background:var(--danger-bg)"><td><strong>Shared between them</strong></td><td class="num-col"><strong>4</strong></td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    The two files also differ in shape — 30 columns versus 50. So the 11% and 15.5% figures do
+    not measure how good the model is; they largely measure a mismatch between two
+    incompatible datasets. The evaluation harness is broken independently of the model.
+  </p>
+
+  <h4>Cause 3 — Synthetic training data</h4>
+  <p>
+    Even a perfect score here would not indicate clinical utility, for the reason given in
+    Section 4: the model can only recover the assumptions its data generator encoded.
+  </p>
+
+  <h3>6.4 &nbsp;Per-class breakdown</h3>
+  <p>
+    Accuracy hides the detail. In the stored per-class results, the majority of ADR classes
+    have precision and recall of <strong>exactly zero</strong> — the model never once correctly
+    identifies them. A representative extract:
+  </p>
+
+  <table>
+    <caption>Per-class performance, from <code>reports/experiment_metrics.json</code></caption>
+    <thead>
+      <tr><th>ADR class</th><th class="num-col">Precision</th><th class="num-col">Recall</th>
+          <th class="num-col">F1</th><th class="num-col">Support</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>No ADR</td><td class="num-col">0.66</td><td class="num-col">0.88</td><td class="num-col">0.75</td><td class="num-col">52</td></tr>
+      <tr><td>Cardiovascular Event (Arrhythmia)</td><td class="num-col">0.54</td><td class="num-col">0.60</td><td class="num-col">0.57</td><td class="num-col">35</td></tr>
+      <tr><td>Nephrotoxicity</td><td class="num-col">0.47</td><td class="num-col">0.50</td><td class="num-col">0.48</td><td class="num-col">16</td></tr>
+      <tr><td>Hepatotoxicity</td><td class="num-col">0.36</td><td class="num-col">0.50</td><td class="num-col">0.42</td><td class="num-col">8</td></tr>
+      <tr><td>QT Prolongation</td><td class="num-col">0.35</td><td class="num-col">0.33</td><td class="num-col">0.34</td><td class="num-col">21</td></tr>
+      <tr style="background:var(--danger-bg)"><td>Gastrointestinal (Nausea/Vomiting)</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">13</td></tr>
+      <tr style="background:var(--danger-bg)"><td>Elevated Liver Enzymes</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">6</td></tr>
+      <tr style="background:var(--danger-bg)"><td>Rash</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">6</td></tr>
+      <tr style="background:var(--danger-bg)"><td>Electrolyte Imbalance</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">5</td></tr>
+      <tr style="background:var(--danger-bg)"><td>Bleeding / Haemorrhage</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">0.00</td><td class="num-col">3</td></tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:9pt;color:var(--muted)">
+    <strong>Precision</strong> — of the cases flagged as this reaction, the proportion that
+    truly were. <strong>Recall</strong> (sensitivity) — of the cases that truly were this
+    reaction, the proportion detected. <strong>Support</strong> — how many such cases existed
+    in the test set. Note how small the supports are: with 3 to 13 examples, these estimates
+    would be highly unstable even if the model performed well.
+  </p>
+
+  <h3>6.5 &nbsp;Unsupported claims in the repository</h3>
+
+  <div class="box danger">
+    <div class="box-title">Two fabricated performance claims are hard-coded into the report generator</div>
+    <p>
+      <code>scripts/model_trainer.py</code> writes the following statements into every report
+      it generates, as fixed text, regardless of the measured results:
+    </p>
+    <ul>
+      <li>"Pharmacogenomic hypersensitivities … reach &gt; 92% recall" — the measured recall
+          for hypersensitivity classes is between 0.00 and 0.50.</li>
+      <li>"Omitting PGx features reduces weighted F1 from 0.871 to 0.774" — the measured
+          weighted F1 is 0.18, and no ablation producing 0.871 exists.</li>
+    </ul>
+    <p>
+      Neither is supported by any artifact in the repository. They are presented here because
+      identifying this kind of claim is a transferable skill: a stated metric is only as good
+      as the experiment that produced it, and a number that cannot be traced to a
+      reproducible run should not be believed.
+    </p>
+  </div>
+
+  <h3>6.6 &nbsp;What would be needed to make this work</h3>
+  <ol>
+    <li><strong>Real data</strong> with linked outcomes, under appropriate governance.</li>
+    <li><strong>One consistent label space</strong> between training and evaluation — the
+        current mismatch must be fixed before any figure is meaningful.</li>
+    <li><strong>Imbalance handling</strong> — class weighting or resampling.</li>
+    <li><strong>Appropriate metrics</strong> — per-class recall, precision-recall AUC, and
+        calibration, rather than overall accuracy.</li>
+    <li><strong>Calibration assessment</strong> — a stated 70% risk should correspond to the
+        event occurring in about 70% of such patients.</li>
+    <li><strong>External validation</strong> on a separate institution's population.</li>
+    <li><strong>Prospective evaluation</strong> of whether using the tool changes outcomes.</li>
+  </ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ 7. LLM ══ -->
+<section>
+  <h2><span class="num">7</span>Layer 3 — The AI narrative</h2>
+
+  <p class="lead">
+    The third layer uses a large language model to convert the numerical output into clinical
+    prose: an interpretation, monitoring suggestions, and a mitigation plan.
+  </p>
+
+  <dl class="kv">
+    <dt>Provider</dt><dd>NVIDIA NIM (OpenAI-compatible endpoint)</dd>
+    <dt>Primary model</dt><dd><code>nvidia/nemotron-3-super-120b-a12b</code></dd>
+    <dt>Fallback model</dt><dd><code>nvidia/nemotron-3-ultra-550b-a55b</code></dd>
+    <dt>Final fallback</dt><dd>Deterministic rule-based text</dd>
+  </dl>
+
+  <h3>Graceful degradation</h3>
+  <p>
+    Language model endpoints fail routinely — they return "temporarily overloaded", or take too
+    long. The system tries the primary model, retries once if it reports itself overloaded,
+    falls through to the secondary model, and finally emits fixed rule-based text. A total time
+    budget bounds the whole sequence so a request cannot hang.
+  </p>
+  <p>
+    Every response carries an <code>ai_generated</code> flag, so it is always possible to tell
+    whether the text was written by the model or by the deterministic fallback.
+  </p>
+
+  <div class="box warn">
+    <div class="box-title">Fluency is not accuracy</div>
+    <p>
+      A language model produces text that reads as though written by a confident clinician,
+      whether or not the content is correct. It has no access to the patient beyond the fields
+      supplied, and it cannot verify the risk score it is asked to explain. Here it is
+      explaining a number that Section 6 shows to be uninformative — so a plausible, well-written
+      narrative may be describing a meaningless figure convincingly. Every AI-generated
+      statement requires independent verification.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ 8. LIMITS ══ -->
+<section>
+  <h2><span class="num">8</span>Safety, limitations and governance</h2>
+
+  <div class="box danger">
+    <div class="box-title">Not suitable for clinical use</div>
+    <p>
+      This system must not inform decisions about any real patient. The limitations below are
+      not caveats around a working tool; several are fundamental.
+    </p>
+  </div>
+
+  <h3>Model limitations</h3>
+  <ul>
+    <li><strong>Performs below the majority-class baseline</strong> — 15.5% against 89.5%.</li>
+    <li><strong>Trained entirely on synthetic data</strong> — no real patient contributed.</li>
+    <li><strong>Never externally validated</strong> — no prospective or independent evaluation.</li>
+    <li><strong>Broken evaluation harness</strong> — training and test label spaces do not match.</li>
+    <li><strong>Uncalibrated</strong> — the stated percentages have no verified relationship to
+        real event frequencies.</li>
+    <li><strong>Most ADR classes are never predicted correctly</strong> — precision and recall
+        of zero for the majority of reaction types.</li>
+  </ul>
+
+  <h3>System limitations</h3>
+  <ul>
+    <li><strong>No authentication</strong> — every endpoint is publicly accessible.</li>
+    <li><strong>No database</strong> — assessments are held in memory and lost on restart.</li>
+    <li><strong>No audit trail</strong> — a clinical requirement that is entirely absent.</li>
+    <li><strong>No regulatory clearance</strong> — a tool of this type would be a regulated
+        medical device in most jurisdictions.</li>
+  </ul>
+
+  <h3>What the project does demonstrate</h3>
+  <p>
+    The engineering is sound even though the model is not. It is a working example of a
+    full clinical decision support architecture: validated data capture, a served ML model,
+    deterministic rule engines, language model integration with sensible failure handling,
+    and a documented deployment. As a teaching artifact for how such systems are built — and
+    how to evaluate the claims they make — it is useful. As a clinical instrument, it is not.
+  </p>
+
+  <div class="box ok">
+    <div class="box-title">What to take away</div>
+    <ul>
+      <li>Always ask what baseline an accuracy figure beats.</li>
+      <li>Ask whether the training data is real, and whether validation was external.</li>
+      <li>For rare outcomes, demand per-class recall, not overall accuracy.</li>
+      <li>Check whether a quoted metric can be traced to a reproducible run.</li>
+      <li>Treat fluent AI prose as a presentation layer, never as evidence.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════ 9. GLOSSARY ══ -->
+<section>
+  <h2><span class="num">9</span>Glossary</h2>
+
+  <table>
+    <thead><tr><th style="width:30%">Term</th><th>In clinical language</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Accuracy</strong></td><td>Proportion of all predictions that were correct. Misleading when one outcome dominates.</td></tr>
+      <tr><td><strong>Precision</strong></td><td>Positive predictive value — of those flagged, how many truly had the outcome.</td></tr>
+      <tr><td><strong>Recall / sensitivity</strong></td><td>Of those who truly had the outcome, how many were detected.</td></tr>
+      <tr><td><strong>F1 score</strong></td><td>Harmonic mean of precision and recall; a single number balancing the two.</td></tr>
+      <tr><td><strong>Support</strong></td><td>Number of true cases of a class in the test set — the denominator behind the percentages.</td></tr>
+      <tr><td><strong>Baseline</strong></td><td>The score achievable by a trivial rule. A model must beat it to be worth anything.</td></tr>
+      <tr><td><strong>Class imbalance</strong></td><td>One outcome vastly outnumbering others — as with any rare disease.</td></tr>
+      <tr><td><strong>Calibration</strong></td><td>Whether a stated 70% risk corresponds to the event occurring in 70% of such patients.</td></tr>
+      <tr><td><strong>Training / test split</strong></td><td>Holding data back to test on, so performance is not measured on cases already seen.</td></tr>
+      <tr><td><strong>External validation</strong></td><td>Testing on a different population or institution — the standard for real clinical claims.</td></tr>
+      <tr><td><strong>Gradient boosting</strong></td><td>Many simple decision trees in sequence, each correcting its predecessors' errors.</td></tr>
+      <tr><td><strong>Feature</strong></td><td>One input variable, e.g. eGFR or age.</td></tr>
+      <tr><td><strong>Hyperparameter</strong></td><td>A setting chosen before training, e.g. how many trees to build.</td></tr>
+      <tr><td><strong>Synthetic data</strong></td><td>Computer-generated records, not from real patients.</td></tr>
+      <tr><td><strong>Large language model</strong></td><td>A text-generating model. Fluent by construction; not a source of verified fact.</td></tr>
+      <tr><td><strong>Pharmacogenomics</strong></td><td>How inherited genetic variation alters drug response.</td></tr>
+      <tr><td><strong>CYP enzymes</strong></td><td>Cytochrome P450 — the main family metabolising most drugs.</td></tr>
+      <tr><td><strong>Poor metaboliser</strong></td><td>Reduced enzyme activity, so the drug accumulates at standard doses.</td></tr>
+      <tr><td><strong>HLA allele</strong></td><td>Immune system variant; specific alleles predict severe hypersensitivity to particular drugs.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="footnote">
+    <p style="margin:0">
+      <strong>PhenoRx Technical &amp; Methodological Overview</strong> · System version 2.1.0.
+      All performance figures in this document were taken from the repository's own artifacts
+      or measured directly from the shipped model; none are estimated. The model evaluated is
+      <code>models/adr_model.pkl</code>.
+    </p>
+    <p style="margin:6px 0 0">
+      This document describes a research and teaching prototype. It is not a clinical tool,
+      has no regulatory clearance, and must not be used in the care of any patient.
+    </p>
+  </div>
+</section>
+
+</body>
+</html>
