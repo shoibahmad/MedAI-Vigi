@@ -159,6 +159,27 @@ curl -s $BASE/sample_data/high_risk | jq .name             # "Harold Wilson"
 `/live` and `/ready` are also available for probes; the container's own
 `HEALTHCHECK` uses `/live`.
 
+### The model-id trap
+
+`/health` echoes the resolved `model` and `fallback_model`. Read them before
+blaming the key. NIM model ids carry a vendor prefix:
+
+```
+nvidia/nemotron-3-super-120b-a12b      correct
+nemotron-3-super-120b-a12b             404 on every call
+```
+
+Without the prefix the endpoint returns a bare `404 page not found`, the service
+falls through to the next model, and the symptom is simply that AI output is
+never generated. Since the value is usually typed by hand into the Render
+dashboard, this is easy to do and nothing else in the stack flags it - so the
+service now logs a warning at startup naming the corrected id.
+
+Note that a wrong prefix and a wrong key produce *different* errors, and a
+deployment can have both at once: a malformed id gives 404, a rejected key gives
+401. `configured: true` only means a non-empty string was supplied; it says
+nothing about whether NVIDIA accepts it.
+
 ### Diagnosing "the API key is not working"
 
 `/health` reports the AI service under `components.ai_service`. Make one AI call
@@ -169,7 +190,7 @@ populate once a call has been attempted:
 |---|---|---|
 | `offline_fallback_active` | No key reached the process. `configured: false`. | Set `NVIDIA_API_KEY` in the Render dashboard, then redeploy. A blueprint variable marked `sync: false` is prompted for, not set automatically. |
 | `configured_untested` | Key present, no call made yet. | Trigger an AI action and re-check. |
-| `error` | Key present but calls fail. `last_error` gives the reason. | **401 with a key you know is good: the process is stale.** The key is read once when `AIService` is constructed, so editing `.env` or the dashboard does nothing until Flask restarts. Restart, then retry. A 403 means the key is genuinely rejected; regenerate it. A 429 means credits or rate limit. A 503 is NVIDIA capacity - retry. |
+| `error` | Key present but calls fail. `last_error` gives the reason. Check `model` and `fallback_model` in the same output first - see the model-id trap below. | **401 with a key you know is good: the process is stale.** The key is read once when `AIService` is constructed, so editing `.env` or the dashboard does nothing until Flask restarts. Restart, then retry. A 403 means the key is genuinely rejected; regenerate it. A 429 means credits or rate limit. A 503 is NVIDIA capacity - retry. |
 | `connected` | Working. `last_success_at` shows when. | - |
 
 The key never appears in this output, and it is never logged.

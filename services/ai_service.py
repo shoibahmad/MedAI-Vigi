@@ -93,6 +93,30 @@ class AIService:
             cls._instance = cls(api_key=api_key, model_name=model_name)
         return cls._instance
 
+    def _warn_on_malformed_model_ids(self) -> None:
+        """
+        Catch model ids that are missing their vendor prefix.
+
+        NIM model ids are "<vendor>/<model>", e.g. nvidia/nemotron-3-super-120b-a12b.
+        Drop the prefix and the endpoint returns a bare 404 "page not found" on every
+        single call, which surfaces as the AI silently serving deterministic output.
+        Worth a loud warning at startup: the value is almost always typed by hand
+        into a dashboard, and nothing else in the stack will tell you it is wrong.
+        """
+        for label, value in (
+            ("NVIDIA_MODEL_NAME", self.model_name),
+            ("NVIDIA_FALLBACK_MODEL", self.fallback_model),
+        ):
+            if value and "/" not in value:
+                logger.warning(
+                    "%s=%r has no vendor prefix. NIM model ids look like "
+                    "'nvidia/%s'. As configured, every call to this model will "
+                    "return 404 and the service will fall through to the next one.",
+                    label,
+                    value,
+                    value,
+                )
+
     def _initialize_client(self) -> None:
         """Initialize the OpenAI-compatible client without logging any secret."""
         if not self.api_key:
@@ -114,6 +138,7 @@ class AIService:
                 # fallback model is tried, and the fallback IS the retry here.
                 max_retries=0,
             )
+            self._warn_on_malformed_model_ids()
             logger.info("NVIDIA NIM client initialized (model=%s).", self.model_name)
         except Exception as e:
             logger.warning(
