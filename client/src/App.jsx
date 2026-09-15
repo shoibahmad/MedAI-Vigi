@@ -1,10 +1,14 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useCallback, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
 import { AssessmentProvider } from '@/context/AssessmentContext'
 import { AppShell } from '@/components/layout/AppShell'
+import { SplashScreen } from '@/components/layout/SplashScreen'
+import { Walkthrough } from '@/components/layout/Walkthrough'
+import { shouldShowSplash, shouldShowWalkthrough } from '@/lib/onboarding'
+import { WalkthroughContext } from '@/context/WalkthroughContext'
 import { LEGACY_URL_ALIASES } from '@/lib/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -52,42 +56,65 @@ function RouteFallback() {
 }
 
 export default function App() {
+  // Decided once, synchronously, so the app never flashes before the splash.
+  const [showSplash, setShowSplash] = useState(shouldShowSplash)
+  // Derived at mount rather than in an effect: a returning visitor, or one who
+  // asked for reduced motion, gets no splash but should still see the tour.
+  const [showTour, setShowTour] = useState(() => !shouldShowSplash() && shouldShowWalkthrough())
+
+  const openWalkthrough = useCallback(() => setShowTour(true), [])
+
+  // The tour opens as the splash closes rather than from an effect watching it,
+  // which would be a synchronous setState inside an effect.
+  const dismissSplash = useCallback(() => {
+    setShowSplash(false)
+    if (shouldShowWalkthrough()) setShowTour(true)
+  }, [])
+
+  if (showSplash) return <SplashScreen onDone={dismissSplash} />
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider delayDuration={200}>
         <AssessmentProvider>
-          <BrowserRouter>
-            <Suspense fallback={<RouteFallback />}>
-              <Routes>
-                <Route element={<AppShell />}>
-                  <Route path="/" element={<Landing />} />
-                  <Route path="/patient-details" element={<PatientDetails />} />
-                  <Route path="/assessment" element={<Assessment />} />
-                  <Route path="/report" element={<Report />} />
-                  <Route path="/drug-interactions" element={<DrugInteractions />} />
-                  <Route path="/clinical-decision-support" element={<ClinicalDecisionSupport />} />
-                  <Route path="/patient-counselling" element={<Counselling />} />
-                  <Route path="/chatbot" element={<Chatbot />} />
-                  <Route path="/methodology" element={<Methodology />} />
+          <WalkthroughContext.Provider value={openWalkthrough}>
+            <BrowserRouter>
+              <Suspense fallback={<RouteFallback />}>
+                <Routes>
+                  <Route element={<AppShell />}>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/patient-details" element={<PatientDetails />} />
+                    <Route path="/assessment" element={<Assessment />} />
+                    <Route path="/report" element={<Report />} />
+                    <Route path="/drug-interactions" element={<DrugInteractions />} />
+                    <Route
+                      path="/clinical-decision-support"
+                      element={<ClinicalDecisionSupport />}
+                    />
+                    <Route path="/patient-counselling" element={<Counselling />} />
+                    <Route path="/chatbot" element={<Chatbot />} />
+                    <Route path="/methodology" element={<Methodology />} />
 
-                  <Route path="/about" element={<About />} />
-                  <Route path="/documentation" element={<Documentation />} />
-                  <Route path="/api-reference" element={<ApiReference />} />
-                  <Route path="/research-papers" element={<ResearchPapers />} />
-                  <Route path="/faqs" element={<Faqs />} />
-                  <Route path="/privacy-policy" element={<Privacy />} />
-                  <Route path="/terms-of-service" element={<Terms />} />
-                  <Route path="/cookie-policy" element={<Cookies />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/documentation" element={<Documentation />} />
+                    <Route path="/api-reference" element={<ApiReference />} />
+                    <Route path="/research-papers" element={<ResearchPapers />} />
+                    <Route path="/faqs" element={<Faqs />} />
+                    <Route path="/privacy-policy" element={<Privacy />} />
+                    <Route path="/terms-of-service" element={<Terms />} />
+                    <Route path="/cookie-policy" element={<Cookies />} />
 
-                  {/* The Jinja pages used underscores; keep those URLs working. */}
-                  {LEGACY_URL_ALIASES.map(({ from, to }) => (
-                    <Route key={from} path={from} element={<Navigate to={to} replace />} />
-                  ))}
-                  <Route path="*" element={<NotFound />} />
-                </Route>
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
+                    {/* The Jinja pages used underscores; keep those URLs working. */}
+                    {LEGACY_URL_ALIASES.map(({ from, to }) => (
+                      <Route key={from} path={from} element={<Navigate to={to} replace />} />
+                    ))}
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
+                </Routes>
+              </Suspense>
+              <Walkthrough open={showTour} onClose={() => setShowTour(false)} />
+            </BrowserRouter>
+          </WalkthroughContext.Provider>
           <Toaster position="top-right" richColors />
         </AssessmentProvider>
       </TooltipProvider>

@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
-import { Activity } from 'lucide-react'
+import { Activity, Compass } from 'lucide-react'
 import { CONTENT_LINKS, LEGAL_LINKS, NAV_ITEMS } from '@/lib/navigation'
+import { useWalkthrough } from '@/context/WalkthroughContext'
 
 export function Footer() {
+  const openWalkthrough = useWalkthrough()
+
   return (
     <footer className="no-print mt-auto border-t bg-card">
       <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6">
@@ -39,6 +42,16 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold">Resources</h3>
             <ul className="mt-3 space-y-2">
+              <li>
+                <button
+                  type="button"
+                  onClick={openWalkthrough}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Compass className="size-3.5" />
+                  Take the tour
+                </button>
+              </li>
               {CONTENT_LINKS.map(({ to, label }) => (
                 <li key={to}>
                   <Link
