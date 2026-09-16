@@ -1,16 +1,16 @@
 {
   "metrics": {
-    "accuracy": 0.5,
-    "f1_score": 0.4103,
-    "precision": 0.3553,
-    "recall": 0.5
+    "accuracy": 0.735,
+    "f1_score": 0.6632,
+    "precision": 0.6435,
+    "recall": 0.735
   },
   "classification_report": {
     "Acute Kidney Injury": {
-      "precision": 0.15384615384615385,
-      "recall": 0.25,
-      "f1-score": 0.19047619047619047,
-      "support": 8.0
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 4.0
     },
     "Bleeding/Hemorrhage": {
       "precision": 0.0,
@@ -22,43 +22,43 @@
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
-      "support": 10.0
+      "support": 2.0
     },
     "Cardiovascular Event (Arrhythmia)": {
-      "precision": 0.5416666666666666,
-      "recall": 0.7428571428571429,
-      "f1-score": 0.6265060240963856,
-      "support": 35.0
-    },
-    "Cholestasis": {
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
       "support": 4.0
     },
+    "Cholestasis": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 0.0
+    },
     "Confusion/Delirium": {
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
-      "support": 1.0
+      "support": 2.0
     },
     "Drug-Drug Interaction": {
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
-      "support": 5.0
+      "support": 3.0
     },
     "Electrolyte Imbalance": {
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
-      "support": 5.0
+      "support": 1.0
     },
     "Elevated Liver Enzymes": {
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
-      "support": 6.0
+      "support": 4.0
     },
     "Fatigue/Weakness": {
       "precision": 0.0,
@@ -67,70 +67,58 @@
       "support": 4.0
     },
     "Gastrointestinal (Nausea/Vomiting)": {
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1-score": 0.0,
-      "support": 13.0
+      "precision": 1.0,
+      "recall": 0.1,
+      "f1-score": 0.18181818181818182,
+      "support": 10.0
     },
     "Headache/Dizziness": {
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
-      "support": 2.0
+      "support": 4.0
     },
     "Hepatotoxicity": {
-      "precision": 0.42857142857142855,
-      "recall": 0.75,
-      "f1-score": 0.5454545454545454,
-      "support": 8.0
+      "precision": 0.5,
+      "recall": 0.8571428571428571,
+      "f1-score": 0.631578947368421,
+      "support": 7.0
     },
     "Hypersensitivity": {
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
-      "support": 0.0
-    },
-    "Nephrotoxicity": {
-      "precision": 0.4666666666666667,
-      "recall": 0.4375,
-      "f1-score": 0.45161290322580644,
-      "support": 16.0
-    },
-    "No ADR": {
-      "precision": 0.611764705882353,
-      "recall": 1.0,
-      "f1-score": 0.7591240875912408,
-      "support": 52.0
-    },
-    "QT Prolongation": {
-      "precision": 0.3888888888888889,
-      "recall": 0.3333333333333333,
-      "f1-score": 0.358974358974359,
-      "support": 21.0
-    },
-    "Rash": {
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1-score": 0.0,
-      "support": 6.0
-    },
-    "Severe Cutaneous Reaction (SJS/TEN)": {
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1-score": 0.0,
       "support": 1.0
     },
-    "accuracy": 0.5,
+    "Nephrotoxicity": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 3.0
+    },
+    "No ADR": {
+      "precision": 0.8,
+      "recall": 0.9722222222222222,
+      "f1-score": 0.877742946708464,
+      "support": 144.0
+    },
+    "QT Prolongation": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 4.0
+    },
+    "accuracy": 0.735,
     "macro avg": {
-      "precision": 0.13638971108011355,
-      "recall": 0.18493107769423558,
-      "f1-score": 0.15432358472729094,
+      "precision": 0.13529411764705881,
+      "recall": 0.11349206349206349,
+      "f1-score": 0.09947882799382746,
       "support": 200.0
     },
     "weighted avg": {
-      "precision": 0.3553138601594484,
-      "recall": 0.5,
-      "f1-score": 0.41026938637819166,
+      "precision": 0.6435,
+      "recall": 0.735,
+      "f1-score": 0.6631710938788978,
       "support": 200.0
     }
   }

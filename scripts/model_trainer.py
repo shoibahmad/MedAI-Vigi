@@ -128,6 +128,13 @@ def train_and_save_model(
         remainder="passthrough",
     )
 
+    # Early stopping carves off a stratified validation slice internally, which
+    # raises if any class has fewer than two members. That is never true of a
+    # real cohort but is easy to hit on a small fixture, so it is switched off
+    # when the data cannot support it rather than letting training crash.
+    rarest_class = int(y.value_counts().min()) if len(y) else 0
+    can_early_stop = len(y) >= 1000 and rarest_class >= 2
+
     model = Pipeline(
         steps=[
             ("preprocessor", preprocessor),
@@ -140,14 +147,14 @@ def train_and_save_model(
                     l2_regularization=cfg.get("l2_regularization", 0.3),
                     max_leaf_nodes=31,
                     min_samples_leaf=10,
-                    early_stopping=True,
+                    early_stopping=can_early_stop,
                     validation_fraction=0.1,
                     n_iter_no_change=25,
                     # Measured on the 50k cohort: "balanced" scored 42.9% against
-                    # 53.0% unweighted, while balanced accuracy was unchanged
-                    # (29.9% vs 28.8%) - it cost 10 points of accuracy and bought
-                    # almost nothing. Set NVIDIA-style overrides via ml_config.yaml
-                    # if a future cohort behaves differently.
+                    # 53.0% unweighted while balanced accuracy was unchanged
+                    # (29.9% vs 28.8%) - ten points of accuracy for nothing.
+                    # Override through ml_config.yaml if a cohort behaves
+                    # differently.
                     class_weight=cfg.get("class_weight") or None,
                     random_state=seed,
                     verbose=0,

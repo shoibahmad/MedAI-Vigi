@@ -148,76 +148,117 @@ def generate_synthetic_data(
     data["prior_adr_history"] = np.random.choice([0, 1], n_samples, p=[0.88, 0.12])
     data["polypharmacy_flag"] = (data["concomitant_drugs_count"] >= 5).astype(int)
 
-    # Risk Label Scoring
+    # ----------------------------------------------------------- risk model
+    #
+    # Each patient's reaction risk is a continuous function of their clinical
+    # picture, not a lookup from a handful of categories.
+    #
+    # Two earlier designs both failed, in opposite directions:
+    #
+    #   Deterministic branches - matching the renal condition guaranteed a
+    #   reaction. A model trained on that learns P(ADR | CKD) = 1.0 and reports
+    #   ~100% risk for anyone with any comorbidity. Useless at the bedside,
+    #   because almost every patient being assessed has something.
+    #
+    #   Branches with a fixed incidence - clinically plausible, but only seven
+    #   distinct risk values existed across the whole cohort, so every CKD
+    #   patient looked identical regardless of eGFR, age or regimen. That caps
+    #   discrimination at roughly AUC 0.72 no matter how good the model is.
+    #
+    # A log-odds sum over the individual risk factors fixes both: risk rises
+    # smoothly with severity, two patients sharing a diagnosis differ according
+    # to everything else about them, and the overall reaction rate stays in a
+    # plausible range. Coefficients are ordered to reflect the relative weight
+    # clinical pharmacology gives each factor - HLA-linked hypersensitivity and
+    # anticoagulation with a poor-metaboliser genotype dominate, background
+    # exposure contributes least - but they are illustrative, not fitted to any
+    # real cohort.
     df = pd.DataFrame(data)
     adr_labels = []
 
+    def _num(value, default=0.0):
+        try:
+            v = float(value)
+            return default if np.isnan(v) else v
+        except (TypeError, ValueError):
+            return default
+
+    NEPHROTOXIC = {"Vancomycin", "Gentamicin", "Ibuprofen", "Lisinopril"}
+    HEPATOTOXIC = {"Simvastatin", "Amiodarone", "Methotrexate", "Isoniazid"}
+
     for _, r in df.iterrows():
-        if (
-            r["liver_disease"] == 1
-            or r["ast_alt"] > 120
-            or (r["medication_name"] == "Simvastatin" and r["slco1b1_genotype"] == "*5/*5")
-        ):
-            adr_labels.append(
-                np.random.choice(
-                    ["Hepatotoxicity", "Elevated Liver Enzymes", "Cholestasis"], p=[0.6, 0.3, 0.1]
-                )
-            )
-        elif r["ckd"] == 1 or r["creatinine"] > 2.0:
-            adr_labels.append(
-                np.random.choice(
-                    ["Nephrotoxicity", "Acute Kidney Injury", "Electrolyte Imbalance"],
-                    p=[0.5, 0.3, 0.2],
-                )
-            )
-        elif (
-            r["cardiac_disease"] == 1
-            or r["qt_prolonging_flag"] == 1
-            or r["medication_name"] == "Amiodarone"
-        ):
-            adr_labels.append(
-                np.random.choice(
-                    ["Cardiovascular Event (Arrhythmia)", "QT Prolongation", "Bradycardia"],
-                    p=[0.5, 0.3, 0.2],
-                )
-            )
-        elif r["medication_name"] == "Warfarin" and (
-            r["cyp2c9"] == "Poor" or r["prior_adr_history"] == 1
-        ):
-            adr_labels.append(
-                np.random.choice(["Bleeding/Hemorrhage", "Bruising/Petechiae"], p=[0.7, 0.3])
-            )
-        elif r["hla_risk_allele_flag"] == 1:
-            adr_labels.append(
-                np.random.choice(
-                    ["Severe Cutaneous Reaction (SJS/TEN)", "Hypersensitivity", "Rash"],
-                    p=[0.4, 0.3, 0.3],
-                )
-            )
-        elif r["polypharmacy_flag"] == 1 and np.random.rand() < 0.35:
-            adr_labels.append(
-                np.random.choice(
-                    [
-                        "Drug-Drug Interaction",
-                        "Gastrointestinal (Nausea/Vomiting)",
-                        "Confusion/Delirium",
-                    ],
-                    p=[0.4, 0.4, 0.2],
-                )
-            )
-        elif np.random.rand() < 0.25:
-            adr_labels.append(
-                np.random.choice(
-                    [
-                        "Gastrointestinal (Nausea/Vomiting)",
-                        "Rash",
-                        "Headache/Dizziness",
-                        "Fatigue/Weakness",
-                    ]
-                )
-            )
-        else:
+        age = _num(r.get("age"), 50.0)
+        egfr = _num(r.get("egfr"), 90.0)
+        ast = _num(r.get("ast_alt"), 25.0)
+        bili = _num(r.get("bilirubin"), 0.8)
+        alb = _num(r.get("albumin"), 4.2)
+        ndrugs = _num(r.get("concomitant_drugs_count"), 0.0)
+        drug = r.get("medication_name", "")
+
+        ckd = int(_num(r.get("ckd")))
+        liver = int(_num(r.get("liver_disease")))
+        cardiac = int(_num(r.get("cardiac_disease")))
+        diabetes = int(_num(r.get("diabetes")))
+        hla = int(_num(r.get("hla_risk_allele_flag")))
+        prior = int(_num(r.get("prior_adr_history")))
+        qt = int(_num(r.get("qt_prolonging_flag")))
+        cyp2c9_poor = r.get("cyp2c9") == "Poor"
+        cyp2d6_poor = r.get("cyp2d6") == "Poor"
+
+        # Organ-system pressures, each graded by how deranged the patient is.
+        renal = 0.50 * ckd + 1.15 * max(0.0, (60.0 - egfr) / 30.0)
+        hepatic = 0.55 * liver + 0.85 * max(0.0, (ast - 40.0) / 60.0) \
+            + 0.35 * max(0.0, (bili - 1.2) / 1.5) + 0.30 * max(0.0, (3.5 - alb) / 1.0)
+        cardio = 0.55 * cardiac + 0.60 * qt
+        immune = 1.45 * hla
+        haem = 0.85 * (cyp2c9_poor and drug == "Warfarin") + 0.40 * (drug == "Warfarin")
+        general = 0.13 * ndrugs + 0.019 * (age - 50.0) + 0.25 * diabetes \
+            + 0.55 * prior + 0.45 * cyp2c9_poor + 0.30 * cyp2d6_poor
+
+        # Drug-organ interactions: a nephrotoxic agent matters far more in a
+        # kidney that is already struggling.
+        if drug in NEPHROTOXIC:
+            renal += 0.35 + 0.55 * max(0.0, (60.0 - egfr) / 30.0)
+        if drug in HEPATOTOXIC:
+            hepatic += 0.35 + 0.45 * liver
+
+        logit = -3.15 + renal + hepatic + cardio + immune + haem + general
+        p_adr = 1.0 / (1.0 + np.exp(-logit))
+
+        if np.random.rand() >= p_adr:
             adr_labels.append("No ADR")
+            continue
+
+        # Which reaction: the organ system under most pressure is most likely,
+        # so the type is learnable from the same features that drove the risk.
+        systems = {
+            "renal": renal,
+            "hepatic": hepatic,
+            "cardio": cardio,
+            "immune": immune,
+            "haem": haem,
+            "general": 0.35 + 0.10 * ndrugs,
+        }
+        weights = np.array([max(v, 0.02) for v in systems.values()], dtype=float)
+        weights = weights / weights.sum()
+        system = np.random.choice(list(systems), p=weights)
+
+        REACTIONS = {
+            "renal": (["Nephrotoxicity", "Acute Kidney Injury", "Electrolyte Imbalance"],
+                      [0.5, 0.3, 0.2]),
+            "hepatic": (["Hepatotoxicity", "Elevated Liver Enzymes", "Cholestasis"],
+                        [0.6, 0.3, 0.1]),
+            "cardio": (["Cardiovascular Event (Arrhythmia)", "QT Prolongation", "Bradycardia"],
+                       [0.5, 0.3, 0.2]),
+            "immune": (["Severe Cutaneous Reaction (SJS/TEN)", "Hypersensitivity", "Rash"],
+                       [0.4, 0.3, 0.3]),
+            "haem": (["Bleeding/Hemorrhage", "Bruising/Petechiae"], [0.7, 0.3]),
+            "general": (["Gastrointestinal (Nausea/Vomiting)", "Headache/Dizziness",
+                         "Fatigue/Weakness", "Drug-Drug Interaction", "Confusion/Delirium"],
+                        [0.35, 0.22, 0.18, 0.15, 0.10]),
+        }
+        types, mix = REACTIONS[system]
+        adr_labels.append(np.random.choice(types, p=mix))
 
     df["adr_risk_label"] = adr_labels
     df["adr_outcome"] = (df["adr_risk_label"] != "No ADR").astype(int)
