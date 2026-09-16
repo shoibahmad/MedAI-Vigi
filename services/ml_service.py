@@ -68,7 +68,12 @@ class MLService:
             "sex": patient_data.get("sex", "M"),
             "ethnicity": patient_data.get("ethnicity", "Asian"),
             "bmi": patient_data.get("bmi", 24.0),
+            # The training cohort names this column height_cm, so the model's
+            # ColumnTransformer looks for that exact name. The API and the form
+            # both use "height", so emit both: the alias keeps the payload
+            # contract unchanged while satisfying the fitted transformer.
             "height": patient_data.get("height", 170.0),
+            "height_cm": patient_data.get("height", 170.0),
             "weight": patient_data.get("weight", 70.0),
             "creatinine": patient_data.get("creatinine", 1.0),
             "egfr": patient_data.get("egfr", 90.0),

@@ -2,11 +2,14 @@
   "name": "phenorx",
   "version": "2.2.0",
   "description": "Adverse Drug Reaction (ADR) Risk Prediction Service",
-  "main": "static/js/script.js",
   "type": "module",
   "scripts": {
     "test": "node --test tests/js/*.test.js",
-    "test:coverage": "node --test --experimental-test-coverage tests/js/*.test.js"
+    "test:coverage": "node --test --experimental-test-coverage tests/js/*.test.js",
+    "docs:pdf": "node scripts/build_docs_pdf.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.0.0"
   },
   "keywords": [
     "adr",

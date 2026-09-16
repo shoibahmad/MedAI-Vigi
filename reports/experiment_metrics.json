@@ -1,15 +1,15 @@
 {
   "metrics": {
-    "accuracy": 0.45,
-    "f1_score": 0.4065,
-    "precision": 0.3746,
-    "recall": 0.45
+    "accuracy": 0.5,
+    "f1_score": 0.4103,
+    "precision": 0.3553,
+    "recall": 0.5
   },
   "classification_report": {
     "Acute Kidney Injury": {
-      "precision": 0.18181818181818182,
+      "precision": 0.15384615384615385,
       "recall": 0.25,
-      "f1-score": 0.21052631578947367,
+      "f1-score": 0.19047619047619047,
       "support": 8.0
     },
     "Bleeding/Hemorrhage": {
@@ -19,15 +19,15 @@
       "support": 3.0
     },
     "Bradycardia": {
-      "precision": 0.16666666666666666,
-      "recall": 0.1,
-      "f1-score": 0.125,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
       "support": 10.0
     },
     "Cardiovascular Event (Arrhythmia)": {
-      "precision": 0.5384615384615384,
-      "recall": 0.6,
-      "f1-score": 0.5675675675675675,
+      "precision": 0.5416666666666666,
+      "recall": 0.7428571428571429,
+      "f1-score": 0.6265060240963856,
       "support": 35.0
     },
     "Cholestasis": {
@@ -79,9 +79,9 @@
       "support": 2.0
     },
     "Hepatotoxicity": {
-      "precision": 0.36363636363636365,
-      "recall": 0.5,
-      "f1-score": 0.42105263157894735,
+      "precision": 0.42857142857142855,
+      "recall": 0.75,
+      "f1-score": 0.5454545454545454,
       "support": 8.0
     },
     "Hypersensitivity": {
@@ -91,21 +91,21 @@
       "support": 0.0
     },
     "Nephrotoxicity": {
-      "precision": 0.47058823529411764,
-      "recall": 0.5,
-      "f1-score": 0.48484848484848486,
+      "precision": 0.4666666666666667,
+      "recall": 0.4375,
+      "f1-score": 0.45161290322580644,
       "support": 16.0
     },
     "No ADR": {
-      "precision": 0.6571428571428571,
-      "recall": 0.8846153846153846,
-      "f1-score": 0.7540983606557377,
+      "precision": 0.611764705882353,
+      "recall": 1.0,
+      "f1-score": 0.7591240875912408,
       "support": 52.0
     },
     "QT Prolongation": {
-      "precision": 0.35,
+      "precision": 0.3888888888888889,
       "recall": 0.3333333333333333,
-      "f1-score": 0.34146341463414637,
+      "f1-score": 0.358974358974359,
       "support": 21.0
     },
     "Rash": {
@@ -115,22 +115,22 @@
       "support": 6.0
     },
     "Severe Cutaneous Reaction (SJS/TEN)": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
       "support": 1.0
     },
-    "accuracy": 0.45,
+    "accuracy": 0.5,
     "macro avg": {
-      "precision": 0.19622704436945923,
-      "recall": 0.21936572199730095,
-      "f1-score": 0.2055029881618083,
+      "precision": 0.13638971108011355,
+      "recall": 0.18493107769423558,
+      "f1-score": 0.15432358472729094,
       "support": 200.0
     },
     "weighted avg": {
-      "precision": 0.37463648606295663,
-      "recall": 0.45,
-      "f1-score": 0.4065445933140171,
+      "precision": 0.3553138601594484,
+      "recall": 0.5,
+      "f1-score": 0.41026938637819166,
       "support": 200.0
     }
   }
