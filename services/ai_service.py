@@ -15,6 +15,7 @@ Two layers of resilience, because the hosted models are not always available:
    unavailable third party.
 """
 
+import itertools
 import json
 import logging
 import hashlib
@@ -406,23 +407,58 @@ Evaluating Clinician: {clinician_name}
             "fallback_reason": "No model returned a completion.",
         }
 
+    #: Severity labels the interaction graph knows how to colour. Anything the
+    #: model returns outside this set is normalised to "Moderate" rather than
+    #: dropped, so an unexpected word cannot make an edge vanish from the diagram.
+    INTERACTION_SEVERITIES = ("Contraindicated", "Major", "Moderate", "Minor")
+
     def analyze_drug_interactions(
         self, drugs: List[str], patient_data: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Evaluate multi-drug interactions."""
-        prompt = f"""
-As a Clinical Pharmacologist, analyze potential drug-drug interactions for:
-Medications: {", ".join(drugs)}
-Patient Context: {patient_data if patient_data else "Standard adult"}
+        """
+        Evaluate multi-drug interactions, pair by pair.
 
-Return a concise summary with severity and clinical management actions.
+        Returns structured pairs rather than only prose: the interaction page
+        draws a network diagram, and a graph needs to know which two drugs an
+        edge joins and how severe it is. The narrative is still produced, as a
+        second field, because the pairs alone do not explain the regimen as a
+        whole.
+        """
+        roster = ", ".join(drugs)
+        prompt = f"""As a Clinical Pharmacologist, analyse drug-drug interactions for this regimen.
+
+Medications: {roster}
+Patient context: {patient_data if patient_data else "Standard adult"}
+
+Return JSON of exactly this shape:
+{{
+  "interactions": [
+    {{
+      "drugs": ["<drug A>", "<drug B>"],
+      "severity": "Contraindicated" | "Major" | "Moderate" | "Minor",
+      "mechanism": "<how the interaction arises, one sentence>",
+      "effect": "<clinical consequence for this patient, one sentence>",
+      "management": "<what to do about it, one sentence>"
+    }}
+  ],
+  "summary": "<markdown overview of the regimen as a whole>"
+}}
+
+Rules:
+- Each entry names EXACTLY TWO drugs, both taken verbatim from the list above.
+- One entry per interacting pair. Omit pairs that do not interact.
+- Return an empty interactions array if no pair interacts.
 """
-        text = self._complete(prompt, max_tokens=2048)
+        parsed = self._generate_json(prompt)
+        interactions = self._normalise_interactions(parsed, drugs) if parsed else None
 
-        if text:
+        if interactions is not None:
+            summary = (parsed or {}).get("summary") or ""
             return {
-                "raw_response": text,
-                "interactions_found": len(drugs) > 1,
+                "interactions": interactions,
+                "summary": summary,
+                "raw_response": summary,
+                "interactions_found": bool(interactions),
                 "ai_generated": True,
                 "model": self.last_model_used,
             }
@@ -432,19 +468,93 @@ Return a concise summary with severity and clinical management actions.
             "severity": "Moderate" if len(drugs) > 2 else "Low",
             "interactions": [
                 {
-                    "drugs_involved": drugs[:2] if len(drugs) >= 2 else drugs,
+                    "drugs": list(pair),
+                    "drugs_involved": list(pair),
                     "severity": "Moderate",
                     "mechanism": (
                         "Potential competitive CYP enzyme metabolism or additive "
                         "pharmacodynamic effect."
                     ),
+                    "effect": "Exposure to either agent may be altered.",
+                    "management": (
+                        "Monitor clinical response and relevant laboratory parameters regularly."
+                    ),
                     "clinical_management": (
                         "Monitor clinical response and relevant laboratory parameters regularly."
                     ),
                 }
+                for pair in itertools.combinations(drugs[:4], 2)
             ],
             "ai_generated": False,
         }
+
+    @classmethod
+    def _normalise_interactions(
+        cls, parsed: Any, drugs: List[str]
+    ) -> Optional[List[Dict[str, Any]]]:
+        """
+        Coerce the model's interaction list into something the graph can draw.
+
+        A diagram is less forgiving than prose: an edge naming a drug that is not
+        on the canvas has nowhere to attach, and a severity outside the known set
+        has no colour. Names are matched back to the caller's spelling
+        case-insensitively, pairs that cannot be resolved to two distinct drugs
+        from the regimen are dropped, and duplicates of the same pair collapse.
+        Returns None when the payload is not the expected shape at all, so the
+        caller can fall back.
+        """
+        if not isinstance(parsed, dict):
+            return None
+        raw = parsed.get("interactions")
+        if not isinstance(raw, list):
+            return None
+
+        canonical = {d.strip().lower(): d for d in drugs if isinstance(d, str)}
+        seen: set = set()
+        out: List[Dict[str, Any]] = []
+
+        for entry in raw:
+            if not isinstance(entry, dict):
+                continue
+            names = entry.get("drugs") or entry.get("drugs_involved") or []
+            if not isinstance(names, list):
+                continue
+            resolved = []
+            for name in names:
+                key = str(name).strip().lower()
+                if key in canonical and canonical[key] not in resolved:
+                    resolved.append(canonical[key])
+            if len(resolved) < 2:
+                continue
+
+            severity = str(entry.get("severity", "")).strip().title()
+            if severity not in cls.INTERACTION_SEVERITIES:
+                severity = "Moderate"
+
+            management = entry.get("management") or entry.get("clinical_management") or ""
+
+            # The prompt asks for pairs, but a model will occasionally describe a
+            # three-way interaction. Drawing that as a triangle keeps the warning
+            # visible; discarding it because it has one drug too many would not.
+            for pair in itertools.combinations(resolved, 2):
+                key = tuple(sorted(pair))
+                if key in seen:
+                    continue
+                seen.add(key)
+                out.append(
+                    {
+                        "drugs": list(pair),
+                        "drugs_involved": list(pair),
+                        "severity": severity,
+                        "mechanism": entry.get("mechanism", ""),
+                        "effect": entry.get("effect", ""),
+                        "management": management,
+                        "clinical_management": management,
+                        "group": resolved if len(resolved) > 2 else None,
+                    }
+                )
+
+        return out
 
     def generate_drug_insights(
         self,

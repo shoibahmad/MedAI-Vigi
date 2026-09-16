@@ -12,6 +12,7 @@ import { useAssessment } from '@/context/AssessmentContext'
 import { useDrugInteractions } from '@/hooks/useApi'
 import { MEDICATION_DATABASE, MEDICATION_NAMES } from '@/lib/dosing'
 import { AnalysisOverlay } from '@/components/clinical/AnalysisOverlay'
+import { InteractionGraph } from '@/components/clinical/InteractionGraph'
 import { Markdown } from '@/components/clinical/Markdown'
 import { cn } from '@/lib/utils'
 
@@ -177,6 +178,11 @@ export default function DrugInteractions() {
 
         {result ? (
           <div className="mt-6 space-y-4">
+            {/* The diagram goes first: which drugs conflict, and how badly, is
+                the question a clinician opens this page with. The cards below
+                answer "why" once the picture has shown them where to look. */}
+            <InteractionGraph drugs={drugs} interactions={interactions} />
+
             {interactions.length > 0 ? (
               interactions.map((item, index) => (
                 <article key={index} className="rounded-xl border bg-card p-5">

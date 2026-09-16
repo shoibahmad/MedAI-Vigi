@@ -352,3 +352,86 @@ def test_attempt_timeout_never_exceeds_remaining_budget() -> None:
 
     used = service._stub.timeouts_used[0]  # type: ignore[attr-defined]
     assert used <= 45.0, f"attempt got {used}s against a 45s budget"
+
+
+# ------------------------------------------------- interaction normalisation
+
+
+def test_interaction_pairs_resolve_case_insensitively() -> None:
+    """The model echoes drug names back in its own casing; match them anyway."""
+    payload = {"interactions": [{"drugs": ["warfarin", "ASPIRIN"], "severity": "Major"}]}
+    result = AIService._normalise_interactions(payload, ["Warfarin", "Aspirin"])
+
+    assert result is not None
+    assert result[0]["drugs"] == ["Warfarin", "Aspirin"], "must use the caller's spelling"
+
+
+def test_interaction_naming_a_drug_not_in_the_regimen_is_dropped() -> None:
+    """An edge needs two nodes on the canvas; one that is absent has nowhere to attach."""
+    payload = {"interactions": [{"drugs": ["Warfarin", "Penicillin"], "severity": "Major"}]}
+    assert AIService._normalise_interactions(payload, ["Warfarin", "Aspirin"]) == []
+
+
+def test_three_way_interaction_becomes_a_triangle() -> None:
+    """
+    The prompt asks for pairs, but a model will sometimes describe three drugs at
+    once. Drawing that as three edges keeps the warning visible; dropping it for
+    having one drug too many would hide a real conflict.
+    """
+    payload = {
+        "interactions": [
+            {"drugs": ["Warfarin", "Aspirin", "Amiodarone"], "severity": "Major"}
+        ]
+    }
+    result = AIService._normalise_interactions(payload, ["Warfarin", "Aspirin", "Amiodarone"])
+
+    assert result is not None
+    assert len(result) == 3
+    assert {tuple(sorted(r["drugs"])) for r in result} == {
+        ("Aspirin", "Warfarin"),
+        ("Amiodarone", "Warfarin"),
+        ("Amiodarone", "Aspirin"),
+    }
+
+
+def test_duplicate_pairs_collapse() -> None:
+    """The same pair twice would draw two edges on top of each other."""
+    payload = {
+        "interactions": [
+            {"drugs": ["Warfarin", "Aspirin"], "severity": "Major"},
+            {"drugs": ["Aspirin", "Warfarin"], "severity": "Minor"},
+        ]
+    }
+    result = AIService._normalise_interactions(payload, ["Warfarin", "Aspirin"])
+    assert len(result) == 1
+
+
+def test_unknown_severity_becomes_moderate_rather_than_vanishing() -> None:
+    """An unexpected word must not silently remove an edge from the diagram."""
+    payload = {"interactions": [{"drugs": ["Warfarin", "Aspirin"], "severity": "Catastrophic"}]}
+    result = AIService._normalise_interactions(payload, ["Warfarin", "Aspirin"])
+
+    assert result[0]["severity"] == "Moderate"
+
+
+def test_malformed_payload_returns_none_so_the_caller_falls_back() -> None:
+    for payload in ({"foo": "bar"}, ["not a dict"], None, {"interactions": "not a list"}):
+        assert AIService._normalise_interactions(payload, ["Warfarin", "Aspirin"]) is None
+
+
+def test_no_interactions_is_a_result_not_a_failure() -> None:
+    """An empty list means "these drugs are fine together" - not "ask again"."""
+    assert AIService._normalise_interactions({"interactions": []}, ["Warfarin", "Aspirin"]) == []
+
+
+def test_offline_fallback_still_supplies_drawable_pairs() -> None:
+    """With no model available the graph should still have something to render."""
+    service = AIService(api_key="")
+    result = service.analyze_drug_interactions(["Warfarin", "Aspirin", "Amiodarone"])
+
+    assert result["ai_generated"] is False
+    pairs = result["interactions"]
+    assert pairs, "the diagram needs at least one pair offline"
+    for entry in pairs:
+        assert len(entry["drugs"]) == 2
+        assert entry["severity"]
